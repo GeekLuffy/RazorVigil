@@ -54,6 +54,7 @@ FEATURE_NAMES = [
     "bin_name_count",
     "ip_distinct_pan_count",
     "device_distinct_bin_count",
+    "device_distinct_ip_count",   # rotating proxy fanout signal
     "cvv_cycle_attempts",
     "cluster_risk_score",
 ]
@@ -98,6 +99,7 @@ def build_feature_vector(
         float(vel.bin_name_count),
         float(vel.ip_distinct_pan_count),
         float(vel.device_distinct_bin_count),
+        float(vel.device_distinct_ip_count),   # rotating proxy fanout
         float(vel.cvv_cycle_attempts),
         float(cluster_score),
     ]

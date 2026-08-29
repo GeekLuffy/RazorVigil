@@ -120,6 +120,7 @@ class CheckoutResponse(BaseModel):
     is_agent: bool = False
     agent_id: Optional[str] = None
     amount: Optional[float] = None
+    bin6: Optional[str] = None
     razorpay_order_id: Optional[str] = None
     razorpay_payment_link: Optional[str] = None
 
@@ -176,6 +177,7 @@ async def checkout(
                 latency_ms=round(latency_ms, 2),
                 explanation=f"Anti-Checker Sentinel: {bot_meta.get('defense', 'Automated')} — {bot_meta.get('detail', bot_reason)}. Deceptive honeypot issued.",
                 amount=req.amount,
+                bin6=req.bin6,
                 razorpay_order_id=None,
             )
             if ws_clients:
@@ -237,6 +239,8 @@ async def checkout(
             return response
 
         rzp_order = await razorpay_client.create_order(req.amount)
+        # Record agent in graph so Louvain can detect compromised agent rings
+        asyncio.create_task(cluster_engine.ingest(req))
         latency_ms = (time.perf_counter() - t0) * 1000
         response = CheckoutResponse(
             transaction_id=req.transaction_id,
@@ -248,6 +252,7 @@ async def checkout(
             is_agent=True,
             agent_id=attestation.agent_id,
             amount=req.amount,
+            bin6=req.bin6,
             razorpay_order_id=rzp_order.get("id"),
         )
         if ws_clients:
@@ -334,6 +339,7 @@ async def checkout(
         cluster_id=cluster_id,
         explanation=explanation,
         amount=req.amount,
+        bin6=req.bin6,
         razorpay_order_id=razorpay_order_id,
         razorpay_payment_link=razorpay_payment_link,
     )
@@ -376,11 +382,23 @@ async def get_canary_demo_hash(index: int = 1):
 async def razorpay_webhook(
     request: Request,
     x_razorpay_signature: Optional[str] = Header(default=None, alias="X-Razorpay-Signature"),
+    x_razorpay_event_id: Optional[str] = Header(default=None, alias="X-Razorpay-Event-Id"),
 ):
     raw_body = await request.body()
     if x_razorpay_signature:
         if not razorpay_client.verify_webhook_signature(raw_body, x_razorpay_signature):
             raise HTTPException(status_code=400, detail="Invalid Razorpay Webhook Signature")
+
+    # Idempotency guard: deduplicate retried webhook deliveries via event-id
+    # Research doc ref: Gemini §1.3 — "at-least-once delivery guarantee"
+    if x_razorpay_event_id:
+        idempotency_key = f"webhook:event:{x_razorpay_event_id}"
+        already_processed = await velocity_tracker.redis.set(
+            idempotency_key, "1", ex=86400, nx=True  # 24-hour TTL, set only if not exists
+        )
+        if already_processed is None:
+            # Key already existed — this is a duplicate delivery, return 200 immediately
+            return {"status": "duplicate", "event_id": x_razorpay_event_id}
 
     try:
         event_data = json.loads(raw_body.decode("utf-8"))
@@ -469,13 +487,10 @@ async def verify_payment(req: VerifyPaymentRequest):
 
 @app.post("/recovery/confirm")
 async def confirm_recovery(req: RecoveryConfirmRequest):
-    from jose import jwt, JWTError
-    try:
-        payload = jwt.decode(req.token, "razorshield-dev-secret-replace-in-prod", algorithms=["HS256"])
-        if payload.get("order_id") != req.order_id:
-            return {"status": "error", "message": "Order ID mismatch"}
-    except JWTError as e:
-        return {"status": "error", "message": f"Invalid token: {e}"}
+    # Validates JWT signature, expiry, and the 5-minute Redis inventory hold atomically
+    is_valid = await recovery_stub.validate_token(req.token, req.order_id)
+    if not is_valid:
+        return {"status": "error", "message": "Recovery token invalid, expired, or order hold released."}
 
     await _broadcast({
         "type": "recovery_completed",

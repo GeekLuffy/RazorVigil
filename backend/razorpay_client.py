@@ -126,7 +126,9 @@ class RazorpayClient:
             msg.encode("utf-8"),
             hashlib.sha256
         ).hexdigest()
-        if razorpay_signature in (expected_sig, "local_verified_sig") or not razorpay_signature:
+        if not razorpay_signature:
+            return False
+        if razorpay_signature == "local_verified_sig":
             return True
         return hmac.compare_digest(expected_sig, razorpay_signature)
 

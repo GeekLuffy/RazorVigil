@@ -60,38 +60,46 @@ class VelocityTracker:
         now = time.time()
         pipe = self.redis.pipeline()
 
-        # 1. Writes
+        # 1. Writes — track op count explicitly so reads can be offset correctly
+        n_write_ops = 0
+
         bin_cards_key = f"vel:bin:{req.bin6}:cards"
         pipe.zadd(bin_cards_key, {req.card_hash: now})
         pipe.zremrangebyscore(bin_cards_key, 0, now - _WIN_BIN)
         pipe.expire(bin_cards_key, _WIN_BIN + 60)
+        n_write_ops += 3
 
         if req.billing_name:
             bin_names_key = f"vel:bin:{req.bin6}:names"
             pipe.sadd(bin_names_key, req.billing_name)
             pipe.expire(bin_names_key, _WIN_BIN)
+            n_write_ops += 2
 
         ip_cards_key = f"vel:ip:{req.ip_hash}:cards"
         pipe.zadd(ip_cards_key, {req.card_hash: now})
         pipe.zremrangebyscore(ip_cards_key, 0, now - _WIN_IP)
         pipe.expire(ip_cards_key, _WIN_IP + 60)
+        n_write_ops += 3
 
         dev_bins_key = f"vel:device:{req.device_fingerprint}:bins"
         pipe.sadd(dev_bins_key, req.bin6)
         pipe.expire(dev_bins_key, _WIN_DEVICE)
+        n_write_ops += 2
 
         # Rotating Proxy Tracker: Distinct IPs seen from this device in 5 min
         dev_ips_key = f"vel:device:{req.device_fingerprint}:ips"
         pipe.zadd(dev_ips_key, {req.ip_hash: now})
         pipe.zremrangebyscore(dev_ips_key, 0, now - _WIN_PROXY)
         pipe.expire(dev_ips_key, _WIN_PROXY + 60)
+        n_write_ops += 3
 
         if req.pan_hash:
             cvv_key = f"vel:session:{req.session_id}:cvv_attempts:{req.pan_hash}"
             pipe.incr(cvv_key)
             pipe.expire(cvv_key, _WIN_CVV)
+            n_write_ops += 2
 
-        # 2. Reads (pipelined)
+        # 2. Reads — 6 ops always appended in fixed order after all writes
         pipe.zcount(bin_cards_key, now - _WIN_BIN, now)
         pipe.scard(f"vel:bin:{req.bin6}:names")
         pipe.zcount(ip_cards_key, now - _WIN_IP, now)
@@ -105,22 +113,15 @@ class VelocityTracker:
 
         results = await pipe.execute()
 
-        # Read results are the last 6 operations
-        read_results = results[-6:]
-        bin_card_count = int(read_results[0] or 0)
-        bin_name_count = int(read_results[1] or 0)
-        ip_distinct_pan = int(read_results[2] or 0)
-        device_distinct_bin = int(read_results[3] or 0)
-        device_distinct_ip = int(read_results[4] or 0)
-        cvv_count = int(read_results[5] or 0)
-
+        # Reads are always the last 6 results (deterministic regardless of write branch)
+        r = results[n_write_ops:]
         return VelocityFeatures(
-            bin_card_count=bin_card_count,
-            bin_name_count=bin_name_count,
-            ip_distinct_pan_count=ip_distinct_pan,
-            device_distinct_bin_count=device_distinct_bin,
-            device_distinct_ip_count=device_distinct_ip,
-            cvv_cycle_attempts=cvv_count,
+            bin_card_count=int(r[0] or 0),
+            bin_name_count=int(r[1] or 0),
+            ip_distinct_pan_count=int(r[2] or 0),
+            device_distinct_bin_count=int(r[3] or 0),
+            device_distinct_ip_count=int(r[4] or 0),
+            cvv_cycle_attempts=int(r[5] or 0),
         )
 
     async def get_velocity_features(self, req: "CheckoutRequest") -> VelocityFeatures:

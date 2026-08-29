@@ -132,7 +132,9 @@ class ClusterEngine:
 
     async def ingest(self, req) -> None:
         """Called by /checkout after velocity is recorded — adds this tx to graph."""
-        await self.add_transaction(req.card_hash, req.device_fingerprint, req.ip_hash)
+        # Guard: skip ingestion if any identifier is empty (prevents garbage nodes)
+        if req.card_hash and req.device_fingerprint and req.ip_hash:
+            await self.add_transaction(req.card_hash, req.device_fingerprint, req.ip_hash)
 
     def get_active_clusters(self) -> list[int]:
         """Return list of active detected cluster IDs."""

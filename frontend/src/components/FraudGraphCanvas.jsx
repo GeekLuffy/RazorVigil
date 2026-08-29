@@ -55,7 +55,7 @@ export default function FraudGraphCanvas({ latestTx }) {
     const newNodeCard = {
       id: cardId,
       type: 'card',
-      label: `BIN ${latestTx.bin6 || '411111'}`,
+      label: `BIN ${latestTx.bin6 || '------'}`,
       x: isFraud ? 170 + (Math.random() * 80 - 40) : 420 + (Math.random() * 60 - 30),
       y: 180 + (Math.random() * 50 - 25),
       cluster: isFraud ? 1 : 2,

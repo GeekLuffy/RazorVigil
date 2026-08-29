@@ -10,15 +10,22 @@ export default function RulesSynthesizer() {
   const [copiedWaf, setCopiedWaf] = useState(false)
 
   useEffect(() => {
-    fetch(`${API_BASE}/rules/active`)
-      .then(res => res.json())
-      .then(data => setRulesData(data))
-      .catch(() => {})
+    const fetchData = () => {
+      fetch(`${API_BASE}/rules/active`)
+        .then(res => res.json())
+        .then(data => setRulesData(data))
+        .catch(() => {})
 
-    fetch(`${API_BASE}/antichecker/stats`)
-      .then(res => res.json())
-      .then(data => setAntiCheckerStats(data))
-      .catch(() => {})
+      fetch(`${API_BASE}/antichecker/stats`)
+        .then(res => res.json())
+        .then(data => setAntiCheckerStats(data))
+        .catch(() => {})
+    }
+
+    fetchData()
+    // Poll every 5s so counters update live after attacks are fired
+    const interval = setInterval(fetchData, 5000)
+    return () => clearInterval(interval)
   }, [])
 
   const copyToClipboard = (text, type) => {
