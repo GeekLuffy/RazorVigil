@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area, PieChart, Pie, Cell, Legend
 } from 'recharts'
-import { Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi, ShoppingBag, LayoutDashboard, FileText, Sparkles } from 'lucide-react'
+import { Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi, ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3 } from 'lucide-react'
 
 import AttackLaunchpad from './components/AttackLaunchpad'
 import MerchantStore from './components/MerchantStore'
@@ -11,6 +11,8 @@ import RulesSynthesizer from './components/RulesSynthesizer'
 import ArchitectureOverview from './components/ArchitectureOverview'
 import FraudGraphCanvas from './components/FraudGraphCanvas'
 import AutomatedThreatRunner from './components/AutomatedThreatRunner'
+import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
+import ModelGovernance from './components/ModelGovernance'
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const WS_URL = 'ws://localhost:8000/ws'
@@ -388,7 +390,7 @@ export default function App() {
         </div>
 
         {/* Tab Navigator */}
-        <div className="flex items-center gap-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
           <button
             onClick={() => setActiveTab('soc')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
@@ -400,11 +402,23 @@ export default function App() {
           </button>
 
           <button
-            onClick={() => setIsStoreOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 transition"
+            onClick={() => setActiveTab('disputes')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              activeTab === 'disputes' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
           >
-            <ShoppingBag size={14} />
-            Live Merchant Store
+            <Scale size={14} />
+            Disputes &amp; Evidence Dossier
+          </button>
+
+          <button
+            onClick={() => setActiveTab('governance')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              activeTab === 'governance' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <BarChart3 size={14} />
+            Model Governance &amp; Metrics
           </button>
 
           <button
@@ -414,7 +428,15 @@ export default function App() {
             }`}
           >
             <FileText size={14} />
-            Architecture &amp; Risk Models
+            Architecture &amp; RBI Compliance
+          </button>
+
+          <button
+            onClick={() => setIsStoreOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 transition ml-1"
+          >
+            <ShoppingBag size={14} />
+            Live Merchant Store
           </button>
         </div>
 
@@ -427,6 +449,10 @@ export default function App() {
       {/* Main Tab Content */}
       {activeTab === 'pitch' ? (
         <ArchitectureOverview />
+      ) : activeTab === 'disputes' ? (
+        <DisputeCaseWorkspace />
+      ) : activeTab === 'governance' ? (
+        <ModelGovernance />
       ) : (
         <>
           {/* Autonomous Threat Simulation Bar */}

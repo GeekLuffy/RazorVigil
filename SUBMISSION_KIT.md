@@ -26,6 +26,8 @@
 > 5. **Track 03 Revenue Recovery Bridge**: Borderline anomalies (VPN users, travelers) are never hard-declined. They are routed to `soft_risk` and issued single-use signed UPI QR recovery links that rescue lost GMV, confirmed by Razorpay Webhooks.
 > 6. **Forensic Copilot with Threat Memory RAG**: In-memory cosine similarity retrieval over historical carding campaigns generates contextual threat briefs off the hot path.
 > 7. **Autonomous WAF & Threat Advisory**: Generates real-time Razorpay Custom Risk Rules and Cloudflare edge WAF rules directly from detected graph clusters.
+> 8. **Automated Chargeback Defense & Evidence Dossier Synthesizer**: Compiles zero-hallucination, 5-domain verifiable dispute evidence packages (HMAC signatures, TLS JA3/JA4, biometrics, Louvain graph rings, and RBI §4.2 compliance) with calculated Win Probability (0–100%) and formal Razorpay Representation Letters.
+> 9. **Human-in-the-Loop (HITL) Case Resolution & Model Governance**: Interactive SOC dispute management workspace allowing one-click representation submission, Track 03 UPI recovery routing, and live held-out model evaluation analytics (Confusion Matrix, Feature Importances, and Ablation Matrices).
 
 ### Key Metrics & Impact (50,000-Row Stratified Reporting)
 > - **Full-Funnel Catch Rate**: **100.00%** (Combined defense: 50 Canary Honeytokens + Deterministic Rules + ML Pipeline).
