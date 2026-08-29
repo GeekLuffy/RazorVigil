@@ -1,5 +1,5 @@
 import React from 'react'
-import { Shield, Zap, TrendingUp, Cpu, Award, ArrowUpRight, CheckCircle2, XCircle, Terminal, Network, Database } from 'lucide-react'
+import { Shield, Zap, TrendingUp, Cpu, Award, ArrowUpRight, CheckCircle2, XCircle, Terminal, Network, Database, Lock, Key, Scale } from 'lucide-react'
 
 export default function ArchitectureOverview() {
   return (
@@ -19,6 +19,65 @@ export default function ArchitectureOverview() {
           RazorShield Sentinel operates directly on the synchronous checkout path with a <strong>strict &lt;50ms latency SLA</strong> (averaging ~10ms p99). 
           It orchestrates atomic sliding-window Redis velocity, Louvain graph community detection, and an Optuna-tuned LightGBM + Isolation Forest ensemble to block automated carding rings while dynamically routing borderline false declines to an out-of-band UPI recovery bridge.
         </p>
+      </div>
+
+      {/* Cryptographic Payment Integrity & RBI Compliance Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Cryptographic Contract Card */}
+        <div className="panel bg-slate-950/80 border-indigo-500/20">
+          <div className="flex items-center gap-2 mb-2 text-indigo-400 text-xs font-bold uppercase tracking-wider">
+            <Lock size={15} />
+            Cryptographic Integrity &amp; Verification
+          </div>
+          <div className="space-y-2 text-xs text-slate-300 font-mono">
+            <div className="bg-slate-900 p-2 rounded-lg border border-slate-800">
+              <span className="text-slate-500 text-[11px] block">Payment Signature Contract:</span>
+              <code className="text-emerald-400 text-[11px]">
+                HMAC_SHA256(order_id + "|" + payment_id, key_secret)
+              </code>
+            </div>
+            <div className="bg-slate-900 p-2 rounded-lg border border-slate-800">
+              <span className="text-slate-500 text-[11px] block">Side-Channel Timing Attack Defense:</span>
+              <span className="text-indigo-300 text-[11px]">
+                Enforces constant-time <code className="text-indigo-400">hmac.compare_digest()</code> comparison.
+              </span>
+            </div>
+            <div className="bg-slate-900 p-2 rounded-lg border border-slate-800">
+              <span className="text-slate-500 text-[11px] block">Webhook Idempotency:</span>
+              <span className="text-slate-300 text-[11px]">
+                Validates <code className="text-amber-400">X-Razorpay-Signature</code> &amp; deduplicates <code className="text-amber-400">x-razorpay-event-id</code> in Redis.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Regulatory Compliance Card */}
+        <div className="panel bg-slate-950/80 border-emerald-500/20">
+          <div className="flex items-center gap-2 mb-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+            <Scale size={15} />
+            RBI 2025/2026 Regulatory Alignment
+          </div>
+          <div className="space-y-2 text-xs text-slate-300">
+            <div className="bg-slate-900 p-2 rounded-lg border border-slate-800">
+              <span className="text-emerald-400 font-bold block text-[11px]">RBI Directions 2025 (Effective April 1, 2026):</span>
+              <span className="text-[11px] text-slate-400">
+                Mandates dynamic 2FA and requires issuers/gateways to implement automated Risk-Based Authentication (RBA).
+              </span>
+            </div>
+            <div className="bg-slate-900 p-2 rounded-lg border border-slate-800">
+              <span className="text-indigo-400 font-bold block text-[11px]">Card-on-File Tokenization (CoFT):</span>
+              <span className="text-[11px] text-slate-400">
+                Zero cleartext PAN/CVV storage. Evaluates synthetic surrogate tokens (<code className="text-indigo-300">card_hash</code>) natively.
+              </span>
+            </div>
+            <div className="bg-slate-900 p-2 rounded-lg border border-slate-800">
+              <span className="text-purple-400 font-bold block text-[11px]">Passive TLS &amp; Biometric Signal Mesh:</span>
+              <span className="text-[11px] text-slate-400">
+                Passive JA4 client TLS ciphers + Keystroke Shannon entropy (<code className="text-purple-300">&gt;2.0</code>) vs machine scripts.
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stratified Performance Matrix */}
