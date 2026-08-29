@@ -27,6 +27,8 @@ from backend.razorpay_client import RazorpayClient
 from backend.recovery.recovery_stub import RecoveryStub
 from backend.velocity.redis_velocity import VelocityTracker
 
+from backend.antichecker.anti_checker_engine import AntiCheckerGuard
+
 # Singletons initialized in lifespan
 velocity_tracker: VelocityTracker
 cluster_engine: ClusterEngine
@@ -36,6 +38,7 @@ recovery_stub: RecoveryStub
 canary_cards: CanaryCards
 agent_validator: AgentAttestationValidator
 razorpay_client: RazorpayClient
+anti_checker: AntiCheckerGuard
 
 ws_clients: list[WebSocket] = []
 
@@ -43,7 +46,7 @@ ws_clients: list[WebSocket] = []
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global velocity_tracker, cluster_engine, risk_scorer
-    global decision_engine, recovery_stub, canary_cards, agent_validator, razorpay_client
+    global decision_engine, recovery_stub, canary_cards, agent_validator, razorpay_client, anti_checker
 
     velocity_tracker = VelocityTracker()
     await velocity_tracker.connect()
@@ -57,6 +60,7 @@ async def lifespan(app: FastAPI):
     canary_cards = CanaryCards()
     agent_validator = AgentAttestationValidator()
     razorpay_client = RazorpayClient()
+    anti_checker = AntiCheckerGuard(enable_tarpit_poisoning=True)
 
     yield
     await velocity_tracker.close()
@@ -130,12 +134,53 @@ async def health():
     }
 
 
+@app.get("/antichecker/stats")
+async def get_antichecker_stats():
+    return {
+        "status": "active",
+        "blocked_checkers_count": anti_checker.blocked_attempts_count if anti_checker else 0,
+        "poisoned_responses_count": anti_checker.poisoned_responses_count if anti_checker else 0,
+        "features": {
+            "micro_auth_sentinel": True,
+            "decoy_honeypot_trap": True,
+            "tarpit_card_poisoning": True,
+            "botnet_fingerprint_blacklist": True,
+        }
+    }
+
+
 @app.post("/checkout", response_model=CheckoutResponse)
 async def checkout(
     req: CheckoutRequest,
     x_agent_attestation: Optional[str] = Header(default=None, alias="X-Agent-Attestation"),
 ) -> CheckoutResponse:
     t0 = time.perf_counter()
+
+    # 0. Anti-Checker Guard (Layer 0 Sentinel against Telegram scrapers & micro-auths)
+    if anti_checker:
+        is_bot, bot_reason, bot_meta = anti_checker.evaluate_request(
+            amount=req.amount,
+            device_fingerprint=req.device_fingerprint,
+            asn_type=req.asn_type,
+            keystroke_entropy=req.keystroke_entropy,
+            mouse_jitter=req.mouse_jitter_score,
+            time_on_page_s=req.time_on_page_s,
+        )
+        if is_bot:
+            latency_ms = (time.perf_counter() - t0) * 1000
+            response = CheckoutResponse(
+                transaction_id=req.transaction_id,
+                tier="high_confidence_bot",
+                risk_score=0.99,
+                action="honeypot",
+                latency_ms=round(latency_ms, 2),
+                explanation=f"Anti-Checker Sentinel: {bot_meta.get('defense', 'Automated')} — {bot_meta.get('detail', bot_reason)}. Deceptive honeypot issued.",
+                amount=req.amount,
+                razorpay_order_id=None,
+            )
+            if ws_clients:
+                asyncio.create_task(_broadcast(response.model_dump()))
+            return response
 
     # 1. Agent attestation & rate limiting
     if agent_validator.is_rate_limited(req.ip_hash):

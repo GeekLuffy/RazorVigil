@@ -5,6 +5,7 @@ const API_BASE = 'http://localhost:8000'
 
 export default function RulesSynthesizer() {
   const [rulesData, setRulesData] = useState(null)
+  const [antiCheckerStats, setAntiCheckerStats] = useState(null)
   const [copiedRzp, setCopiedRzp] = useState(false)
   const [copiedWaf, setCopiedWaf] = useState(false)
 
@@ -12,6 +13,11 @@ export default function RulesSynthesizer() {
     fetch(`${API_BASE}/rules/active`)
       .then(res => res.json())
       .then(data => setRulesData(data))
+      .catch(() => {})
+
+    fetch(`${API_BASE}/antichecker/stats`)
+      .then(res => res.json())
+      .then(data => setAntiCheckerStats(data))
       .catch(() => {})
   }, [])
 
@@ -37,12 +43,15 @@ export default function RulesSynthesizer() {
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
-              Autonomous Threat Advisory &amp; WAF Rule Synthesizer
+              Autonomous Threat Advisory &amp; Anti-Checker Sentinel
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono">
                 {rulesData.active_clusters_detected} Clusters Tracked
               </span>
+              <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono">
+                Tarpit Poisoning: Active
+              </span>
             </h3>
-            <p className="text-[11px] text-slate-400">Dynamically generated mitigation rules from active Louvain graph communities</p>
+            <p className="text-[11px] text-slate-400">Dynamic Louvain graph rules &amp; anti-carding scraper mitigation</p>
           </div>
         </div>
       </div>
