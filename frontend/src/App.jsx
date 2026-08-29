@@ -3,14 +3,16 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area, PieChart, Pie, Cell, Legend
 } from 'recharts'
-import { Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi, ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3 } from 'lucide-react'
+import {
+  Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
+  ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2
+} from 'lucide-react'
 
-import AttackLaunchpad from './components/AttackLaunchpad'
+import ThreatLabWorkspace from './components/ThreatLabWorkspace'
+import ActiveDefenseWorkspace from './components/ActiveDefenseWorkspace'
 import MerchantStore from './components/MerchantStore'
-import RulesSynthesizer from './components/RulesSynthesizer'
 import ArchitectureOverview from './components/ArchitectureOverview'
 import FraudGraphCanvas from './components/FraudGraphCanvas'
-import AutomatedThreatRunner from './components/AutomatedThreatRunner'
 import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
 import ModelGovernance from './components/ModelGovernance'
 
@@ -398,7 +400,27 @@ export default function App() {
             }`}
           >
             <LayoutDashboard size={14} />
-            SOC Command Center
+            Live SOC Gateway
+          </button>
+
+          <button
+            onClick={() => setActiveTab('lab')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'lab' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Flame size={14} />
+            Threat Simulator &amp; Lab
+          </button>
+
+          <button
+            onClick={() => setActiveTab('rules')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'rules' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Code2 size={14} />
+            Active Defense &amp; WAF
           </button>
 
           <button
@@ -408,7 +430,7 @@ export default function App() {
             }`}
           >
             <Scale size={14} />
-            Disputes &amp; Evidence Dossier
+            Disputes &amp; Evidence
           </button>
 
           <button
@@ -428,7 +450,7 @@ export default function App() {
             }`}
           >
             <FileText size={14} />
-            Architecture &amp; RBI Compliance
+            Architecture &amp; RBI Specs
           </button>
 
           <button
@@ -447,7 +469,11 @@ export default function App() {
       </div>
 
       {/* Main Tab Content */}
-      {activeTab === 'pitch' ? (
+      {activeTab === 'lab' ? (
+        <ThreatLabWorkspace onTriggerStoreDemo={() => setIsStoreOpen(true)} />
+      ) : activeTab === 'rules' ? (
+        <ActiveDefenseWorkspace copilotNotes={copilotNotes} />
+      ) : activeTab === 'pitch' ? (
         <ArchitectureOverview />
       ) : activeTab === 'disputes' ? (
         <DisputeCaseWorkspace />
@@ -455,12 +481,6 @@ export default function App() {
         <ModelGovernance />
       ) : (
         <>
-          {/* Autonomous Threat Simulation Bar */}
-          <AutomatedThreatRunner />
-
-          {/* Attack Launchpad Bar */}
-          <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />
-
           {/* Canary alert */}
           <CanaryAlert event={canaryAlert} onDismiss={() => setCanaryAlert(null)} />
 
@@ -481,61 +501,63 @@ export default function App() {
             <GmvCounter amount={recoveredGmv} />
           </div>
 
-          {/* Live Fraud Ring Graph Canvas + Classification Distribution */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-            <div className="md:col-span-2">
-              <FraudGraphCanvas latestTx={feed[0]} />
-            </div>
-            <div className="panel flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp size={14} color="#818cf8" />
-                  <span className="text-xs uppercase tracking-widest text-slate-400 font-bold">Traffic Classification</span>
+          {/* Balanced 2-Column Live SOC Operations Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Left Column (7 cols): Real-Time Risk Score Stream & Live Transaction Feed */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="panel bg-slate-900/90 border border-slate-800">
+                <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Activity size={14} className="text-rose-400" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Live Risk Score Stream (p99 &lt;15ms)</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-500">— — 0.75 bot threshold</span>
                 </div>
-                <TierPie counts={tierCounts} />
+                <RiskChart points={chartPoints} />
               </div>
-              <div className="text-[10px] text-slate-500 font-mono pt-2 border-t border-slate-800 flex justify-between">
-                <span>Total Monitored: {stats.total}</span>
-                <span className="text-emerald-400">0% False Positives</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Main content: charts & stream */}
-          <div className="grid grid-cols-1 gap-3">
-            <div className="panel">
-              <div className="flex items-center gap-2 mb-3">
-                <Activity size={14} color="#f87171" />
-                <span className="text-xs uppercase tracking-widest text-slate-400 font-bold">Live Risk Score Stream (p99 &lt;15ms)</span>
-                <span className="ml-auto text-xs font-mono text-slate-600">— — 0.75 bot threshold</span>
-              </div>
-              <RiskChart points={chartPoints} />
-            </div>
-          </div>
-
-          {/* Autonomous Threat Advisory & Rules Synthesizer */}
-          <RulesSynthesizer />
-
-          {/* Copilot notes */}
-          <CopilotNotes notes={copilotNotes} />
-
-          {/* Live feed */}
-          <div className="panel mt-3">
-            <div className="flex items-center gap-2 mb-3">
-              <Wifi size={14} color="#38bdf8" />
-              <span className="text-xs uppercase tracking-widest text-slate-400">Live Transaction Feed</span>
-              <span className="ml-auto text-xs font-mono text-slate-600">latency · tier · score · tx-id</span>
-            </div>
-            <div className="flex flex-col gap-0.5 max-h-64 overflow-y-auto">
-              {feed.length === 0 ? (
-                <div className="text-slate-600 text-sm text-center py-8">
-                  No transactions yet. Click any button on the Attack Launchpad above to fire live traffic!
+              <div className="panel bg-slate-900/90 border border-slate-800">
+                <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Wifi size={14} className="text-sky-400" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Live Transaction Telemetry Feed</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-500">latency · tier · score · tx-id</span>
                 </div>
-              ) : (
-                feed.map((tx) => (
-                  <FeedRow key={tx.transaction_id} tx={tx} isNew={tx.transaction_id === newId} />
-                ))
-              )}
+                <div className="flex flex-col gap-1 max-h-72 overflow-y-auto pr-1">
+                  {feed.length === 0 ? (
+                    <div className="text-slate-600 text-xs text-center py-10 font-mono">
+                      No live transactions processed yet.<br />
+                      Switch to "Threat Simulator &amp; Lab" tab to trigger automated or manual attacks.
+                    </div>
+                  ) : (
+                    feed.map((tx) => (
+                      <FeedRow key={tx.transaction_id} tx={tx} isNew={tx.transaction_id === newId} />
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column (5 cols): Live Louvain Community Graph & Traffic Classification */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="panel bg-slate-900/90 border border-slate-800">
+                <FraudGraphCanvas latestTx={feed[0]} />
+              </div>
+
+              <div className="panel bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2 border-b border-slate-800 pb-2">
+                    <TrendingUp size={14} className="text-indigo-400" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Traffic Tier Classification</span>
+                  </div>
+                  <TierPie counts={tierCounts} />
+                </div>
+                <div className="text-[11px] text-slate-500 font-mono pt-3 mt-3 border-t border-slate-800 flex justify-between">
+                  <span>Total Monitored: {stats.total}</span>
+                  <span className="text-emerald-400 font-bold">0% False Positives</span>
+                </div>
+              </div>
             </div>
           </div>
         </>
