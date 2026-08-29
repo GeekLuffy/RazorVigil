@@ -39,12 +39,12 @@ function fmtRupees(n) { return `Rs.${Number(n || 0).toLocaleString('en-IN', { mi
 // ─── Stat card ────────────────────────────────────────────────────────────────
 function StatCard({ icon: Icon, label, value, sub, color = '#64748b' }) {
   return (
-    <div className="panel flex flex-col gap-1">
+    <div className="panel flex flex-col gap-1 hover:border-slate-600/80 transition-all duration-200">
       <div className="flex items-center gap-2 text-slate-400 text-xs uppercase tracking-widest mb-1">
         <Icon size={14} color={color} />
         {label}
       </div>
-      <div className="text-2xl font-bold" style={{ color }}>{value}</div>
+      <div className="text-2xl font-bold font-mono" style={{ color }}>{value}</div>
       {sub && <div className="text-xs text-slate-500">{sub}</div>}
     </div>
   )
@@ -105,7 +105,7 @@ function GmvCounter({ amount }) {
   }, [amount])
 
   return (
-    <div className="panel flex flex-col gap-1 border-emerald-500/30 bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/30">
+    <div className="panel glow-emerald flex flex-col gap-1 border-emerald-500/40 bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/30">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-slate-400 text-xs uppercase tracking-widest mb-1">
           <TrendingUp size={14} color="#10b981" />
@@ -372,16 +372,16 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200 p-4">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-800">
+      {/* Sticky Glassmorphic Header */}
+      <div className="sticky top-0 z-40 backdrop-blur-md bg-[#0a0a0f]/90 -mx-4 -mt-4 px-4 py-3 mb-4 border-b border-slate-800/80 shadow-lg shadow-black/30 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-indigo-400">
+          <div className="p-2 bg-indigo-600/20 border border-indigo-500/40 rounded-xl text-indigo-400 glow-indigo">
             <Shield size={26} />
           </div>
           <div>
             <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
               RazorShield Sentinel
-              <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full">
                 Enterprise Edition v1.2
               </span>
             </h1>
@@ -390,11 +390,11 @@ export default function App() {
         </div>
 
         {/* Tab Navigator */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
           <button
             onClick={() => setActiveTab('soc')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              activeTab === 'soc' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'soc' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
             }`}
           >
             <LayoutDashboard size={14} />
@@ -403,8 +403,8 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('disputes')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              activeTab === 'disputes' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'disputes' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Scale size={14} />
@@ -413,8 +413,8 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('governance')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              activeTab === 'governance' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'governance' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
             }`}
           >
             <BarChart3 size={14} />
@@ -423,8 +423,8 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('pitch')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              activeTab === 'pitch' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'pitch' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
             }`}
           >
             <FileText size={14} />
