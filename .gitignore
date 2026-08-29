@@ -1,0 +1,12 @@
+.env
+.env.local
+__pycache__/
+*.pyc
+*.pkl
+node_modules/
+dist/
+data/*.csv
+data/*.parquet
+data/*.png
+data/load_test_results.json
+.ipynb_checkpoints/

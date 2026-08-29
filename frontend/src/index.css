@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #0a0a0f;
+  color: #e2e8f0;
+  font-family: 'Inter', 'JetBrains Mono', monospace;
+}
+
+.tier-safe { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+.tier-soft_risk { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
+.tier-elevated_review { @apply bg-orange-500/20 text-orange-300 border border-orange-500/30; }
+.tier-high_confidence_bot { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+
+.panel { @apply bg-slate-900/80 border border-slate-700/50 rounded-xl p-4; }
+
+.canary-flash {
+  animation: canary-pulse 0.5s ease-in-out 4;
+}
+@keyframes canary-pulse {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(234, 179, 8, 0.15); }
+}
