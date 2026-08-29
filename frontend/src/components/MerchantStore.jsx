@@ -3,6 +3,21 @@ import { ShoppingBag, Lock, ShieldCheck, QrCode, ArrowRight, RefreshCw, Smartpho
 
 const API_BASE = 'http://localhost:8000'
 
+let rzpScriptPromise = null
+function loadRazorpayScript() {
+  if (typeof window !== 'undefined' && window.Razorpay) return Promise.resolve(true)
+  if (rzpScriptPromise) return rzpScriptPromise
+  rzpScriptPromise = new Promise((resolve) => {
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.async = true
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.head.appendChild(script)
+  })
+  return rzpScriptPromise
+}
+
 export default function MerchantStore({ onClose, onPaymentComplete }) {
   const [selectedProduct, setSelectedProduct] = useState({
     name: 'Air Jordan 1 Retro High OG "Chicago"',
@@ -217,21 +232,31 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         const keyId = cfg.razorpay_key_id || 'rzp_test_demo12345678'
 
         // If user provided a live key, launch Razorpay Checkout.js
-        if (!keyId.startsWith('rzp_test_demo') && window.Razorpay) {
-          const rzp = new window.Razorpay({
-            key: keyId,
-            amount: selectedProduct.price * 100,
-            currency: 'INR',
-            name: 'SneakerVault India',
-            description: selectedProduct.name,
-            order_id: data.razorpay_order_id,
-            handler: async function (resp) {
-              await verifyPaymentOnBackend(resp.razorpay_order_id || data.razorpay_order_id, resp.razorpay_payment_id, resp.razorpay_signature)
-            },
-            prefill: { name: cardName, email: 'customer@razorshield.io', contact: '9876543210' },
-            theme: { color: '#4f46e5' },
-          })
-          rzp.open()
+        if (!keyId.startsWith('rzp_test_demo')) {
+          await loadRazorpayScript()
+          if (window.Razorpay) {
+            const rzp = new window.Razorpay({
+              key: keyId,
+              amount: selectedProduct.price * 100,
+              currency: 'INR',
+              name: 'SneakerVault India',
+              description: selectedProduct.name,
+              order_id: data.razorpay_order_id,
+              handler: async function (resp) {
+                await verifyPaymentOnBackend(resp.razorpay_order_id || data.razorpay_order_id, resp.razorpay_payment_id, resp.razorpay_signature)
+              },
+              prefill: { name: cardName, email: 'customer@razorshield.io', contact: '9876543210' },
+              theme: { color: '#4f46e5' },
+            })
+            rzp.open()
+          } else {
+            // Fallback to native test modal if script blocked
+            setRzpModal({
+              order_id: data.razorpay_order_id,
+              amount: selectedProduct.price,
+              key_id: keyId,
+            })
+          }
         } else {
           // Open native test modal
           setRzpModal({

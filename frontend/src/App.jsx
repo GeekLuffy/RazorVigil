@@ -327,44 +327,89 @@ export default function App() {
   }, [])
 
   // WebSocket
+  // WebSocket with Back-Forward Cache (bfcache) & Visibility lifecycle handling
   useEffect(() => {
     let alive = true
-    let ws
+    let ws = null
+    let reconnectTimeout = null
 
     function connect() {
-      setWsStatus('connecting')
-      ws = new WebSocket(WS_URL)
-      wsRef.current = ws
+      if (!alive) return
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        return
+      }
 
-      ws.onopen = () => setWsStatus('connected')
-      ws.onmessage = (e) => {
-        try {
-          const data = JSON.parse(e.data)
-          if (data.type === 'copilot_note') {
-            handleCopilotNote(data)
-          } else {
-            handleTx(data)
+      setWsStatus('connecting')
+      try {
+        ws = new WebSocket(WS_URL)
+        wsRef.current = ws
+
+        ws.onopen = () => {
+          if (alive) setWsStatus('connected')
+        }
+
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data)
+            if (data.type === 'copilot_note') {
+              handleCopilotNote(data)
+            } else {
+              handleTx(data)
+            }
+          } catch {}
+        }
+
+        ws.onclose = () => {
+          if (alive) {
+            setWsStatus('disconnected')
+            clearTimeout(reconnectTimeout)
+            reconnectTimeout = setTimeout(connect, 2500)
           }
-        } catch {}
+        }
+
+        ws.onerror = () => {
+          if (ws) {
+            try { ws.close() } catch {}
+          }
+        }
+      } catch {
+        if (alive) {
+          setWsStatus('disconnected')
+          clearTimeout(reconnectTimeout)
+          reconnectTimeout = setTimeout(connect, 2500)
+        }
       }
-      ws.onclose = () => {
-        setWsStatus('disconnected')
-        if (alive) setTimeout(connect, 2000)
-      }
-      ws.onerror = () => {}
     }
 
+    const handlePageShow = (e) => {
+      if (e.persisted || !ws || ws.readyState !== WebSocket.OPEN) {
+        connect()
+      }
+    }
+
+    const handlePageHide = () => {
+      clearTimeout(reconnectTimeout)
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        try { ws.close() } catch {}
+      }
+    }
+
+    window.addEventListener('pageshow', handlePageShow)
+    window.addEventListener('pagehide', handlePageHide)
+
     connect()
+
     return () => {
       alive = false
+      clearTimeout(reconnectTimeout)
+      window.removeEventListener('pageshow', handlePageShow)
+      window.removeEventListener('pagehide', handlePageHide)
       if (ws) {
         ws.onopen = null
         ws.onmessage = null
         ws.onclose = null
         ws.onerror = null
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.close()
-        }
+        try { ws.close() } catch {}
       }
     }
   }, [handleTx, handleCopilotNote])
