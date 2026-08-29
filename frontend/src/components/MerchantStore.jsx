@@ -88,27 +88,96 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
     })
   }
 
-  const autofillBotData = () => {
-    setCardName('Test Bot 001')
-    setCardNumber('5222 2200 1234 5678')
-    setExpiry('08/29')
-    setCvv('999')
-    setVpnMode(true)
-    setKeystrokeDeltas([])
-    setMousePoints([])
-    setLiveEntropy(0.0)
-    setLiveJitter(0.0)
+  const [showConfig, setShowConfig] = useState(false)
+  const [customKeyId, setCustomKeyId] = useState('')
+  const [customKeySecret, setCustomKeySecret] = useState('')
+  const [isConfigSaving, setIsConfigSaving] = useState(false)
+  const [configSavedMsg, setConfigSavedMsg] = useState('')
+
+  useEffect(() => {
+    fetch(`${API_BASE}/config`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.razorpay_key_id && !d.razorpay_key_id.startsWith('rzp_test_demo')) {
+          setCustomKeyId(d.razorpay_key_id)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const handleSaveRazorpayConfig = async (e) => {
+    e.preventDefault()
+    setIsConfigSaving(true)
+    setConfigSavedMsg('')
+    try {
+      const res = await fetch(`${API_BASE}/config/razorpay`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key_id: customKeyId,
+          key_secret: customKeySecret
+        })
+      })
+      const data = await res.json()
+      if (data.status === 'updated') {
+        setConfigSavedMsg(data.is_live_configured ? '✓ Real Razorpay SDK Active' : '✓ Simulator Mode Active')
+        setTimeout(() => setConfigSavedMsg(''), 3000)
+      }
+    } catch {
+      setConfigSavedMsg('Error updating keys')
+    } finally {
+      setIsConfigSaving(false)
+    }
   }
 
-  const autofillHumanData = () => {
-    setCardName('Rahul Sharma')
-    setCardNumber('4242 4242 4242 4242')
-    setExpiry('12/28')
-    setCvv('888')
-    setVpnMode(false)
-    setLiveEntropy(2.45)
-    setLiveJitter(0.65)
+  const autofillPreset = (type) => {
+    if (type === 'human') {
+      setCardName('Rahul Sharma')
+      setCardNumber('4242 4242 4242 4242')
+      setExpiry('12/28')
+      setCvv('888')
+      setVpnMode(false)
+      setLiveEntropy(2.65)
+      setLiveJitter(0.68)
+    } else if (type === 'bot') {
+      setCardName('Test Bot 001')
+      setCardNumber('5222 2200 1234 5678')
+      setExpiry('08/29')
+      setCvv('999')
+      setVpnMode(true)
+      setKeystrokeDeltas([])
+      setMousePoints([])
+      setLiveEntropy(0.0)
+      setLiveJitter(0.0)
+    } else if (type === 'telegram') {
+      setCardName('TG Scraper')
+      setCardNumber('4117 7300 0000 1111')
+      setExpiry('11/27')
+      setCvv('123')
+      setVpnMode(true)
+      setLiveEntropy(0.0)
+      setLiveJitter(0.0)
+    } else if (type === 'canary') {
+      setCardName('Canary Honeytoken')
+      setCardNumber('5999 9900 0000 0007')
+      setExpiry('05/30')
+      setCvv('777')
+      setVpnMode(true)
+      setLiveEntropy(0.0)
+      setLiveJitter(0.0)
+    } else if (type === 'vpn') {
+      setCardName('Aditya Verma')
+      setCardNumber('4242 4242 4242 4242')
+      setExpiry('10/29')
+      setCvv('456')
+      setVpnMode(true)
+      setLiveEntropy(2.45)
+      setLiveJitter(0.62)
+    }
   }
+
+  const autofillBotData = () => autofillPreset('bot')
+  const autofillHumanData = () => autofillPreset('human')
 
   const handleCheckout = async (e) => {
     e.preventDefault()
@@ -300,27 +369,96 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         {/* Form Column */}
         <div className="w-full md:w-7/12 p-6 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
                 <Lock size={13} className="text-indigo-400" />
                 Payment Information
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={autofillHumanData}
-                  className="text-[10px] font-mono bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 transition"
+                  onClick={() => setShowConfig(!showConfig)}
+                  className="text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition"
                 >
-                  Fill Human
-                </button>
-                <button
-                  type="button"
-                  onClick={autofillBotData}
-                  className="text-[10px] font-mono bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded border border-red-500/30 transition"
-                >
-                  Fill Bot
+                  ⚙️ Gateway Keys
                 </button>
               </div>
+            </div>
+
+            {/* Razorpay Gateway Keys Drawer */}
+            {showConfig && (
+              <form onSubmit={handleSaveRazorpayConfig} className="mb-3 p-3 bg-slate-950 rounded-xl border border-indigo-500/30 space-y-2 animate-fadeIn text-xs">
+                <div className="text-[11px] font-bold text-indigo-300 flex items-center justify-between">
+                  <span>Razorpay API Configuration (Test Mode)</span>
+                  {configSavedMsg && <span className="text-emerald-400 font-mono text-[10px]">{configSavedMsg}</span>}
+                </div>
+                <div className="grid grid-cols-2 gap-2 font-mono">
+                  <input
+                    type="text"
+                    placeholder="Key ID (rzp_test_...)"
+                    value={customKeyId}
+                    onChange={e => setCustomKeyId(e.target.value)}
+                    className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-white focus:outline-none focus:border-indigo-500"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Key Secret"
+                    value={customKeySecret}
+                    onChange={e => setCustomKeySecret(e.target.value)}
+                    className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-[10px] text-slate-500 font-mono">Leave empty for instant simulator mode</span>
+                  <button
+                    type="submit"
+                    disabled={isConfigSaving}
+                    className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-bold transition"
+                  >
+                    {isConfigSaving ? 'Saving…' : 'Apply Keys'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Quick Demo Autofill Presets */}
+            <div className="flex flex-wrap items-center gap-1.5 mb-3 bg-slate-950/70 p-2 rounded-xl border border-slate-800/80">
+              <span className="text-[10px] font-mono text-slate-500 uppercase mr-1">Presets:</span>
+              <button
+                type="button"
+                onClick={() => autofillPreset('human')}
+                className="text-[10px] font-mono bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 transition"
+              >
+                ✓ Genuine
+              </button>
+              <button
+                type="button"
+                onClick={() => autofillPreset('vpn')}
+                className="text-[10px] font-mono bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 transition"
+              >
+                ⚠ VPN Recovery
+              </button>
+              <button
+                type="button"
+                onClick={() => autofillPreset('bot')}
+                className="text-[10px] font-mono bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded border border-red-500/30 transition"
+              >
+                🚫 Carding Bot
+              </button>
+              <button
+                type="button"
+                onClick={() => autofillPreset('telegram')}
+                className="text-[10px] font-mono bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30 transition"
+              >
+                🤖 TG Scraper
+              </button>
+              <button
+                type="button"
+                onClick={() => autofillPreset('canary')}
+                className="text-[10px] font-mono bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 transition"
+              >
+                🐤 Canary #7
+              </button>
             </div>
 
             <form onSubmit={handleCheckout} className="space-y-3">

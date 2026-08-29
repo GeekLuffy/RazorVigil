@@ -450,6 +450,22 @@ async def get_config():
     }
 
 
+class UpdateRazorpayConfigRequest(BaseModel):
+    key_id: str
+    key_secret: str
+
+
+@app.post("/config/razorpay")
+async def update_razorpay_config(req: UpdateRazorpayConfigRequest):
+    razorpay_client.update_credentials(req.key_id, req.key_secret)
+    return {
+        "status": "updated",
+        "razorpay_key_id": razorpay_client.key_id,
+        "is_live_configured": razorpay_client.is_live_configured,
+        "mode": "live" if razorpay_client.is_live_configured else "test",
+    }
+
+
 class VerifyPaymentRequest(BaseModel):
     razorpay_order_id: str
     razorpay_payment_id: str
