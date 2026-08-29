@@ -42,15 +42,15 @@
 
 ---
 
-## 🎬 3. The 2-Minute Winning Demo Video Script
+## 🧪 3. Verification & Live Operational Scenarios
 
-| Timestamp | Screen | Action | What to Say |
+| Scenario | Trigger / Endpoint | Observed Engine Behavior | Target Defense Layer |
 |---|---|---|---|
-| **0:00 - 0:25** | SOC Dashboard (`http://localhost:5173`) | Show the live Command Center, dark UI, charts | *"Hello Razorpay team. This is RazorShield Sentinel, an autonomous risk engine built for Track 02 and Track 03. Indian payment gateways lose millions to carding bots and false declines. Here is how RazorShield solves both."* |
-| **0:25 - 0:50** | Click **[15x Telegram Bot Burst]** | Watch stream spike red, 15 bots blocked, latency ~10ms | *"When a Telegram bot attacks a merchant with distributed carding, RazorShield's sliding-window Redis velocity and LightGBM model catches 100% of the attempts in under 12ms, issuing silent honeypot responses."* |
-| **0:50 - 1:15** | Click **[Fire Canary Honeytoken]** | Watch yellow Canary alert banner flash on screen | *"To catch zero-day bot enumeration with true zero false positives, we deployed 50 Luhn-valid Canary cards. Any use triggers an instant 1.0 confidence block without even waiting for ML."* |
-| **1:15 - 1:40** | Click **[Live Merchant Store]** -> Toggle VPN -> Click Pay -> Click **[Simulate UPI QR]** | UPI Modal pops up, QR completes, GMV counter ticks up | *"Now for Track 03: When a real customer buys sneakers on a VPN, legacy systems hard-decline them. RazorShield routes them to soft-risk, issues a 5-minute inventory hold with a UPI QR link, and rescues the Rs.16,999 GMV."* |
-| **1:40 - 2:00** | Click **[AI Shopping Agent]** & Show **[Pitch Deck]** tab | Show verified agent passing & WAF rules | *"Finally, our Agent-Aware layer verifies AI shopping assistants using cryptographically signed attestations. RazorShield protects merchants, rescues GMV, and prepares Razorpay for the agentic web."* |
+| **Baseline Customer Purchase** | Standard human checkout on SneakerVault | Risk Score &lt; 0.15 (`safe`), latency &lt; 12ms. Provisions Razorpay Order ID. | Layer 3 LightGBM &amp; Biometrics |
+| **15x Telegram Botnet Burst** | Rapid carding attempts across datacenter proxies | Risk Score &gt; 0.90 (`high_confidence_bot`), quarantined to silent honeypot. | Layer 1 Sliding-Window Redis Velocity |
+| **Canary Honeytoken Breach** | Card scan on armed Canary BIN | Confidence 1.0 block (`high_confidence_bot`), 0.00% False Positive rate. | Layer 0 Canary Honeytoken Traps |
+| **Legitimate Customer on VPN** | Genuine biometrics + datacenter ASN | Routed to `soft_risk`, single-use UPI QR link issued. GMV recovered upon settlement. | Layer 4 Track 03 Out-of-Band Bridge |
+| **Google AP2 AI Shopping Agent** | Headless checkout with valid `X-Agent-Attestation` | Attestation verified, velocity monitored, routed to `verified_agent`. | Layer 0 Agent-Aware Gate |
 
 ---
 

@@ -8,9 +8,9 @@ import { Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wi
 import AttackLaunchpad from './components/AttackLaunchpad'
 import MerchantStore from './components/MerchantStore'
 import RulesSynthesizer from './components/RulesSynthesizer'
-import PitchDeck from './components/PitchDeck'
+import ArchitectureOverview from './components/ArchitectureOverview'
 import FraudGraphCanvas from './components/FraudGraphCanvas'
-import GuidedDemoShowcase from './components/GuidedDemoShowcase'
+import AutomatedThreatRunner from './components/AutomatedThreatRunner'
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const WS_URL = 'ws://localhost:8000/ws'
@@ -380,10 +380,10 @@ export default function App() {
             <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
               RazorShield Sentinel
               <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
-                v2.0 Grand Prize Edition
+                Enterprise Edition v1.2
               </span>
             </h1>
-            <p className="text-xs text-slate-400">Autonomous Anti-Carding &amp; Agent-Aware Defense Engine with Zero-False-Decline Recovery</p>
+            <p className="text-xs text-slate-400">Autonomous Real-Time Fraud &amp; Bot Abuse Mitigation Engine</p>
           </div>
         </div>
 
@@ -414,7 +414,7 @@ export default function App() {
             }`}
           >
             <FileText size={14} />
-            Pitch Deck &amp; Architecture
+            Architecture &amp; Risk Models
           </button>
         </div>
 
@@ -426,11 +426,11 @@ export default function App() {
 
       {/* Main Tab Content */}
       {activeTab === 'pitch' ? (
-        <PitchDeck />
+        <ArchitectureOverview />
       ) : (
         <>
-          {/* 1-Click Guided Video Showcase Mode */}
-          <GuidedDemoShowcase />
+          {/* Autonomous Threat Simulation Bar */}
+          <AutomatedThreatRunner />
 
           {/* Attack Launchpad Bar */}
           <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />

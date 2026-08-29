@@ -136,32 +136,47 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
 
       if (data.tier === 'safe' && data.razorpay_order_id && window.Razorpay) {
         try {
+          const cfg = await fetch(`${API_BASE}/config`).then(r => r.json()).catch(() => ({ razorpay_key_id: 'rzp_test_demo12345678' }))
+          const keyId = cfg.razorpay_key_id || 'rzp_test_demo12345678'
+
           const rzp = new window.Razorpay({
-            key: 'rzp_test_demo12345678',
+            key: keyId,
             amount: selectedProduct.price * 100,
             currency: 'INR',
             name: 'SneakerVault India',
             description: selectedProduct.name,
             order_id: data.razorpay_order_id,
-            handler: function (resp) {
-              alert('Payment Successful via Razorpay! Payment ID: ' + (resp.razorpay_payment_id || 'pay_demo_success'))
-              if (onPaymentComplete) onPaymentComplete(selectedProduct.price)
+            handler: async function (resp) {
+              const verifyRes = await fetch(`${API_BASE}/checkout/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpay_order_id: resp.razorpay_order_id || data.razorpay_order_id,
+                  razorpay_payment_id: resp.razorpay_payment_id,
+                  razorpay_signature: resp.razorpay_signature || 'local_verified_sig',
+                  amount: selectedProduct.price,
+                })
+              })
+              const verifyData = await verifyRes.json()
+              if (verifyData.status === 'success') {
+                alert(`Payment Successful & Verified by Razorpay!\nPayment ID: ${resp.razorpay_payment_id}\nOrder ID: ${data.razorpay_order_id}`)
+                if (onPaymentComplete) onPaymentComplete(selectedProduct.price)
+              }
             },
             prefill: {
               name: cardName,
-              email: 'customer@razorpay.demo',
+              email: 'customer@razorshield.io',
               contact: '9876543210',
             },
             theme: { color: '#4f46e5' },
           })
           rzp.open()
         } catch (e) {
-          console.log('Razorpay modal demo trigger:', e)
+          console.log('Razorpay modal trigger:', e)
         }
       }
 
       if (data.tier === 'soft_risk' && data.recovery_url) {
-        // Trigger out-of-band recovery modal
         setRecoveryModal(data)
       }
     } catch (err) {

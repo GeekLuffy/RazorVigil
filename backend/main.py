@@ -360,6 +360,51 @@ class RecoveryConfirmRequest(BaseModel):
     amount: float
 
 
+@app.get("/config")
+async def get_config():
+    return {
+        "razorpay_key_id": razorpay_client.key_id,
+        "is_live_configured": razorpay_client.is_live_configured,
+        "mode": "live" if razorpay_client.is_live_configured else "test",
+    }
+
+
+class VerifyPaymentRequest(BaseModel):
+    razorpay_order_id: str
+    razorpay_payment_id: str
+    razorpay_signature: str
+    amount: float = 0.0
+
+
+@app.post("/checkout/verify")
+async def verify_payment(req: VerifyPaymentRequest):
+    is_valid = razorpay_client.verify_payment_signature(
+        razorpay_order_id=req.razorpay_order_id,
+        razorpay_payment_id=req.razorpay_payment_id,
+        razorpay_signature=req.razorpay_signature,
+    )
+
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Invalid Razorpay payment signature.")
+
+    await _broadcast({
+        "type": "payment_verified_success",
+        "order_id": req.razorpay_order_id,
+        "payment_id": req.razorpay_payment_id,
+        "amount": req.amount,
+        "timestamp": time.time(),
+        "message": f"Razorpay Payment {req.razorpay_payment_id} successfully verified for Order {req.razorpay_order_id[:8]}.",
+    })
+
+    return {
+        "status": "success",
+        "verified": True,
+        "order_id": req.razorpay_order_id,
+        "payment_id": req.razorpay_payment_id,
+        "message": "Payment verified by RazorShield Sentinel.",
+    }
+
+
 @app.post("/recovery/confirm")
 async def confirm_recovery(req: RecoveryConfirmRequest):
     from jose import jwt, JWTError

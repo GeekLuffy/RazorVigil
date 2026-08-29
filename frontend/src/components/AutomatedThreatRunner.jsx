@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import { Play, CheckCircle2, ShieldAlert, Sparkles, Volume2 } from 'lucide-react'
+import React, { useState } from 'react'
+import { Play, ShieldAlert, Sparkles, Activity } from 'lucide-react'
 
-const SHOWCASE_STEPS = [
+const SIMULATION_STAGES = [
   {
     step: 1,
-    title: 'Baseline Genuine Traffic',
-    script: 'RazorShield maintains sub-15ms latency on genuine checkouts, passing verified cardholders smoothly.',
+    title: 'Baseline Synthetic Traffic',
+    status: 'Routing baseline transactions…',
     endpoint: '/checkout',
     method: 'POST',
     payload: {
       amount: 1499.0,
       bin6: '424242',
-      card_hash: 'gen_card_showcase_01',
-      device_fingerprint: 'dev_gen_showcase_01',
-      ip_hash: 'ip_gen_showcase_01',
+      card_hash: 'gen_card_sim_01',
+      device_fingerprint: 'dev_gen_sim_01',
+      ip_hash: 'ip_gen_sim_01',
       asn_type: 'residential',
       ja3_ua_mismatch: false,
       keystroke_entropy: 2.5,
@@ -23,39 +23,39 @@ const SHOWCASE_STEPS = [
   },
   {
     step: 2,
-    title: 'Distributed Botnet Carding Burst',
-    script: 'When a distributed carding botnet launches 10 burst attempts across datacenter proxies, sliding-window Redis velocity catches them instantly.',
+    title: 'Distributed Carding Burst',
+    status: 'Simulating multi-proxy botnet burst…',
     isBurst: true,
   },
   {
     step: 3,
-    title: 'Zero-Day Canary Honeytoken Trap',
-    script: 'To catch zero-day card scanners with 0% false positives, our 50 Luhn-valid Canary cards trigger instant honeypot containment.',
+    title: 'Canary Honeytoken Breach',
+    status: 'Injecting synthetic canary card…',
     isCanary: true,
   },
   {
     step: 4,
-    title: 'Track 03 Recovery & Razorpay Webhook GMV',
-    script: 'When a genuine user shops on a VPN, RazorShield avoids a hard decline, issues an out-of-band UPI link, and recovers Rs.16,999 confirmed by Razorpay webhooks.',
+    title: 'Revenue Recovery & Webhook Ingestion',
+    status: 'Simulating out-of-band recovery settlement…',
     isRecovery: true,
   },
 ]
 
-export default function GuidedDemoShowcase({ onRunTx }) {
+export default function AutomatedThreatRunner() {
   const [isRunning, setIsRunning] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
-  const [activeScript, setActiveScript] = useState('')
+  const [statusMsg, setStatusMsg] = useState('')
 
-  const runShowcase = async () => {
+  const runSimulation = async () => {
     if (isRunning) return
     setIsRunning(true)
 
-    for (let i = 0; i < SHOWCASE_STEPS.length; i++) {
-      const stepData = SHOWCASE_STEPS[i]
+    for (let i = 0; i < SIMULATION_STAGES.length; i++) {
+      const stage = SIMULATION_STAGES[i]
       setCurrentStep(i + 1)
-      setActiveScript(stepData.script)
+      setStatusMsg(stage.status)
 
-      if (stepData.isBurst) {
+      if (stage.isBurst) {
         for (let b = 0; b < 8; b++) {
           await fetch('http://localhost:8000/checkout', {
             method: 'POST',
@@ -63,8 +63,8 @@ export default function GuidedDemoShowcase({ onRunTx }) {
             body: JSON.stringify({
               amount: 10.0,
               bin6: '522222',
-              card_hash: `showcase_bot_${b}_${Date.now()}`,
-              device_fingerprint: 'dev_showcase_botnet',
+              card_hash: `sim_bot_${b}_${Date.now()}`,
+              device_fingerprint: 'dev_sim_botnet',
               ip_hash: `ip_dc_burst_${b}`,
               asn_type: 'datacenter',
               ja3_ua_mismatch: true,
@@ -75,7 +75,7 @@ export default function GuidedDemoShowcase({ onRunTx }) {
           })
           await new Promise(r => setTimeout(r, 200))
         }
-      } else if (stepData.isCanary) {
+      } else if (stage.isCanary) {
         const canaryRes = await fetch('http://localhost:8000/canary/demo-hash?index=7').then(r => r.json())
         await fetch('http://localhost:8000/checkout', {
           method: 'POST',
@@ -93,8 +93,7 @@ export default function GuidedDemoShowcase({ onRunTx }) {
             time_on_page_s: 30.0,
           })
         })
-      } else if (stepData.isRecovery) {
-        // Trigger soft risk
+      } else if (stage.isRecovery) {
         await fetch('http://localhost:8000/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -112,7 +111,6 @@ export default function GuidedDemoShowcase({ onRunTx }) {
           })
         })
         await new Promise(r => setTimeout(r, 1200))
-        // Trigger Webhook Confirmation
         await fetch('http://localhost:8000/webhook/razorpay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -121,77 +119,73 @@ export default function GuidedDemoShowcase({ onRunTx }) {
             payload: {
               payment: {
                 entity: {
-                  id: `pay_showcase_${Date.now()}`,
+                  id: `pay_sim_${Date.now()}`,
                   amount: 1699900,
-                  order_id: 'order_sneaker_recovered_99',
+                  order_id: 'order_recovered_sim_99',
                 }
               }
             }
           })
         })
       } else {
-        await fetch(`http://localhost:8000${stepData.endpoint}`, {
-          method: stepData.method,
+        await fetch(`http://localhost:8000${stage.endpoint}`, {
+          method: stage.method,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(stepData.payload),
+          body: JSON.stringify(stage.payload),
         })
       }
 
-      await new Promise(r => setTimeout(r, 4500))
+      await new Promise(r => setTimeout(r, 3500))
     }
 
     setIsRunning(false)
-    setActiveScript('Showcase complete! All 4 defense layers verified.')
+    setStatusMsg('Simulation complete. All defense layers verified.')
     setTimeout(() => {
       setCurrentStep(0)
-      setActiveScript('')
+      setStatusMsg('')
     }, 4000)
   }
 
   return (
-    <div className="mb-4 bg-gradient-to-r from-indigo-950/90 via-slate-900 to-indigo-950/90 border border-indigo-500/40 rounded-xl p-3 shadow-lg">
+    <div className="mb-4 bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-md">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 bg-indigo-600 rounded-lg text-white">
-            <Sparkles size={16} />
+            <Activity size={16} />
           </div>
           <div>
             <div className="text-xs font-bold text-white flex items-center gap-2">
-              1-Click Video Showcase Mode
+              Autonomous Resilience &amp; Threat Simulation
               {isRunning && (
-                <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.2 rounded-full animate-pulse">
-                  Step {currentStep}/4 Active
+                <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.2 rounded-full animate-pulse">
+                  Stage {currentStep}/4 Active
                 </span>
               )}
             </div>
-            <div className="text-[11px] text-slate-300">
-              Auto-choreographs the full 2-minute pitch story across normal, botnet, canary, and recovery flows.
+            <div className="text-[11px] text-slate-400">
+              Evaluates synchronous gateway throughput, velocity defense, honeypot isolation, and recovery loops.
             </div>
           </div>
         </div>
 
         <button
-          onClick={runShowcase}
+          onClick={runSimulation}
           disabled={isRunning}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold font-mono transition-all ${
             isRunning
               ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-              : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md hover:shadow-indigo-500/25 border border-indigo-400/30'
+              : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm border border-indigo-400/30'
           }`}
         >
           <Play size={13} className={isRunning ? 'animate-spin' : ''} />
-          {isRunning ? 'Running Guided Showcase…' : '🎬 Run Guided Pitch Showcase'}
+          {isRunning ? 'Running Simulation…' : 'Execute Automated Threat Suite'}
         </button>
       </div>
 
-      {/* Real-Time Teleprompter Subtitles for Recording */}
-      {activeScript && (
-        <div className="mt-2.5 pt-2 border-t border-indigo-500/20 flex items-start gap-2 text-xs text-indigo-200 font-sans bg-indigo-950/40 p-2 rounded-lg">
-          <Volume2 size={15} className="text-indigo-400 mt-0.5 shrink-0 animate-pulse" />
-          <div className="flex-1 leading-relaxed">
-            <strong className="text-white">Presenter Voiceover Prompt: </strong>
-            "{activeScript}"
-          </div>
+      {statusMsg && (
+        <div className="mt-2 pt-2 border-t border-slate-800 flex items-center gap-2 text-xs text-indigo-300 font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+          <span>{statusMsg}</span>
         </div>
       )}
     </div>
