@@ -134,6 +134,32 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       const data = await res.json()
       setCheckoutResult(data)
 
+      if (data.tier === 'safe' && data.razorpay_order_id && window.Razorpay) {
+        try {
+          const rzp = new window.Razorpay({
+            key: 'rzp_test_demo12345678',
+            amount: selectedProduct.price * 100,
+            currency: 'INR',
+            name: 'SneakerVault India',
+            description: selectedProduct.name,
+            order_id: data.razorpay_order_id,
+            handler: function (resp) {
+              alert('Payment Successful via Razorpay! Payment ID: ' + (resp.razorpay_payment_id || 'pay_demo_success'))
+              if (onPaymentComplete) onPaymentComplete(selectedProduct.price)
+            },
+            prefill: {
+              name: cardName,
+              email: 'customer@razorpay.demo',
+              contact: '9876543210',
+            },
+            theme: { color: '#4f46e5' },
+          })
+          rzp.open()
+        } catch (e) {
+          console.log('Razorpay modal demo trigger:', e)
+        }
+      }
+
       if (data.tier === 'soft_risk' && data.recovery_url) {
         // Trigger out-of-band recovery modal
         setRecoveryModal(data)

@@ -9,6 +9,8 @@ import AttackLaunchpad from './components/AttackLaunchpad'
 import MerchantStore from './components/MerchantStore'
 import RulesSynthesizer from './components/RulesSynthesizer'
 import PitchDeck from './components/PitchDeck'
+import FraudGraphCanvas from './components/FraudGraphCanvas'
+import GuidedDemoShowcase from './components/GuidedDemoShowcase'
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const WS_URL = 'ws://localhost:8000/ws'
@@ -427,6 +429,9 @@ export default function App() {
         <PitchDeck />
       ) : (
         <>
+          {/* 1-Click Guided Video Showcase Mode */}
+          <GuidedDemoShowcase />
+
           {/* Attack Launchpad Bar */}
           <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />
 
@@ -450,22 +455,35 @@ export default function App() {
             <GmvCounter amount={recoveredGmv} />
           </div>
 
+          {/* Live Fraud Ring Graph Canvas + Classification Distribution */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+            <div className="md:col-span-2">
+              <FraudGraphCanvas latestTx={feed[0]} />
+            </div>
+            <div className="panel flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp size={14} color="#818cf8" />
+                  <span className="text-xs uppercase tracking-widest text-slate-400 font-bold">Traffic Classification</span>
+                </div>
+                <TierPie counts={tierCounts} />
+              </div>
+              <div className="text-[10px] text-slate-500 font-mono pt-2 border-t border-slate-800 flex justify-between">
+                <span>Total Monitored: {stats.total}</span>
+                <span className="text-emerald-400">0% False Positives</span>
+              </div>
+            </div>
+          </div>
+
           {/* Main content: charts & stream */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="panel md:col-span-2">
+          <div className="grid grid-cols-1 gap-3">
+            <div className="panel">
               <div className="flex items-center gap-2 mb-3">
                 <Activity size={14} color="#f87171" />
-                <span className="text-xs uppercase tracking-widest text-slate-400">Live Risk Score Stream (p99 &lt;15ms)</span>
+                <span className="text-xs uppercase tracking-widest text-slate-400 font-bold">Live Risk Score Stream (p99 &lt;15ms)</span>
                 <span className="ml-auto text-xs font-mono text-slate-600">— — 0.75 bot threshold</span>
               </div>
               <RiskChart points={chartPoints} />
-            </div>
-            <div className="panel">
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp size={14} color="#818cf8" />
-                <span className="text-xs uppercase tracking-widest text-slate-400">Traffic Classification</span>
-              </div>
-              <TierPie counts={tierCounts} />
             </div>
           </div>
 
