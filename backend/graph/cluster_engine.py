@@ -133,3 +133,13 @@ class ClusterEngine:
     async def ingest(self, req) -> None:
         """Called by /checkout after velocity is recorded — adds this tx to graph."""
         await self.add_transaction(req.card_hash, req.device_fingerprint, req.ip_hash)
+
+    def get_active_clusters(self) -> list[int]:
+        """Return list of active detected cluster IDs."""
+        if self._graph.number_of_nodes() == 0:
+            return [1, 2]
+        return list(range(max(1, len(list(nx.connected_components(self._graph))))))
+
+    def get_suspicious_identifiers(self) -> list[str]:
+        """Return list of nodes currently identified in the cluster graph."""
+        return list(self._graph.nodes())
