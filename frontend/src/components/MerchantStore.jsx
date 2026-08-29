@@ -133,9 +133,9 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   const autofillPreset = (type) => {
     if (type === 'human') {
       setCardName('Rahul Sharma')
-      setCardNumber('4242 4242 4242 4242')
+      setCardNumber('4111 1111 1111 1111')
       setExpiry('12/28')
-      setCvv('888')
+      setCvv('123')
       setVpnMode(false)
       setLiveEntropy(2.65)
       setLiveJitter(0.68)
