@@ -61,6 +61,13 @@ THREAT_MEMORY_CASES: List[Dict[str, Any]] = [
         "remedy": "Trigger out-of-band UPI QR recovery link; hold inventory for 5 minutes.",
     },
     {
+        "case_id": "TM-2026-PROXY01",
+        "title": "Rotating Residential Proxy Autohitter Swarm",
+        "description": "Multi-threaded checkout cashout bot cycling disparate residential/mobile SOCKS5 proxies to hit high-ticket inventory with zero session warmup.",
+        "vector": np.array([16999.0, 0.0, 1.0, 0.0, 0.0, 14.0, 1.0, 0.95]),
+        "remedy": "Quarantine device fingerprint across all rotating IPs and trigger Louvain community ring isolation.",
+    },
+    {
         "case_id": "TM-2026-TG01",
         "title": "Telegram ₹1 Payment Page Checker (Browserless CDP / r.php)",
         "description": "Multi-threaded Telegram bot hitting razorpay.me payment links with ₹1 micro-charges, static CDP device fingerprints, and zero-entropy AJAX calls.",

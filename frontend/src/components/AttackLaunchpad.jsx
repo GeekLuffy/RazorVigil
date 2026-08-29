@@ -98,28 +98,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
         })
         setLastActionStatus('Verified AI Shopping Agent Passed via Attestation')
       } else if (type === 'proxy') {
-        // Slow rate distributed
+        // Rotating Residential Proxy Autohitter: single device cycling 6 residential IPs on high-value items
+        const isps = ['airtel_delhi', 'jio_mumbai', 'act_blr', 'tata_hyd', 'bsnl_kolkata', 'hathway_pune']
         for (let i = 0; i < 6; i++) {
           await fetch(`${API_BASE}/checkout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              amount: 85,
+              amount: 16999,
               bin6: '522222',
-              card_hash: `slow_card_w${i}_${Date.now()}`,
-              device_fingerprint: `fp_slow_cluster_${i % 2}`,
-              ip_hash: `ip_residential_proxy_${i}`,
+              card_hash: `autohit_card_${Date.now()}_${i}`,
+              device_fingerprint: 'fp_autohitter_node_x9',
+              ip_hash: `ip_res_${isps[i]}`,
               asn_type: 'residential',
-              ja3_ua_mismatch: true,
-              keystroke_entropy: 0.15,
-              mouse_jitter_score: 0.02,
+              ja3_ua_mismatch: false,
+              keystroke_entropy: 0.0,
+              mouse_jitter_score: 0.0,
               paste_event: true,
-              time_on_page_s: 1.2
+              time_on_page_s: 0.4
             })
           })
-          await new Promise(r => setTimeout(r, 120))
+          await new Promise(r => setTimeout(r, 100))
         }
-        setLastActionStatus('Distributed Proxy Ring Detected via Velocity Graph')
+        setLastActionStatus('Rotating Residential Proxy Autohitter Blocked via Device Fanout & Louvain Graph Ring')
       }
     } catch (e) {
       setLastActionStatus(`Error: ${e.message}`)
@@ -185,10 +186,10 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('proxy')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 rounded-lg text-xs font-medium transition disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 rounded-lg text-xs font-bold transition disabled:opacity-50 shadow-sm"
           >
             {loadingAction === 'proxy' ? <Loader2 size={13} className="animate-spin" /> : <Globe size={13} />}
-            Distributed Proxy Ring
+            🌐 Rotating Proxies (6x Swarm)
           </button>
 
           {onTriggerStoreDemo && (

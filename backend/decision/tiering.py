@@ -54,6 +54,21 @@ class DecisionEngine:
             )
 
         # ----------------------------------------------------------------
+        # Session-Compressed Autohitter Trap (Layer 1)
+        # Catches multi-threaded checkout bots hitting high-ticket items instantly
+        # ----------------------------------------------------------------
+        if req.time_on_page_s < 2.0 and req.amount >= 5000 and req.keystroke_entropy < 0.5:
+            return (
+                "high_confidence_bot",
+                "honeypot",
+                (
+                    f"Rule override: Session-compressed autohitter detected "
+                    f"(amount=Rs.{req.amount:,.0f} in {req.time_on_page_s:.2f}s with zero biometric entropy). "
+                    f"Quarantined."
+                ),
+            )
+
+        # ----------------------------------------------------------------
         # Micro-Auth Enumeration Trap (Layer 1)
         # Catches Telegram ₹1.00 checker attacks on Payment Pages
         # ----------------------------------------------------------------

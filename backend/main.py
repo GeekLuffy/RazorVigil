@@ -277,6 +277,23 @@ async def checkout(
     vel_features = await velocity_tracker.record_and_get_features(req)
     asyncio.create_task(cluster_engine.ingest(req))
 
+    # 3.1 Rotating Residential Proxy Pool Trap
+    if vel_features.device_distinct_ip_count >= 3:
+        latency_ms = (time.perf_counter() - t0) * 1000
+        response = CheckoutResponse(
+            transaction_id=req.transaction_id,
+            tier="high_confidence_bot",
+            risk_score=0.98,
+            action="honeypot",
+            latency_ms=round(latency_ms, 2),
+            explanation=f"Rotating residential proxy autohitter detected: Device fingerprint cycled across {vel_features.device_distinct_ip_count} distinct IPs in <5m. Quarantined.",
+            amount=req.amount,
+            razorpay_order_id=None,
+        )
+        if ws_clients:
+            asyncio.create_task(_broadcast(response.model_dump()))
+        return response
+
     # 4. Louvain Community Cluster Scoring
     cluster_score, cluster_id = await cluster_engine.get_cluster_score(req.device_fingerprint)
 
