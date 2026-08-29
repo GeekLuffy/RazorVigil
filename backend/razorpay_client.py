@@ -10,6 +10,9 @@ import time
 import uuid
 from typing import Optional, Dict, Any
 
+from dotenv import load_dotenv
+load_dotenv()
+
 try:
     import razorpay
 except ImportError:
