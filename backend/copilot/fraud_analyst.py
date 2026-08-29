@@ -61,6 +61,13 @@ THREAT_MEMORY_CASES: List[Dict[str, Any]] = [
         "remedy": "Trigger out-of-band UPI QR recovery link; hold inventory for 5 minutes.",
     },
     {
+        "case_id": "TM-2026-TG01",
+        "title": "Telegram ₹1 Payment Page Checker (Browserless CDP / r.php)",
+        "description": "Multi-threaded Telegram bot hitting razorpay.me payment links with ₹1 micro-charges, static CDP device fingerprints, and zero-entropy AJAX calls.",
+        "vector": np.array([1.0, 2.0, 1.0, 0.0, 0.0, 25.0, 18.0, 0.98]),
+        "remedy": "Blacklist botnet device fingerprint hash, quarantine ASN CIDR, and enforce micro-auth rate limiting.",
+    },
+    {
         "case_id": "TM-2026-0211",
         "title": "Compromised Agent Credential Replay",
         "description": "AI agent attestation token reused across anomalous burst of disparate cards and geographic regions.",

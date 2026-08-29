@@ -12,7 +12,27 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
     setLastActionStatus(null)
 
     try {
-      if (type === 'burst') {
+      if (type === 'tg_checker') {
+        // Real-world Telegram ₹1 Checker exploit with hardcoded CDP fingerprint & micro-auth
+        await fetch(`${API_BASE}/checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: 1.0,
+            bin6: '411773',
+            card_hash: `tg_stolen_card_411773_${Date.now()}`,
+            device_fingerprint: 'noXc7Zv4NmOzRNIl3zmSernrLMFEo05J0lh73kdY46cUpMIuLjBQbCwQygBbMH4t4xfrCkwWutyony5DncDTRX0e50ULyy2GMgy2LUxAwaxczwLNJYzwLXqTe7GlMxqzCo7XgsfxKEWuy6hRjefIXYKVOJ23KBn6',
+            ip_hash: 'ip_browserless_cdp_node',
+            asn_type: 'datacenter',
+            ja3_ua_mismatch: true,
+            keystroke_entropy: 0.0,
+            mouse_jitter_score: 0.0,
+            paste_event: true,
+            time_on_page_s: 0.05,
+          })
+        })
+        setLastActionStatus('Telegram ₹1 Checker Exploit Blocked via Botnet Fingerprint & Micro-Auth Trap')
+      } else if (type === 'burst') {
         // Fire 15 rapid bot requests
         for (let i = 0; i < 15; i++) {
           await fetch(`${API_BASE}/checkout`, {
@@ -128,11 +148,20 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
         <div className="flex flex-wrap items-center gap-2">
           <button
             disabled={loadingAction !== null}
+            onClick={() => sendAttack('tg_checker')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600/25 hover:bg-rose-600/35 border border-rose-500/50 text-rose-200 rounded-lg text-xs font-bold transition disabled:opacity-50 shadow-sm animate-pulse"
+          >
+            {loadingAction === 'tg_checker' ? <Loader2 size={13} className="animate-spin" /> : <span>⚡</span>}
+            Telegram ₹1 Checker (CDP Bot)
+          </button>
+
+          <button
+            disabled={loadingAction !== null}
             onClick={() => sendAttack('burst')}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 rounded-lg text-xs font-medium transition disabled:opacity-50 shadow-sm"
           >
             {loadingAction === 'burst' ? <Loader2 size={13} className="animate-spin" /> : <Flame size={13} />}
-            15x Telegram Bot Burst
+            15x Distributed Burst
           </button>
 
           <button

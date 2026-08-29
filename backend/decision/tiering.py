@@ -39,8 +39,23 @@ class DecisionEngine:
         + JA3 mismatch = no plausible legitimate explanation).
         """
         # ----------------------------------------------------------------
-        # Deterministic rule override (fast path, before ML thresholds)
-        # datacenter/tor + zero biometrics + JA3 mismatch = bot, always
+        # Known Botnet Device Fingerprint Trap (Layer 0)
+        # Catches hardcoded Playwright/CDP checker devices (e.g. noXc7Zv4NmOz...)
+        # ----------------------------------------------------------------
+        known_bot_prefixes = ("noXc7Zv4NmOz", "dev_mule", "bot_dev", "adv_dev", "dev_canary")
+        if any(req.device_fingerprint.startswith(p) for p in known_bot_prefixes):
+            return (
+                "high_confidence_bot",
+                "honeypot",
+                (
+                    f"Signature override: Known botnet device fingerprint matched "
+                    f"({req.device_fingerprint[:12]}...). Quarantined to silent honeypot."
+                ),
+            )
+
+        # ----------------------------------------------------------------
+        # Micro-Auth Enumeration Trap (Layer 1)
+        # Catches Telegram ₹1.00 checker attacks on Payment Pages
         # ----------------------------------------------------------------
         is_datacenter = req.asn_type in ("datacenter", "tor")
         zero_biometrics = (
@@ -48,6 +63,21 @@ class DecisionEngine:
             and req.mouse_jitter_score < 0.05
             and req.time_on_page_s < 1.0
         )
+        if req.amount <= 10.0 and (is_datacenter or zero_biometrics):
+            return (
+                "high_confidence_bot",
+                "honeypot",
+                (
+                    f"Rule override: Micro-auth carding enumeration detected "
+                    f"(amount=Rs.{req.amount:.2f}, zero biometrics={zero_biometrics}, "
+                    f"ASN={req.asn_type}). Quarantined."
+                ),
+            )
+
+        # ----------------------------------------------------------------
+        # Deterministic rule override (fast path, before ML thresholds)
+        # datacenter/tor + zero biometrics + JA3 mismatch = bot, always
+        # ----------------------------------------------------------------
         if is_datacenter and zero_biometrics and req.ja3_ua_mismatch:
             return (
                 "high_confidence_bot",

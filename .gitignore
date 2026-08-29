@@ -10,3 +10,6 @@ data/*.parquet
 data/*.png
 data/load_test_results.json
 .ipynb_checkpoints/
+threat_intelligence/
+evidence/
+*.log
