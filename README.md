@@ -7,7 +7,9 @@
 
 ## 📌 Executive Overview
 
-**RazorShield Sentinel** is an autonomous risk mitigation and fraud intelligence shield designed for payment gateways and high-volume digital merchants. It delivers sub-15ms decisioning to neutralize carding botnets, credential enumeration, and distributed proxy attacks while recovering legitimate revenue from false declines via automated out-of-band checkout recovery.
+**RazorShield Sentinel** is a **specialist carding & bot-abuse investigation sub-agent** for the Razorpay ecosystem — designed to plug into [Razorpay Agent Studio](https://razorpay.com/agent-studio) via the **Model Context Protocol (MCP)**, the same Claude Agent SDK stack that powers Agent Studio natively.
+
+Rather than competing with Razorpay's own native fraud agents, RazorShield provides the **deep forensic layer** they can delegate to: Louvain graph-based carding ring detection, biometric entropy scoring, canary honeytoken traps, and structured dispute evidence dossiers — all exposed as MCP tools callable by any Agent Studio agent.
 
 ```
                                     CHECKOUT REQUEST
@@ -16,7 +18,7 @@
                        RAZORSHIELD SENTINEL PIPELINE (<50ms)
        ┌───────────────────────────────────────────────────────────────┐
        │ 1. [L0] Agent-Aware Gate: Cryptographic AP2 JWT Attestation   │
-       │ 2. [L0] Honeytoken Traps: 50 Luhn-Valid Canary Cards (0% FP) │
+       │ 2. [L0] Honeytoken Traps: 50 Luhn-Valid Canary Cards          │
        │ 3. [L1] Velocity Engine: Redis Atomic Sliding-Window Counters │
        │ 4. [L2] Graph Engine: In-Memory Louvain Community Clustering  │
        │ 5. [L3] Hybrid ML: Optuna-Tuned LightGBM + Isolation Forest   │
@@ -28,29 +30,35 @@
         SAFE & RECOVERED ORDERS                        BLOCKED BOTNET TRAFFIC
      • Razorpay Orders API Provisioning            • Zero Gateway Contamination
      • Dynamic Out-of-Band UPI QR Recovery         • Edge WAF Rule Synthesis
-     • Razorpay Webhook GMV Confirmation           • Async Forensic Threat RAG
+     • Razorpay Webhook GMV Confirmation           • MCP Tools for Agent Studio
 ```
 
 ---
 
 ## ⚡ Core Capabilities & Differentiators
 
-1. **50 Luhn-Valid Canary Honeytokens**:
-   - Programmatically deployed synthetic payment instruments that are never issued to real cardholders.
-   - Any authorization attempt immediately triggers an instant 1.0 confidence block without ML latency, yielding a **0.00% False Positive Rate**.
+1. **Razorpay Agent Studio MCP Integration (Primary Differentiator)**:
+   - Exposes 4 MCP tools (`check_canary_status`, `get_cluster_risk_score`, `investigate_transaction`, `compile_dispute_evidence`) callable by any Claude Agent SDK agent.
+   - Razorpay's native Dispute Responder can call `compile_dispute_evidence` to get richer 5-domain forensic dossiers for dispute cases.
+   - Pitch: *"Not competing with what Razorpay shipped — plugging into it as the specialist sub-agent."*
 
-2. **Agent-Aware Risk Protocol (Google AP2 Compatible)**:
+2. **50 Luhn-Valid Canary Honeytokens**:
+   - Programmatically deployed synthetic payment instruments seeded exclusively within our own decoy inventory and honeytoken check endpoint.
+   - Discoverable only via BIN-enumeration or scraping directed at our own system — any hit is an unambiguous 1.0-confidence block.
+   - **0.00% False Positive Rate on the canary detection layer** (by mathematical construction — these PANs were never issued to real cardholders).
+
+3. **Agent-Aware Risk Protocol (Google AP2 Compatible)**:
    - Evaluates cryptographic JWT attestations (`X-Agent-Attestation`) issued to autonomous shopping agents.
-   - Bypasses human biometric checks (e.g., mouse jitter, typing entropy) while enforcing strict sliding-window replay velocity to block stolen credentials.
+   - Bypasses human biometric checks while enforcing strict sliding-window replay velocity to block stolen credentials.
 
-3. **Track 03 Autonomous Revenue Recovery Loop**:
+4. **Track 03 Autonomous Revenue Recovery Loop**:
    - Borderline transactions (VPN users, mobile network handoffs) are classified as `soft_risk` rather than hard declined.
    - Generates a single-use signed payment link with an inventory hold, confirmed via live Razorpay Webhooks (`payment.captured`).
 
-4. **Autonomous Threat Advisory & Edge WAF Synthesizer**:
+5. **Autonomous Threat Advisory & Edge WAF Synthesizer**:
    - Dynamically synthesizes Cloudflare WAF firewall expressions and Razorpay Risk Rules directly from active Louvain graph clusters.
 
-5. **Forensic Copilot with Threat Memory RAG**:
+6. **Forensic Copilot with Threat Memory RAG**:
    - Executes off-hot-path cosine similarity retrieval over historical carding campaigns to provide structured intelligence briefs to SOC analysts.
 
 ---

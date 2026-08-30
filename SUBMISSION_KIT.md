@@ -7,7 +7,7 @@
 ## 📌 1. Project Title & Tagline
 
 - **Project Name**: **RazorShield Sentinel**
-- **Tagline**: Autonomous Anti-Carding & Agent-Aware Defense Engine with Zero-False-Decline Revenue Recovery
+- **Tagline**: Specialist Carding & Bot-Abuse Sub-Agent for Razorpay Agent Studio — Exposed via MCP, Built on the Same Claude Agent SDK Stack
 - **Tracks**: **Track 02 (AI Risk Manager)** & **Track 03 (Revenue Recovery)**
 
 ---
@@ -44,19 +44,51 @@
 
 ---
 
-## 🧪 3. Verification & Live Operational Scenarios
+## 🤖 3. Razorpay Agent Studio Integration (MCP Sub-Agent Positioning)
+
+**Positioning**: RazorShield Sentinel is **not** an alternative to Razorpay's native Agent Studio (launched March 12, 2026 at FTX'26) — Razorpay already ships a native transaction-monitoring fraud agent and a Dispute Responder agent. RazorShield is the **specialist carding/bot-abuse sub-agent** that Razorpay's own agents can delegate to for deep-forensic investigation — exposed using the same MCP protocol and Claude Agent SDK stack that Agent Studio is built on.
+
+### MCP Tool Schema (4 Tools)
+```python
+# Tool 1: Instant canary-hit detection
+check_canary_status(transaction_id: str) -> {"is_canary": bool, "confidence": float, "canary_index": int | None}
+
+# Tool 2: Cluster-risk score from live Louvain graph
+get_cluster_risk_score(device_fingerprint: str | None, ip_hash: str | None, card_hash: str | None) -> {"cluster_score": float, "cluster_id": str, "ring_size": int}
+
+# Tool 3: Full 8-layer pipeline investigation
+investigate_transaction(transaction_id: str) -> {"tier": str, "risk_score": float, "explanation": str, "signals": dict}
+
+# Tool 4: 5-domain draft evidence dossier (feeds Razorpay's Dispute Responder)
+compile_dispute_evidence(transaction_id: str) -> {"package_id": str, "claims": list, "signal_strength": float, "dossier_draft": str}
+```
+
+### How It Plugs Into Agent Studio
+> A judge-facing 1-sentence pitch: "We're not competing with what Razorpay just shipped — we're building the specialist carding/bot-abuse sub-agent that Razorpay's own Agent Studio can delegate to, exposed the same way Razorpay exposes its own agents: via MCP on the Claude Agent SDK."
+
+| Integration Point | What It Enables |
+|---|---|
+| `investigate_transaction` | Razorpay's native fraud agent delegates deep-forensic carding investigation to us |
+| `compile_dispute_evidence` | Our 5-domain dossier feeds Razorpay's own Dispute Responder with richer evidence |
+| `check_canary_status` | Instant zero-latency honeytoken check any agent can call |
+| `get_cluster_risk_score` | Real-time Louvain graph risk score for any entity hash |
+
+---
+
+## 🧪 4. Verification & Live Operational Scenarios
 
 | Scenario | Trigger / Endpoint | Observed Engine Behavior | Target Defense Layer |
 |---|---|---|---|
 | **Baseline Customer Purchase** | Standard human checkout on SneakerVault | Risk Score &lt; 0.15 (`safe`), latency &lt; 12ms. Provisions Razorpay Order ID. | Layer 3 LightGBM &amp; Biometrics |
 | **15x Telegram Botnet Burst** | Rapid carding attempts across datacenter proxies | Risk Score &gt; 0.90 (`high_confidence_bot`), quarantined to silent honeypot. | Layer 1 Sliding-Window Redis Velocity |
-| **Canary Honeytoken Breach** | Card scan on armed Canary BIN | Confidence 1.0 block (`high_confidence_bot`), 0.00% False Positive rate. | Layer 0 Canary Honeytoken Traps |
+| **Canary Honeytoken Breach** | Card scan on armed Canary BIN | Confidence 1.0 block (`high_confidence_bot`), 0.00% False Positive rate on canary layer. | Layer 0 Canary Honeytoken Traps |
 | **Legitimate Customer on VPN** | Genuine biometrics + datacenter ASN | Routed to `soft_risk`, single-use UPI QR link issued. GMV recovered upon settlement. | Layer 4 Track 03 Out-of-Band Bridge |
 | **Google AP2 AI Shopping Agent** | Headless checkout with valid `X-Agent-Attestation` | Attestation verified, velocity monitored, routed to `verified_agent`. | Layer 0 Agent-Aware Gate |
+| **MCP Agent Delegation Demo** | Claude Agent SDK agent calls `investigate_transaction` → `compile_dispute_evidence` | Full forensic pipeline + draft evidence dossier returned as structured JSON | Agent Studio MCP Integration |
 
 ---
 
-## 🚀 4. How to Run Locally
+## 🚀 5. How to Run Locally
 
 ```powershell
 # 1. Start Backend API (Port 8000)
