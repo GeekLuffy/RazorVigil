@@ -20,3 +20,4 @@ evidence/
 notes/
 scripts/
 *.log
+backend/dataset/*.csv
