@@ -144,8 +144,8 @@ function TierPie({ counts }) {
       <PieChart>
         <Pie data={data} cx="50%" cy="50%" innerRadius={45} outerRadius={75}
           dataKey="value" stroke="none">
-          {data.map((d) => (
-            <Cell key={d.tier} fill={PIE_COLORS[d.tier] ?? '#64748b'} />
+          {data.map((d, idx) => (
+            <Cell key={`tier-pie-${d.tier}-${idx}`} fill={PIE_COLORS[d.tier] ?? '#64748b'} />
           ))}
         </Pie>
         <Tooltip
@@ -225,7 +225,7 @@ function CopilotNotes({ notes }) {
       </div>
       <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
         {notes.slice(0, 5).map((n, i) => (
-          <div key={i} className="bg-slate-800/60 rounded-lg p-3 border border-slate-700/40">
+          <div key={n.transaction_id ? `${n.transaction_id}-${i}` : `copilot-note-${i}`} className="bg-slate-800/60 rounded-lg p-3 border border-slate-700/40">
             <div className="text-xs text-slate-500 font-mono mb-1">tx: {n.transaction_id?.slice(0, 8)}…</div>
             <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono leading-relaxed">{n.note}</pre>
           </div>
@@ -409,7 +409,11 @@ export default function App() {
         ws.onmessage = null
         ws.onclose = null
         ws.onerror = null
-        try { ws.close() } catch {}
+        if (ws.readyState === WebSocket.OPEN) {
+          try { ws.close() } catch {}
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+          ws.onopen = () => { try { ws.close() } catch {} }
+        }
       }
     }
   }, [handleTx, handleCopilotNote])
@@ -576,8 +580,8 @@ export default function App() {
                       Switch to "Threat Simulator &amp; Lab" tab to trigger automated or manual attacks.
                     </div>
                   ) : (
-                    feed.map((tx) => (
-                      <FeedRow key={tx.transaction_id} tx={tx} isNew={tx.transaction_id === newId} />
+                    feed.map((tx, idx) => (
+                      <FeedRow key={tx.transaction_id ? `${tx.transaction_id}-${idx}` : `feed-tx-${idx}`} tx={tx} isNew={tx.transaction_id === newId} />
                     ))
                   )}
                 </div>
