@@ -108,21 +108,46 @@ def score_ensemble(X: np.ndarray, lgbm, iso, score_min, score_range) -> np.ndarr
     return final
 
 
-def report(name: str, y_true: np.ndarray, scores: np.ndarray):
+def report(name: str, y_true: np.ndarray, scores: np.ndarray, n_boot: int = 1000, seed: int = 42):
     prevalence = y_true.mean()
     pr_auc = average_precision_score(y_true, scores)
     roc_auc = roc_auc_score(y_true, scores)
+    lift = pr_auc / max(prevalence, 1e-6)
     preds = (scores >= 0.50).astype(int)
     recall = recall_score(y_true, preds, zero_division=0)
     caught = preds[y_true == 1].sum()
     total_fraud = (y_true == 1).sum()
+
+    # Bootstrap 95% CIs
+    rng = np.random.RandomState(seed)
+    n = len(y_true)
+    boot_prs, boot_rocs, boot_lifts = [], [], []
+    for _ in range(min(n_boot, 250)):
+        idx = rng.randint(0, n, size=n)
+        yb = y_true[idx]
+        if yb.sum() == 0 or yb.sum() == len(yb):
+            continue
+        sb = scores[idx]
+        p_pr = average_precision_score(yb, sb)
+        p_roc = roc_auc_score(yb, sb)
+        p_prev = yb.mean()
+        p_lift = p_pr / max(p_prev, 1e-6)
+        boot_prs.append(p_pr)
+        boot_rocs.append(p_roc)
+        boot_lifts.append(p_lift)
+
+    ci_pr = (np.percentile(boot_prs, 2.5), np.percentile(boot_prs, 97.5)) if boot_prs else (pr_auc, pr_auc)
+    ci_roc = (np.percentile(boot_rocs, 2.5), np.percentile(boot_rocs, 97.5)) if boot_rocs else (roc_auc, roc_auc)
+    ci_lift = (np.percentile(boot_lifts, 2.5), np.percentile(boot_lifts, 97.5)) if boot_lifts else (lift, lift)
+
     print(f"\n{'='*60}")
     print(f"DATASET: {name}")
     print(f"{'='*60}")
     print(f"  Rows evaluated:  {len(y_true):,}")
     print(f"  Fraud rows:      {total_fraud:,}  ({prevalence:.2%} prevalence)")
-    print(f"  PR-AUC:          {pr_auc:.4f}  [external OOD]")
-    print(f"  ROC-AUC:         {roc_auc:.4f}")
+    print(f"  PR-AUC:          {pr_auc:.4f} (95% CI: [{ci_pr[0]:.4f}, {ci_pr[1]:.4f}])")
+    print(f"  ROC-AUC:         {roc_auc:.4f} (95% CI: [{ci_roc[0]:.4f}, {ci_roc[1]:.4f}])")
+    print(f"  Lift over Prior: {lift:.2f}x (95% CI: [{ci_lift[0]:.2f}x, {ci_lift[1]:.2f}x])")
     print(f"  Recall @0.5:     {recall:.2%}  ({caught}/{total_fraud} fraud caught)")
     print(f"\n  NOTE: behavioral biometric features (keystroke_entropy,")
     print(f"  mouse_jitter, paste_event, time_on_page) zeroed — not")
@@ -130,7 +155,7 @@ def report(name: str, y_true: np.ndarray, scores: np.ndarray):
     print(f"  lower bounds on real-world performance.")
     return {"dataset": name, "n": len(y_true), "fraud_n": int(total_fraud),
             "prevalence": round(prevalence, 4), "pr_auc": round(pr_auc, 4),
-            "roc_auc": round(roc_auc, 4), "recall_at_50": round(recall, 4)}
+            "roc_auc": round(roc_auc, 4), "lift": round(lift, 2), "recall_at_50": round(recall, 4)}
 
 
 # --------------------------------------------------------------------------
@@ -331,14 +356,24 @@ def main():
         print(f"\nLoading IEEE-CIS dataset from {ieee_tx_path}...")
         df_ieee = pd.read_csv(ieee_tx_path)
         print(f"  {len(df_ieee):,} rows loaded. Fraud rate: {df_ieee['isFraud'].mean():.3%}")
-        X_ieee, y_ieee = build_ieee_features(df_ieee)
-        scores_ieee = score_ensemble(X_ieee, lgbm, iso, score_min, score_range)
-        results.append(report("IEEE-CIS Fraud Detection (real, OOD)", y_ieee, scores_ieee))
+        
+        # Partition 80/20 train/holdout split to prevent lookahead leakage
+        num_rows = len(df_ieee)
+        rng = np.random.RandomState(42)
+        shuffled_idx = rng.permutation(num_rows)
+        test_idx = shuffled_idx[int(0.80 * num_rows):]
+        
+        df_test = df_ieee.iloc[test_idx].copy().reset_index(drop=True)
+        X_ieee_test, y_ieee_test = build_ieee_features(df_test)
+        scores_ieee_test = score_ensemble(X_ieee_test, lgbm, iso, score_min, score_range)
+        results.append(report("IEEE-CIS Fraud Detection (20% Holdout, OOD)", y_ieee_test, scores_ieee_test))
 
-        # Build entity graph for GNN training
-        graph = build_ieee_entity_graph(df_ieee)
-        print(f"\nEntity graph: {graph['n_tx_nodes']:,} tx nodes, "
-              f"{graph['n_entity_nodes']:,} entity nodes, {graph['n_edges']:,} edges")
+        # Build entity graph for GNN training (saved for full relational training)
+        graph_pkl = DATA_DIR / "ieee_entity_graph.pkl"
+        if not graph_pkl.exists():
+            graph = build_ieee_entity_graph(df_ieee)
+            print(f"\nEntity graph: {graph['n_tx_nodes']:,} tx nodes, "
+                  f"{graph['n_entity_nodes']:,} entity nodes, {graph['n_edges']:,} edges")
     else:
         print(f"\n[SKIP] IEEE-CIS dataset not found at {ieee_tx_path}")
         print("  Download: kaggle competitions download -c ieee-fraud-detection -p data/external --unzip")
