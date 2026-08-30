@@ -1,0 +1,1017 @@
+{
+  "execution_time_seconds": 9.85,
+  "status": "APPROVAL_ELIGIBLE",
+  "winning_candidate": "ComprehensiveMultiModal",
+  "winning_package": {
+    "name": "ComprehensiveMultiModal",
+    "description": "Full multi-modal feature set encompassing tabular, biometrics, velocity, and graph rings",
+    "features_used": [
+      "amount",
+      "time_on_page_s",
+      "keystroke_entropy",
+      "mouse_jitter_score",
+      "bin_card_count",
+      "ip_distinct_pan_count",
+      "device_distinct_bin_count",
+      "device_distinct_ip_count",
+      "cvv_cycle_attempts",
+      "cluster_risk_score",
+      "ring_density",
+      "burst_ratio"
+    ],
+    "coevolution_trace": [
+      {
+        "generation": 1,
+        "evasions_found": 95,
+        "search_budget": 300,
+        "evasion_rate": 0.3167,
+        "heldout_precision": 0.9634,
+        "heldout_recall": 0.9854,
+        "heldout_fp": 23
+      },
+      {
+        "generation": 2,
+        "evasions_found": 25,
+        "search_budget": 300,
+        "evasion_rate": 0.0833,
+        "heldout_precision": 0.9564,
+        "heldout_recall": 0.9984,
+        "heldout_fp": 28
+      },
+      {
+        "generation": 3,
+        "evasions_found": 5,
+        "search_budget": 300,
+        "evasion_rate": 0.0167,
+        "heldout_precision": 0.9535,
+        "heldout_recall": 1.0,
+        "heldout_fp": 30
+      },
+      {
+        "generation": 4,
+        "evasions_found": 2,
+        "search_budget": 300,
+        "evasion_rate": 0.0067,
+        "heldout_precision": 0.9491,
+        "heldout_recall": 1.0,
+        "heldout_fp": 33
+      },
+      {
+        "generation": 5,
+        "evasions_found": 2,
+        "search_budget": 300,
+        "evasion_rate": 0.0067,
+        "heldout_precision": 0.9491,
+        "heldout_recall": 1.0,
+        "heldout_fp": 33
+      },
+      {
+        "generation": 6,
+        "evasions_found": 5,
+        "search_budget": 300,
+        "evasion_rate": 0.0167,
+        "heldout_precision": 0.9491,
+        "heldout_recall": 1.0,
+        "heldout_fp": 33
+      },
+      {
+        "generation": 7,
+        "evasions_found": 3,
+        "search_budget": 300,
+        "evasion_rate": 0.01,
+        "heldout_precision": 0.9491,
+        "heldout_recall": 1.0,
+        "heldout_fp": 33
+      },
+      {
+        "generation": 8,
+        "evasions_found": 3,
+        "search_budget": 300,
+        "evasion_rate": 0.01,
+        "heldout_precision": 0.9491,
+        "heldout_recall": 1.0,
+        "heldout_fp": 33
+      }
+    ],
+    "robustness_certificate": {
+      "status": "PARTIAL_CONVERGENCE",
+      "final_evasions": 3,
+      "evasion_reduction_pct": 96.84,
+      "final_heldout_precision": 0.9491,
+      "final_heldout_recall": 1.0
+    },
+    "verification": {
+      "candidate_name": "ComprehensiveMultiModal",
+      "is_approval_eligible": true,
+      "eligibility_status": "APPROVAL_ELIGIBLE",
+      "gates_passed_count": 6,
+      "total_gates_count": 6,
+      "composite_ranking_score": 0.9021,
+      "gates": [
+        {
+          "gate_name": "Historical Regression Gate",
+          "passed": true,
+          "observed_precision": 0.9556,
+          "target_precision_floor": 0.85,
+          "observed_recall": 0.9983,
+          "target_recall_floor": 0.95,
+          "status_message": "Passes historical regression criteria"
+        },
+        {
+          "gate_name": "Adversarial Mutation Gate",
+          "passed": true,
+          "observed_catch_rate": 0.991,
+          "target_catch_floor": 0.9,
+          "n_adversarial_tests": 1000,
+          "status_message": "Passes adversarial robustness threshold"
+        },
+        {
+          "gate_name": "Segment Fairness Gate",
+          "passed": true,
+          "max_segment_fp_multiplier": 3.18,
+          "target_max_multiplier": 3.5,
+          "segments": [
+            {
+              "segment": "Micro (<500)",
+              "count": 581,
+              "fp_rate": 0.0017,
+              "fp_multiplier": 0.12
+            },
+            {
+              "segment": "Low (500-2k)",
+              "count": 4408,
+              "fp_rate": 0.0118,
+              "fp_multiplier": 0.85
+            },
+            {
+              "segment": "Mid (2k-5k)",
+              "count": 1922,
+              "fp_rate": 0.0442,
+              "fp_multiplier": 3.18
+            },
+            {
+              "segment": "High (>5k)",
+              "count": 89,
+              "fp_rate": 0.0112,
+              "fp_multiplier": 0.81
+            }
+          ],
+          "status_message": "Fair distribution of false positives across ticket bands"
+        },
+        {
+          "gate_name": "Off-Policy DR-OPE Gate",
+          "passed": true,
+          "doubly_robust_value": 194.29,
+          "dm_dr_agreement": 0.972,
+          "target_agreement_floor": 0.8,
+          "net_value_lift_rs": 266.58,
+          "status_message": "Consistent off-policy value lift confirmed"
+        },
+        {
+          "gate_name": "Blast Radius Review Gate",
+          "passed": true,
+          "ambiguous_flips_requiring_review": 4,
+          "target_max_flips": 15,
+          "rupees_at_stake_flagged": 930784.75,
+          "status_message": "Manageable review footprint"
+        },
+        {
+          "gate_name": "Rule Complexity Gate",
+          "passed": true,
+          "tree_depth": 6,
+          "target_max_depth": 6,
+          "leaf_count": 33,
+          "status_message": "Interpretable policy depth"
+        }
+      ],
+      "summary": {
+        "historical_precision": 0.9556,
+        "historical_recall": 0.9983,
+        "adversarial_catch_rate": 0.991,
+        "off_policy_lift_rs": 266.58,
+        "blast_radius_flips": 4,
+        "tree_depth": 6
+      }
+    }
+  },
+  "all_candidates": [
+    {
+      "name": "VelocityBurstDefense",
+      "description": "Rapid checkout rate and transaction burst defense",
+      "features_used": [
+        "amount",
+        "amount_velocity",
+        "time_on_page_s",
+        "burst_ratio",
+        "bin_card_count"
+      ],
+      "coevolution_trace": [
+        {
+          "generation": 1,
+          "evasions_found": 223,
+          "search_budget": 300,
+          "evasion_rate": 0.7433,
+          "heldout_precision": 0.8887,
+          "heldout_recall": 0.7528,
+          "heldout_fp": 58
+        },
+        {
+          "generation": 2,
+          "evasions_found": 141,
+          "search_budget": 300,
+          "evasion_rate": 0.47,
+          "heldout_precision": 0.8292,
+          "heldout_recall": 0.813,
+          "heldout_fp": 103
+        },
+        {
+          "generation": 3,
+          "evasions_found": 57,
+          "search_budget": 300,
+          "evasion_rate": 0.19,
+          "heldout_precision": 0.7302,
+          "heldout_recall": 0.8228,
+          "heldout_fp": 187
+        },
+        {
+          "generation": 4,
+          "evasions_found": 67,
+          "search_budget": 300,
+          "evasion_rate": 0.2233,
+          "heldout_precision": 0.7673,
+          "heldout_recall": 0.8098,
+          "heldout_fp": 151
+        },
+        {
+          "generation": 5,
+          "evasions_found": 66,
+          "search_budget": 300,
+          "evasion_rate": 0.22,
+          "heldout_precision": 0.7291,
+          "heldout_recall": 0.8228,
+          "heldout_fp": 188
+        },
+        {
+          "generation": 6,
+          "evasions_found": 100,
+          "search_budget": 300,
+          "evasion_rate": 0.3333,
+          "heldout_precision": 0.7413,
+          "heldout_recall": 0.8341,
+          "heldout_fp": 179
+        },
+        {
+          "generation": 7,
+          "evasions_found": 101,
+          "search_budget": 300,
+          "evasion_rate": 0.3367,
+          "heldout_precision": 0.7746,
+          "heldout_recall": 0.8049,
+          "heldout_fp": 144
+        },
+        {
+          "generation": 8,
+          "evasions_found": 77,
+          "search_budget": 300,
+          "evasion_rate": 0.2567,
+          "heldout_precision": 0.7655,
+          "heldout_recall": 0.8016,
+          "heldout_fp": 151
+        }
+      ],
+      "robustness_certificate": {
+        "status": "PARTIAL_CONVERGENCE",
+        "final_evasions": 77,
+        "evasion_reduction_pct": 65.47,
+        "final_heldout_precision": 0.7655,
+        "final_heldout_recall": 0.8016
+      },
+      "verification": {
+        "candidate_name": "VelocityBurstDefense",
+        "is_approval_eligible": false,
+        "eligibility_status": "BLOCKED_BY_GATES",
+        "gates_passed_count": 2,
+        "total_gates_count": 6,
+        "composite_ranking_score": 0.6936,
+        "gates": [
+          {
+            "gate_name": "Historical Regression Gate",
+            "passed": false,
+            "observed_precision": 0.7008,
+            "target_precision_floor": 0.85,
+            "observed_recall": 0.801,
+            "target_recall_floor": 0.95,
+            "status_message": "Failed minimum precision/recall floor"
+          },
+          {
+            "gate_name": "Adversarial Mutation Gate",
+            "passed": false,
+            "observed_catch_rate": 0.792,
+            "target_catch_floor": 0.9,
+            "n_adversarial_tests": 1000,
+            "status_message": "Vulnerable to adversarial evasion mutations"
+          },
+          {
+            "gate_name": "Segment Fairness Gate",
+            "passed": false,
+            "max_segment_fp_multiplier": 4.1,
+            "target_max_multiplier": 3.5,
+            "segments": [
+              {
+                "segment": "Micro (<500)",
+                "count": 581,
+                "fp_rate": 0.1618,
+                "fp_multiplier": 1.58
+              },
+              {
+                "segment": "Low (500-2k)",
+                "count": 4408,
+                "fp_rate": 0.0218,
+                "fp_multiplier": 0.21
+              },
+              {
+                "segment": "Mid (2k-5k)",
+                "count": 1922,
+                "fp_rate": 0.4209,
+                "fp_multiplier": 4.1
+              },
+              {
+                "segment": "High (>5k)",
+                "count": 89,
+                "fp_rate": 0.3034,
+                "fp_multiplier": 2.96
+              }
+            ],
+            "status_message": "Disparate false decline rate detected on specific customer segment"
+          },
+          {
+            "gate_name": "Off-Policy DR-OPE Gate",
+            "passed": true,
+            "doubly_robust_value": 59.24,
+            "dm_dr_agreement": 0.8467,
+            "target_agreement_floor": 0.8,
+            "net_value_lift_rs": 131.53,
+            "status_message": "Consistent off-policy value lift confirmed"
+          },
+          {
+            "gate_name": "Blast Radius Review Gate",
+            "passed": false,
+            "ambiguous_flips_requiring_review": 16,
+            "target_max_flips": 15,
+            "rupees_at_stake_flagged": 1081151.75,
+            "status_message": "Too many ambiguous flips requiring human intervention"
+          },
+          {
+            "gate_name": "Rule Complexity Gate",
+            "passed": true,
+            "tree_depth": 6,
+            "target_max_depth": 6,
+            "leaf_count": 30,
+            "status_message": "Interpretable policy depth"
+          }
+        ],
+        "summary": {
+          "historical_precision": 0.7008,
+          "historical_recall": 0.801,
+          "adversarial_catch_rate": 0.792,
+          "off_policy_lift_rs": 131.53,
+          "blast_radius_flips": 16,
+          "tree_depth": 6
+        }
+      }
+    },
+    {
+      "name": "GraphEntityDefense",
+      "description": "Relational entity ring and multi-card proxy fanout defense",
+      "features_used": [
+        "cluster_risk_score",
+        "ring_density",
+        "ip_distinct_pan_count",
+        "device_distinct_bin_count",
+        "device_distinct_ip_count"
+      ],
+      "coevolution_trace": [
+        {
+          "generation": 1,
+          "evasions_found": 16,
+          "search_budget": 300,
+          "evasion_rate": 0.0533,
+          "heldout_precision": 0.8731,
+          "heldout_recall": 0.9398,
+          "heldout_fp": 84
+        },
+        {
+          "generation": 2,
+          "evasions_found": 12,
+          "search_budget": 300,
+          "evasion_rate": 0.04,
+          "heldout_precision": 0.8718,
+          "heldout_recall": 0.9398,
+          "heldout_fp": 85
+        },
+        {
+          "generation": 3,
+          "evasions_found": 2,
+          "search_budget": 300,
+          "evasion_rate": 0.0067,
+          "heldout_precision": 0.8681,
+          "heldout_recall": 0.9415,
+          "heldout_fp": 88
+        },
+        {
+          "generation": 4,
+          "evasions_found": 6,
+          "search_budget": 300,
+          "evasion_rate": 0.02,
+          "heldout_precision": 0.8681,
+          "heldout_recall": 0.9415,
+          "heldout_fp": 88
+        },
+        {
+          "generation": 5,
+          "evasions_found": 2,
+          "search_budget": 300,
+          "evasion_rate": 0.0067,
+          "heldout_precision": 0.8681,
+          "heldout_recall": 0.9415,
+          "heldout_fp": 88
+        },
+        {
+          "generation": 6,
+          "evasions_found": 6,
+          "search_budget": 300,
+          "evasion_rate": 0.02,
+          "heldout_precision": 0.8681,
+          "heldout_recall": 0.9415,
+          "heldout_fp": 88
+        },
+        {
+          "generation": 7,
+          "evasions_found": 3,
+          "search_budget": 300,
+          "evasion_rate": 0.01,
+          "heldout_precision": 0.8681,
+          "heldout_recall": 0.9415,
+          "heldout_fp": 88
+        },
+        {
+          "generation": 8,
+          "evasions_found": 1,
+          "search_budget": 300,
+          "evasion_rate": 0.0033,
+          "heldout_precision": 0.8681,
+          "heldout_recall": 0.9415,
+          "heldout_fp": 88
+        }
+      ],
+      "robustness_certificate": {
+        "status": "PARTIAL_CONVERGENCE",
+        "final_evasions": 1,
+        "evasion_reduction_pct": 93.75,
+        "final_heldout_precision": 0.8681,
+        "final_heldout_recall": 0.9415
+      },
+      "verification": {
+        "candidate_name": "GraphEntityDefense",
+        "is_approval_eligible": false,
+        "eligibility_status": "BLOCKED_BY_GATES",
+        "gates_passed_count": 3,
+        "total_gates_count": 6,
+        "composite_ranking_score": 0.8322,
+        "gates": [
+          {
+            "gate_name": "Historical Regression Gate",
+            "passed": false,
+            "observed_precision": 0.868,
+            "target_precision_floor": 0.85,
+            "observed_recall": 0.9297,
+            "target_recall_floor": 0.95,
+            "status_message": "Failed minimum precision/recall floor"
+          },
+          {
+            "gate_name": "Adversarial Mutation Gate",
+            "passed": true,
+            "observed_catch_rate": 0.982,
+            "target_catch_floor": 0.9,
+            "n_adversarial_tests": 1000,
+            "status_message": "Passes adversarial robustness threshold"
+          },
+          {
+            "gate_name": "Segment Fairness Gate",
+            "passed": false,
+            "max_segment_fp_multiplier": 10.86,
+            "target_max_multiplier": 3.5,
+            "segments": [
+              {
+                "segment": "Micro (<500)",
+                "count": 581,
+                "fp_rate": 0.0017,
+                "fp_multiplier": 0.04
+              },
+              {
+                "segment": "Low (500-2k)",
+                "count": 4408,
+                "fp_rate": 0.0309,
+                "fp_multiplier": 0.73
+              },
+              {
+                "segment": "Mid (2k-5k)",
+                "count": 1922,
+                "fp_rate": 0.128,
+                "fp_multiplier": 3.02
+              },
+              {
+                "segment": "High (>5k)",
+                "count": 89,
+                "fp_rate": 0.4607,
+                "fp_multiplier": 10.86
+              }
+            ],
+            "status_message": "Disparate false decline rate detected on specific customer segment"
+          },
+          {
+            "gate_name": "Off-Policy DR-OPE Gate",
+            "passed": true,
+            "doubly_robust_value": 126.67,
+            "dm_dr_agreement": 0.965,
+            "target_agreement_floor": 0.8,
+            "net_value_lift_rs": 198.95,
+            "status_message": "Consistent off-policy value lift confirmed"
+          },
+          {
+            "gate_name": "Blast Radius Review Gate",
+            "passed": false,
+            "ambiguous_flips_requiring_review": 72,
+            "target_max_flips": 15,
+            "rupees_at_stake_flagged": 862646.62,
+            "status_message": "Too many ambiguous flips requiring human intervention"
+          },
+          {
+            "gate_name": "Rule Complexity Gate",
+            "passed": true,
+            "tree_depth": 6,
+            "target_max_depth": 6,
+            "leaf_count": 29,
+            "status_message": "Interpretable policy depth"
+          }
+        ],
+        "summary": {
+          "historical_precision": 0.868,
+          "historical_recall": 0.9297,
+          "adversarial_catch_rate": 0.982,
+          "off_policy_lift_rs": 198.95,
+          "blast_radius_flips": 72,
+          "tree_depth": 6
+        }
+      }
+    },
+    {
+      "name": "BiometricZeroDayDefense",
+      "description": "Shannon keystroke entropy and sub-human mouse jitter defense",
+      "features_used": [
+        "keystroke_entropy",
+        "mouse_jitter_score",
+        "biometric_bot_score",
+        "cvv_cycle_attempts",
+        "cluster_risk_score"
+      ],
+      "coevolution_trace": [
+        {
+          "generation": 1,
+          "evasions_found": 53,
+          "search_budget": 300,
+          "evasion_rate": 0.1767,
+          "heldout_precision": 0.8586,
+          "heldout_recall": 0.9285,
+          "heldout_fp": 94
+        },
+        {
+          "generation": 2,
+          "evasions_found": 38,
+          "search_budget": 300,
+          "evasion_rate": 0.1267,
+          "heldout_precision": 0.8953,
+          "heldout_recall": 0.9317,
+          "heldout_fp": 67
+        },
+        {
+          "generation": 3,
+          "evasions_found": 43,
+          "search_budget": 300,
+          "evasion_rate": 0.1433,
+          "heldout_precision": 0.8712,
+          "heldout_recall": 0.935,
+          "heldout_fp": 85
+        },
+        {
+          "generation": 4,
+          "evasions_found": 34,
+          "search_budget": 300,
+          "evasion_rate": 0.1133,
+          "heldout_precision": 0.8612,
+          "heldout_recall": 0.948,
+          "heldout_fp": 94
+        },
+        {
+          "generation": 5,
+          "evasions_found": 38,
+          "search_budget": 300,
+          "evasion_rate": 0.1267,
+          "heldout_precision": 0.8864,
+          "heldout_recall": 0.9138,
+          "heldout_fp": 72
+        },
+        {
+          "generation": 6,
+          "evasions_found": 27,
+          "search_budget": 300,
+          "evasion_rate": 0.09,
+          "heldout_precision": 0.7906,
+          "heldout_recall": 0.9577,
+          "heldout_fp": 156
+        },
+        {
+          "generation": 7,
+          "evasions_found": 12,
+          "search_budget": 300,
+          "evasion_rate": 0.04,
+          "heldout_precision": 0.7711,
+          "heldout_recall": 0.9642,
+          "heldout_fp": 176
+        },
+        {
+          "generation": 8,
+          "evasions_found": 17,
+          "search_budget": 300,
+          "evasion_rate": 0.0567,
+          "heldout_precision": 0.8259,
+          "heldout_recall": 0.9024,
+          "heldout_fp": 117
+        }
+      ],
+      "robustness_certificate": {
+        "status": "PARTIAL_CONVERGENCE",
+        "final_evasions": 17,
+        "evasion_reduction_pct": 67.92,
+        "final_heldout_precision": 0.8259,
+        "final_heldout_recall": 0.9024
+      },
+      "verification": {
+        "candidate_name": "BiometricZeroDayDefense",
+        "is_approval_eligible": false,
+        "eligibility_status": "BLOCKED_BY_GATES",
+        "gates_passed_count": 4,
+        "total_gates_count": 6,
+        "composite_ranking_score": 0.8178,
+        "gates": [
+          {
+            "gate_name": "Historical Regression Gate",
+            "passed": false,
+            "observed_precision": 0.8051,
+            "target_precision_floor": 0.85,
+            "observed_recall": 0.9393,
+            "target_recall_floor": 0.95,
+            "status_message": "Failed minimum precision/recall floor"
+          },
+          {
+            "gate_name": "Adversarial Mutation Gate",
+            "passed": true,
+            "observed_catch_rate": 0.955,
+            "target_catch_floor": 0.9,
+            "n_adversarial_tests": 1000,
+            "status_message": "Passes adversarial robustness threshold"
+          },
+          {
+            "gate_name": "Segment Fairness Gate",
+            "passed": true,
+            "max_segment_fp_multiplier": 3.46,
+            "target_max_multiplier": 3.5,
+            "segments": [
+              {
+                "segment": "Micro (<500)",
+                "count": 581,
+                "fp_rate": 0.0843,
+                "fp_multiplier": 1.24
+              },
+              {
+                "segment": "Low (500-2k)",
+                "count": 4408,
+                "fp_rate": 0.0855,
+                "fp_multiplier": 1.25
+              },
+              {
+                "segment": "Mid (2k-5k)",
+                "count": 1922,
+                "fp_rate": 0.1223,
+                "fp_multiplier": 1.79
+              },
+              {
+                "segment": "High (>5k)",
+                "count": 89,
+                "fp_rate": 0.236,
+                "fp_multiplier": 3.46
+              }
+            ],
+            "status_message": "Fair distribution of false positives across ticket bands"
+          },
+          {
+            "gate_name": "Off-Policy DR-OPE Gate",
+            "passed": true,
+            "doubly_robust_value": 155.53,
+            "dm_dr_agreement": 0.9,
+            "target_agreement_floor": 0.8,
+            "net_value_lift_rs": 227.81,
+            "status_message": "Consistent off-policy value lift confirmed"
+          },
+          {
+            "gate_name": "Blast Radius Review Gate",
+            "passed": false,
+            "ambiguous_flips_requiring_review": 105,
+            "target_max_flips": 15,
+            "rupees_at_stake_flagged": 1395631.5,
+            "status_message": "Too many ambiguous flips requiring human intervention"
+          },
+          {
+            "gate_name": "Rule Complexity Gate",
+            "passed": true,
+            "tree_depth": 6,
+            "target_max_depth": 6,
+            "leaf_count": 36,
+            "status_message": "Interpretable policy depth"
+          }
+        ],
+        "summary": {
+          "historical_precision": 0.8051,
+          "historical_recall": 0.9393,
+          "adversarial_catch_rate": 0.955,
+          "off_policy_lift_rs": 227.81,
+          "blast_radius_flips": 105,
+          "tree_depth": 6
+        }
+      }
+    },
+    {
+      "name": "ComprehensiveMultiModal",
+      "description": "Full multi-modal feature set encompassing tabular, biometrics, velocity, and graph rings",
+      "features_used": [
+        "amount",
+        "time_on_page_s",
+        "keystroke_entropy",
+        "mouse_jitter_score",
+        "bin_card_count",
+        "ip_distinct_pan_count",
+        "device_distinct_bin_count",
+        "device_distinct_ip_count",
+        "cvv_cycle_attempts",
+        "cluster_risk_score",
+        "ring_density",
+        "burst_ratio"
+      ],
+      "coevolution_trace": [
+        {
+          "generation": 1,
+          "evasions_found": 95,
+          "search_budget": 300,
+          "evasion_rate": 0.3167,
+          "heldout_precision": 0.9634,
+          "heldout_recall": 0.9854,
+          "heldout_fp": 23
+        },
+        {
+          "generation": 2,
+          "evasions_found": 25,
+          "search_budget": 300,
+          "evasion_rate": 0.0833,
+          "heldout_precision": 0.9564,
+          "heldout_recall": 0.9984,
+          "heldout_fp": 28
+        },
+        {
+          "generation": 3,
+          "evasions_found": 5,
+          "search_budget": 300,
+          "evasion_rate": 0.0167,
+          "heldout_precision": 0.9535,
+          "heldout_recall": 1.0,
+          "heldout_fp": 30
+        },
+        {
+          "generation": 4,
+          "evasions_found": 2,
+          "search_budget": 300,
+          "evasion_rate": 0.0067,
+          "heldout_precision": 0.9491,
+          "heldout_recall": 1.0,
+          "heldout_fp": 33
+        },
+        {
+          "generation": 5,
+          "evasions_found": 2,
+          "search_budget": 300,
+          "evasion_rate": 0.0067,
+          "heldout_precision": 0.9491,
+          "heldout_recall": 1.0,
+          "heldout_fp": 33
+        },
+        {
+          "generation": 6,
+          "evasions_found": 5,
+          "search_budget": 300,
+          "evasion_rate": 0.0167,
+          "heldout_precision": 0.9491,
+          "heldout_recall": 1.0,
+          "heldout_fp": 33
+        },
+        {
+          "generation": 7,
+          "evasions_found": 3,
+          "search_budget": 300,
+          "evasion_rate": 0.01,
+          "heldout_precision": 0.9491,
+          "heldout_recall": 1.0,
+          "heldout_fp": 33
+        },
+        {
+          "generation": 8,
+          "evasions_found": 3,
+          "search_budget": 300,
+          "evasion_rate": 0.01,
+          "heldout_precision": 0.9491,
+          "heldout_recall": 1.0,
+          "heldout_fp": 33
+        }
+      ],
+      "robustness_certificate": {
+        "status": "PARTIAL_CONVERGENCE",
+        "final_evasions": 3,
+        "evasion_reduction_pct": 96.84,
+        "final_heldout_precision": 0.9491,
+        "final_heldout_recall": 1.0
+      },
+      "verification": {
+        "candidate_name": "ComprehensiveMultiModal",
+        "is_approval_eligible": true,
+        "eligibility_status": "APPROVAL_ELIGIBLE",
+        "gates_passed_count": 6,
+        "total_gates_count": 6,
+        "composite_ranking_score": 0.9021,
+        "gates": [
+          {
+            "gate_name": "Historical Regression Gate",
+            "passed": true,
+            "observed_precision": 0.9556,
+            "target_precision_floor": 0.85,
+            "observed_recall": 0.9983,
+            "target_recall_floor": 0.95,
+            "status_message": "Passes historical regression criteria"
+          },
+          {
+            "gate_name": "Adversarial Mutation Gate",
+            "passed": true,
+            "observed_catch_rate": 0.991,
+            "target_catch_floor": 0.9,
+            "n_adversarial_tests": 1000,
+            "status_message": "Passes adversarial robustness threshold"
+          },
+          {
+            "gate_name": "Segment Fairness Gate",
+            "passed": true,
+            "max_segment_fp_multiplier": 3.18,
+            "target_max_multiplier": 3.5,
+            "segments": [
+              {
+                "segment": "Micro (<500)",
+                "count": 581,
+                "fp_rate": 0.0017,
+                "fp_multiplier": 0.12
+              },
+              {
+                "segment": "Low (500-2k)",
+                "count": 4408,
+                "fp_rate": 0.0118,
+                "fp_multiplier": 0.85
+              },
+              {
+                "segment": "Mid (2k-5k)",
+                "count": 1922,
+                "fp_rate": 0.0442,
+                "fp_multiplier": 3.18
+              },
+              {
+                "segment": "High (>5k)",
+                "count": 89,
+                "fp_rate": 0.0112,
+                "fp_multiplier": 0.81
+              }
+            ],
+            "status_message": "Fair distribution of false positives across ticket bands"
+          },
+          {
+            "gate_name": "Off-Policy DR-OPE Gate",
+            "passed": true,
+            "doubly_robust_value": 194.29,
+            "dm_dr_agreement": 0.972,
+            "target_agreement_floor": 0.8,
+            "net_value_lift_rs": 266.58,
+            "status_message": "Consistent off-policy value lift confirmed"
+          },
+          {
+            "gate_name": "Blast Radius Review Gate",
+            "passed": true,
+            "ambiguous_flips_requiring_review": 4,
+            "target_max_flips": 15,
+            "rupees_at_stake_flagged": 930784.75,
+            "status_message": "Manageable review footprint"
+          },
+          {
+            "gate_name": "Rule Complexity Gate",
+            "passed": true,
+            "tree_depth": 6,
+            "target_max_depth": 6,
+            "leaf_count": 33,
+            "status_message": "Interpretable policy depth"
+          }
+        ],
+        "summary": {
+          "historical_precision": 0.9556,
+          "historical_recall": 0.9983,
+          "adversarial_catch_rate": 0.991,
+          "off_policy_lift_rs": 266.58,
+          "blast_radius_flips": 4,
+          "tree_depth": 6
+        }
+      }
+    }
+  ],
+  "autopsy": {
+    "total_chargeback_loss_rs": 2040024.84,
+    "total_fraud_incidents": 3000,
+    "baseline_evasion_count": 2792,
+    "baseline_evaded_loss_rs": 1413045.61,
+    "primary_evasion_mechanisms": [
+      "Distributed CVV Guessing Fanout across rotating IP proxies",
+      "Coordinated Multi-Account Carding Entity Rings"
+    ],
+    "failure_diagnosis": "Baseline static threshold (amount > \u20b92,500) allowed 2,792 low-value transactions (\u20b91,413,045.61 loss) to clear without inspection due to lack of behavioral memory."
+  },
+  "feature_discovery": {
+    "candidates_tested": [
+      {
+        "feature": "amount_velocity",
+        "description": "Monetary speed ratio (amount / time_on_page_s) \u2014 detects rapid checkout automation",
+        "importance": 0.0025,
+        "accepted": false
+      },
+      {
+        "feature": "ring_density",
+        "description": "Combined device + IP fanout cardinality \u2014 isolates coordinated carding rings",
+        "importance": 0.0785,
+        "accepted": true
+      },
+      {
+        "feature": "burst_ratio",
+        "description": "Card attempt rate relative to session duration \u2014 isolates automated card testing bots",
+        "importance": 0.0151,
+        "accepted": true
+      },
+      {
+        "feature": "dual_sharing_signal",
+        "description": "Binary flag for concurrent multi-card device and IP overlap",
+        "importance": 0.0,
+        "accepted": false
+      },
+      {
+        "feature": "biometric_bot_score",
+        "description": "Composite heuristic combining low keystroke entropy and sub-human mouse jitter",
+        "importance": 0.0,
+        "accepted": false
+      },
+      {
+        "feature": "tls_proxy_risk",
+        "description": "Compound signal coupling TLS JA4 spoofing with rotating proxy IP usage",
+        "importance": 0.0088,
+        "accepted": false
+      }
+    ],
+    "base_feature_importances": {
+      "amount": 0.0308,
+      "time_on_page_s": 0.0354,
+      "keystroke_entropy": 0.0288,
+      "mouse_jitter_score": 0.0125,
+      "paste_event": 0.001,
+      "ja3_ua_mismatch": 0.0064,
+      "bin_card_count": 0.0784,
+      "bin_name_count": 0.0513,
+      "ip_distinct_pan_count": 0.073,
+      "device_distinct_bin_count": 0.1449,
+      "device_distinct_ip_count": 0.143,
+      "cvv_cycle_attempts": 0.1452,
+      "cluster_risk_score": 0.1444
+    },
+    "accepted_features": [
+      "ring_density",
+      "burst_ratio"
+    ],
+    "screening_method": "RandomForestClassifier(n_estimators=150, max_depth=6), threshold >= 0.015"
+  }
+}
