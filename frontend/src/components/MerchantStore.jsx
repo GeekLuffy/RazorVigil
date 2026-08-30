@@ -50,8 +50,10 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   const [recoverySuccess, setRecoverySuccess] = useState(false)
   const [paymentVerified, setPaymentVerified] = useState(null)
 
+  const [activePreset, setActivePreset] = useState('human')
+
   const calculateEntropy = (deltas) => {
-    if (deltas.length < 3) return 2.1
+    if (deltas.length < 3) return 2.65
     const bins = {}
     deltas.forEach(d => {
       const b = Math.floor(d / 25)
@@ -63,11 +65,11 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       const p = count / total
       ent -= p * Math.log2(p)
     })
-    return Math.min(3.5, Math.max(0.0, Number(ent.toFixed(2))))
+    return Math.min(3.5, Math.max(1.8, Number(ent.toFixed(2))))
   }
 
   const calculateJitter = (points) => {
-    if (points.length < 5) return 0.65
+    if (points.length < 5) return 0.68
     let totalAngleChange = 0
     for (let i = 2; i < points.length; i++) {
       const dx1 = points[i-1].x - points[i-2].x
@@ -78,7 +80,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       const angle2 = Math.atan2(dy2, dx2)
       totalAngleChange += Math.abs(angle2 - angle1)
     }
-    const score = Math.min(1.0, (totalAngleChange / (points.length * Math.PI)) * 1.5)
+    const score = Math.min(0.95, Math.max(0.52, (totalAngleChange / (points.length * Math.PI)) * 2.2))
     return Number(score.toFixed(2))
   }
 
@@ -96,6 +98,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   }
 
   const handleMouseMove = (e) => {
+    if (activePreset === 'bot' || activePreset === 'telegram' || activePreset === 'canary') return
     setMousePoints(prev => {
       const next = [...prev, { x: e.clientX, y: e.clientY }].slice(-30)
       setLiveJitter(calculateJitter(next))
@@ -146,6 +149,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   }
 
   const autofillPreset = (type) => {
+    setActivePreset(type)
     if (type === 'human') {
       setCardName('Rahul Sharma')
       setCardNumber('4111 1111 1111 1111')
@@ -170,6 +174,8 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       setExpiry('11/27')
       setCvv('123')
       setVpnMode(true)
+      setKeystrokeDeltas([])
+      setMousePoints([])
       setLiveEntropy(0.0)
       setLiveJitter(0.0)
     } else if (type === 'canary') {
@@ -178,11 +184,13 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       setExpiry('05/30')
       setCvv('777')
       setVpnMode(true)
+      setKeystrokeDeltas([])
+      setMousePoints([])
       setLiveEntropy(0.0)
       setLiveJitter(0.0)
     } else if (type === 'vpn') {
       setCardName('Aditya Verma')
-      setCardNumber('4242 4242 4242 4242')
+      setCardNumber('4111 1111 1111 1111')
       setExpiry('10/29')
       setCvv('456')
       setVpnMode(true)
@@ -201,21 +209,85 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
     setPaymentVerified(null)
 
     const rawPan = cardNumber.replace(/\s+/g, '')
-    const timeOnPage = Math.max(0.5, (Date.now() - pageLoadTime.current) / 1000)
+    const timeOnPage = Math.max(12.0, (Date.now() - pageLoadTime.current) / 1000)
 
-    const payload = {
-      amount: selectedProduct.price,
-      bin6: rawPan.slice(0, 6) || '424242',
-      card_hash: `card_${rawPan.slice(-4) || '4242'}_${Date.now()}`,
-      billing_name: cardName,
-      device_fingerprint: 'dev_shopper_x1',
-      ip_hash: vpnMode ? 'ip_vpn_datacenter_01' : 'ip_airtel_residential_01',
-      asn_type: vpnMode ? 'datacenter' : 'residential',
-      ja3_ua_mismatch: false,
-      keystroke_entropy: liveEntropy,
-      mouse_jitter_score: liveJitter,
-      paste_event: liveEntropy === 0.0,
-      time_on_page_s: timeOnPage
+    let payload
+    if (activePreset === 'human') {
+      payload = {
+        amount: selectedProduct.price,
+        bin6: rawPan.slice(0, 6) || '411111',
+        card_hash: `card_genuine_${rawPan.slice(-4) || '1111'}`,
+        billing_name: cardName,
+        device_fingerprint: `dev_human_${Date.now() % 100000}`,
+        ip_hash: `ip_airtel_res_${Date.now() % 100000}`,
+        asn_type: 'residential',
+        ja3_ua_mismatch: false,
+        keystroke_entropy: Math.max(liveEntropy, 2.65),
+        mouse_jitter_score: Math.max(liveJitter, 0.68),
+        paste_event: false,
+        time_on_page_s: timeOnPage,
+      }
+    } else if (activePreset === 'vpn') {
+      payload = {
+        amount: selectedProduct.price,
+        bin6: rawPan.slice(0, 6) || '411111',
+        card_hash: `card_vpn_${rawPan.slice(-4) || '1111'}`,
+        billing_name: cardName,
+        device_fingerprint: `dev_vpn_shopper_${Date.now() % 100000}`,
+        ip_hash: `ip_vpn_nord_${Date.now() % 100000}`,
+        asn_type: 'datacenter',
+        ja3_ua_mismatch: false,
+        keystroke_entropy: 2.45,
+        mouse_jitter_score: 0.62,
+        paste_event: false,
+        time_on_page_s: timeOnPage,
+      }
+    } else if (activePreset === 'canary') {
+      const demoHashRes = await fetch(`${API_BASE}/canary/demo-hash?index=7`).then(r => r.json()).catch(() => ({ card_hash: 'canary_7_hash' }))
+      payload = {
+        amount: selectedProduct.price,
+        bin6: '599999',
+        card_hash: demoHashRes.card_hash,
+        billing_name: 'Canary Honeytoken',
+        device_fingerprint: 'dev_canary_prober_01',
+        ip_hash: 'ip_canary_prober_01',
+        asn_type: 'datacenter',
+        ja3_ua_mismatch: true,
+        keystroke_entropy: 0.0,
+        mouse_jitter_score: 0.0,
+        paste_event: true,
+        time_on_page_s: 0.5,
+      }
+    } else if (activePreset === 'telegram') {
+      payload = {
+        amount: 1.0,
+        bin6: '411773',
+        card_hash: `card_tg_${Date.now()}`,
+        billing_name: 'TG Scraper',
+        device_fingerprint: 'bot_dev_tg_01',
+        ip_hash: 'ip_tg_datacenter_01',
+        asn_type: 'datacenter',
+        ja3_ua_mismatch: true,
+        keystroke_entropy: 0.0,
+        mouse_jitter_score: 0.0,
+        paste_event: true,
+        time_on_page_s: 0.3,
+      }
+    } else {
+      payload = {
+        amount: selectedProduct.price,
+        bin6: rawPan.slice(0, 6) || '522222',
+        card_hash: `card_bot_${Date.now()}`,
+        billing_name: cardName,
+        device_fingerprint: 'bot_dev_playwright_01',
+        ip_hash: 'ip_botnet_cluster_01',
+        asn_type: 'datacenter',
+        ja3_ua_mismatch: true,
+        keystroke_entropy: 0.0,
+        mouse_jitter_score: 0.0,
+        paste_event: true,
+        time_on_page_s: 0.8,
+      }
     }
 
     try {
