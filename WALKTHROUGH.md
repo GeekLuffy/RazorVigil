@@ -95,8 +95,49 @@ Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
 | Feature | Technical Implementation | Judge Impact |
 |---|---|---|
+| **Agent Studio MCP Integration** | 4 MCP tools (check_canary_status, get_cluster_risk_score, investigate_transaction, compile_dispute_evidence) exposed via Anthropic MCP SDK | Plugs into Razorpay's own Agent Studio — specialist sub-agent, not a competing engine |
 | **Multi-Layer Ensemble** | LightGBM + Isolation Forest + Redis Sliding-Window Velocity + NetworkX Louvain Graph | Solves both fast bot bursts and slow distributed proxy rings. |
 | **50 Canary Cards** | Luhn-valid synthetic PANs seeded exclusively in our own honeytoken check endpoint | Deterministic 1.0-confidence block for any BIN-enumeration or scraping of our own inventory. **0.00% FPR applies to this layer only.** |
 | **Agent-Aware Risk Layer** | JWT attestation validator with spend limits | First fraud engine ready for agentic AI shopping (Google AP2). |
 | **Zero False Decline Loop** | Signed, single-use, amount-bound JWT recovery links | Rescues genuine GMV and proves dual-track synergy (Track 02 + 03). |
 | **Autonomous WAF Generation** | Dynamic rule synthesis from Louvain graph clusters | Proactive merchant-level defense ready for production deployment. |
+
+---
+
+## 🤖 Razorpay Agent Studio MCP Integration
+
+RazorShield Sentinel is positioned as a **specialist sub-agent** for [Razorpay Agent Studio](https://razorpay.com/agent-studio) (launched March 12, 2026 at FTX'26, built on Anthropic's Claude Agent SDK). Rather than competing with Razorpay's native fraud and dispute agents, it plugs into the same MCP tooling layer.
+
+### MCP Server (`backend/mcp_server.py`)
+
+```bash
+# Install MCP dependencies
+pip install mcp anthropic
+
+# Run the MCP server (stdio transport — standard for local MCP tools)
+python backend/mcp_server.py
+
+# Point RAZORSHIELD_API_URL to a deployed backend if needed
+RAZORSHIELD_API_URL=https://your-deployed-backend.com python backend/mcp_server.py
+```
+
+### Demo Agent (`backend/demo_agent.py`)
+
+```bash
+# Run the demo agent (simulates Agent Studio delegation pattern)
+python backend/demo_agent.py --transaction-id TXN_DEMO_001
+```
+
+The demo agent simulates the full delegation chain:
+1. `investigate_transaction` — full 8-layer forensic pipeline
+2. `check_canary_status` — honeytoken detection (if elevated risk)
+3. `compile_dispute_evidence` — 5-domain draft dossier for Dispute Responder
+
+### Tool Schema Summary
+
+| MCP Tool | Purpose | Returns |
+|---|---|---|
+| `check_canary_status` | Instant honeytoken hit detection | `is_canary`, `confidence`, `canary_index` |
+| `get_cluster_risk_score` | Louvain graph ring membership score | `cluster_score`, `cluster_id`, `ring_size` |
+| `investigate_transaction` | Full 8-layer forensic investigation | `tier`, `risk_score`, `explanation`, `signals` |
+| `compile_dispute_evidence` | 5-domain draft evidence dossier | `claims`, `signal_strength`, `dossier_draft` |

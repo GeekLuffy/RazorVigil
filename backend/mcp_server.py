@@ -1,0 +1,247 @@
+﻿"""
+RazorShield Sentinel - MCP Server for Razorpay Agent Studio Integration.
+
+Exposes 4 MCP tools callable by any Claude Agent SDK agent:
+  1. check_canary_status(transaction_id)
+  2. get_cluster_risk_score(device_fingerprint, ip_hash, card_hash)
+  3. investigate_transaction(transaction_id)
+  4. compile_dispute_evidence(transaction_id)
+
+How to run standalone:
+    python backend/mcp_server.py
+
+Note: Wraps the live RazorShield backend HTTP API (localhost:8000).
+Set RAZORSHIELD_API_URL env var to point to a deployed backend.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import sys
+from typing import Any
+
+import httpx
+
+try:
+    from mcp.server import Server
+    from mcp.server.stdio import stdio_server
+    from mcp import types as mcp_types
+    MCP_AVAILABLE = True
+except ImportError:
+    MCP_AVAILABLE = False
+
+RAZORSHIELD_API_URL = os.getenv("RAZORSHIELD_API_URL", "http://localhost:8000")
+_client = httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0)
+
+
+async def _get(path: str, params: dict | None = None) -> dict[str, Any]:
+    try:
+        r = await _client.get(path, params=params or {})
+        r.raise_for_status()
+        return r.json()
+    except httpx.HTTPError as exc:
+        return {"error": str(exc), "path": path}
+
+
+async def _post(path: str, body: dict) -> dict[str, Any]:
+    try:
+        r = await _client.post(path, json=body)
+        r.raise_for_status()
+        return r.json()
+    except httpx.HTTPError as exc:
+        return {"error": str(exc), "path": path}
+
+
+async def tool_check_canary_status(transaction_id: str) -> dict[str, Any]:
+    """Check if a transaction triggered a canary honeytoken hit."""
+    result = await _get("/canary/status", params={"transaction_id": transaction_id})
+    if "error" in result:
+        return {
+            "transaction_id": transaction_id,
+            "is_canary": False,
+            "confidence": 0.0,
+            "canary_index": None,
+            "note": "Transaction not found in canary registry.",
+            "status": "not_found",
+        }
+    return result
+
+
+async def tool_get_cluster_risk_score(
+    device_fingerprint: str | None = None,
+    ip_hash: str | None = None,
+    card_hash: str | None = None,
+) -> dict[str, Any]:
+    """Get Louvain graph community risk score for any entity."""
+    result = await _post("/cluster/risk-score", {
+        "device_fingerprint": device_fingerprint,
+        "ip_hash": ip_hash,
+        "card_hash": card_hash,
+    })
+    if "error" in result:
+        return {
+            "cluster_score": 0.0,
+            "cluster_id": "unknown",
+            "ring_size": 0,
+            "note": "Cluster engine unavailable or entity not tracked.",
+            "status": "unavailable",
+        }
+    return result
+
+
+async def tool_investigate_transaction(transaction_id: str) -> dict[str, Any]:
+    """Run the full 8-layer forensic investigation pipeline."""
+    result = await _get(f"/investigate/{transaction_id}")
+    if "error" in result:
+        return {
+            "transaction_id": transaction_id,
+            "tier": "unknown",
+            "risk_score": None,
+            "explanation": f"Investigation failed: {result.get('error')}",
+            "signals": {},
+            "status": "error",
+        }
+    return result
+
+
+async def tool_compile_dispute_evidence(transaction_id: str) -> dict[str, Any]:
+    """
+    Compile a 5-domain draft evidence dossier.
+    DRAFT only - requires merchant/human review before filing.
+    """
+    case_result = await _post("/cases/create-from-transaction", {
+        "transaction_id": transaction_id,
+        "amount": 0.0,
+        "telemetry": {},
+    })
+    if "error" in case_result:
+        return {"status": "error", "transaction_id": transaction_id,
+                "dossier_draft": "Evidence compilation failed."}
+
+    case_id = case_result.get("case_id")
+    if not case_id:
+        return {"status": "error", "transaction_id": transaction_id,
+                "dossier_draft": "Failed to create dispute case."}
+
+    evidence = await _post(f"/cases/{case_id}/synthesize-evidence", {})
+    if "error" in evidence:
+        return {"status": "error", "transaction_id": transaction_id,
+                "case_id": case_id,
+                "dossier_draft": f"Synthesis failed: {evidence.get('error')}"}
+
+    return {
+        "transaction_id": transaction_id,
+        "case_id": case_id,
+        "package_id": evidence.get("package_id"),
+        "claims_count": len(evidence.get("claims", [])),
+        "claims": evidence.get("claims", []),
+        "signal_strength": evidence.get("win_probability", 0.0),
+        "recommended_action": evidence.get("recommended_action", ""),
+        "dossier_draft": evidence.get("representation_letter", ""),
+        "rbi_context": evidence.get("rbi_compliance_attestation", ""),
+        "note": "DRAFT - requires merchant/human review before any formal filing.",
+        "status": "compiled",
+    }
+
+
+TOOL_DEFINITIONS = [
+    {
+        "name": "check_canary_status",
+        "description": (
+            "Check whether a transaction triggered a RazorShield canary honeytoken hit. "
+            "Canary cards are synthetic Luhn-valid PANs seeded exclusively within RazorShield's "
+            "own decoy inventory endpoints. Any hit = 1.0-confidence attacker was scanning our system. "
+            "Returns is_canary, confidence, canary_index."
+        ),
+        "inputSchema": {"type": "object",
+                        "properties": {"transaction_id": {"type": "string"}},
+                        "required": ["transaction_id"]},
+    },
+    {
+        "name": "get_cluster_risk_score",
+        "description": (
+            "Get real-time Louvain graph community risk score for any entity (device/IP/card). "
+            "Returns cluster_id, cluster_score (0.0=isolated, 1.0=core ring), ring_size."
+        ),
+        "inputSchema": {"type": "object",
+                        "properties": {
+                            "device_fingerprint": {"type": "string"},
+                            "ip_hash": {"type": "string"},
+                            "card_hash": {"type": "string"},
+                        }},
+    },
+    {
+        "name": "investigate_transaction",
+        "description": (
+            "Run the full 8-layer RazorShield forensic pipeline. "
+            "Returns tier, risk_score (0-1), explanation, and all 16 signal values. "
+            "Use for specialist carding/bot-abuse deep-forensic analysis."
+        ),
+        "inputSchema": {"type": "object",
+                        "properties": {"transaction_id": {"type": "string"}},
+                        "required": ["transaction_id"]},
+    },
+    {
+        "name": "compile_dispute_evidence",
+        "description": (
+            "Compile a 5-domain structured DRAFT evidence dossier: "
+            "(1) Gateway HMAC, (2) ASN/JA3 telemetry, (3) biometrics, "
+            "(4) Louvain graph topology, (5) RBI regulatory context. "
+            "DRAFT for merchant review only - not a formally filed document. "
+            "Returns package_id, claims, signal_strength, dossier_draft."
+        ),
+        "inputSchema": {"type": "object",
+                        "properties": {"transaction_id": {"type": "string"}},
+                        "required": ["transaction_id"]},
+    },
+]
+
+
+async def run_mcp_server():
+    if not MCP_AVAILABLE:
+        print(
+            "ERROR: mcp package not installed.\n"
+            "Run: pip install mcp\n"
+            "This installs the Anthropic MCP Python SDK.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    server = Server("razorshield-sentinel")
+
+    @server.list_tools()
+    async def list_tools() -> list[mcp_types.Tool]:
+        return [
+            mcp_types.Tool(
+                name=t["name"],
+                description=t["description"],
+                inputSchema=t["inputSchema"],
+            )
+            for t in TOOL_DEFINITIONS
+        ]
+
+    @server.call_tool()
+    async def call_tool(name: str, arguments: dict) -> list[mcp_types.TextContent]:
+        try:
+            if name == "check_canary_status":
+                result = await tool_check_canary_status(arguments["transaction_id"])
+            elif name == "get_cluster_risk_score":
+                result = await tool_get_cluster_risk_score(**arguments)
+            elif name == "investigate_transaction":
+                result = await tool_investigate_transaction(arguments["transaction_id"])
+            elif name == "compile_dispute_evidence":
+                result = await tool_compile_dispute_evidence(arguments["transaction_id"])
+            else:
+                result = {"error": f"Unknown tool: {name}"}
+        except Exception as exc:
+            result = {"error": str(exc), "tool": name}
+        return [mcp_types.TextContent(type="text", text=json.dumps(result, indent=2))]
+
+    async with stdio_server() as streams:
+        await server.run(streams[0], streams[1], server.create_initialization_options())
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(run_mcp_server())

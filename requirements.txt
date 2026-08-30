@@ -17,3 +17,5 @@ networkx==3.4.2
 python-louvain==0.16
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.12
+mcp>=1.0.0              # Anthropic MCP Python SDK — Agent Studio MCP server
+anthropic>=0.30.0       # Claude Agent SDK (for demo_agent.py orchestration)
