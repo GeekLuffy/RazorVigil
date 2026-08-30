@@ -17,4 +17,5 @@ data/load_test_results.json
 .ipynb_checkpoints/
 threat_intelligence/
 evidence/
+notes/
 *.log

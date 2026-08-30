@@ -137,9 +137,8 @@ python simulator/adversarial_runner.py --generations 5 --pop-size 15
 ```
 razorshield/
 ├── backend/                     # FastAPI engine, ML inference, Graph, Canary, MCP server
-├── docs/                        # Architecture deep dives, runbooks, and validation studies
+├── docs/                        # Architecture deep dives and validation studies
 │   ├── WALKTHROUGH.md           # End-to-end technical walkthrough & pipeline architecture
-│   ├── DEMO_RUNBOOK.md          # Live presentation runbook & failure recovery playbook
 │   ├── EXTERNAL_VALIDATION.md   # Out-of-Distribution (OOD) benchmark study (ULB / IEEE-CIS)
 │   └── ROADMAP_AND_LIMITATIONS.md # Production boundaries, roadmap & scaling considerations
 ├── frontend/                    # React 18 + Tailwind + Recharts live SOC Dashboard
@@ -154,7 +153,6 @@ razorshield/
 ## 📚 Documentation & Deep Dives
 
 - 🧭 **[Technical Walkthrough](docs/WALKTHROUGH.md)**: Layer-by-layer architectural breakdown from L0 Anti-Checker to L4 Decision Tiering.
-- 🎯 **[Live Demo Runbook](docs/DEMO_RUNBOOK.md)**: Minute-by-minute demo sequence with failure recovery playbooks.
 - 🔬 **[External Validation Study](docs/EXTERNAL_VALIDATION.md)**: Cold-transfer evaluation on independently-labeled datasets (ULB & IEEE-CIS).
 - 🗺️ **[Production Roadmap & Scope](docs/ROADMAP_AND_LIMITATIONS.md)**: Engineering boundaries, multi-tenant scaling, and future federated defenses.
 - 📋 **[Submission Kit](SUBMISSION_KIT.md)**: Concise executive summary and evaluation reference.
