@@ -101,13 +101,13 @@ export default function ArchitectureOverview() {
 
           <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
             <div className="text-[10px] text-slate-500">ML-Layer PR-AUC</div>
-            <div className="text-base font-bold text-indigo-400">1.0000</div>
+            <div className="text-base font-bold text-indigo-400">0.9983</div>
             <div className="text-[9px] text-slate-600">Ambiguous Set (n=9,003)</div>
           </div>
 
           <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
             <div className="text-[10px] text-slate-500">Adversarial Recall</div>
-            <div className="text-base font-bold text-amber-400">100.0%</div>
+            <div className="text-base font-bold text-amber-400">99.1%</div>
             <div className="text-[9px] text-slate-600">Stealth Jitter Bots</div>
           </div>
 
