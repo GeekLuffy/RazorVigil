@@ -75,7 +75,16 @@ app = FastAPI(title="RazorShield Sentinel", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "*",
+    ],
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -374,7 +383,7 @@ async def checkout(
         "risk_score": round(final_risk, 4),
         "explanation": explanation,
         "is_canary": False,
-        "is_agent": is_agent,
+        "is_agent": False,
         "signals": {
             "asn_type": req.asn_type,
             "ja3_mismatch": req.ja3_ua_mismatch,

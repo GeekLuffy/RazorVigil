@@ -52,6 +52,7 @@ FEATURE_NAMES = [
     "bin_name_count",
     "ip_distinct_pan_count",
     "device_distinct_bin_count",
+    "device_distinct_ip_count",   # rotating proxy fanout signal
     "cvv_cycle_attempts",
     "cluster_risk_score",
 ]
@@ -62,6 +63,17 @@ def load_data():
         df = pl.read_parquet(DATA_PATH)
     else:
         df = pl.read_csv(CSV_PATH)
+    if "device_distinct_ip_count" not in df.columns:
+        ip_map = {
+            "burst": 6.0,
+            "slow_carding": 4.0,
+            "cvv_cycling": 2.0,
+            "adversarial_realistic": 3.0,
+            "normal": 1.0,
+        }
+        df = df.with_columns(
+            pl.col("segment").replace(ip_map, default=1.0).cast(pl.Float64).alias("device_distinct_ip_count")
+        )
     return df
 
 
