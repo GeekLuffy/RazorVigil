@@ -1,7 +1,7 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Shield, Cpu, RefreshCw, FileDown, CheckCircle2, XCircle, AlertTriangle,
-  TrendingUp, Activity, BarChart2, Flame, Layers, Network, Lock, Award, ArrowRight
+  TrendingUp, Activity, BarChart2, Flame, Layers, Network, Lock, Award, ArrowRight, Sparkles
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
