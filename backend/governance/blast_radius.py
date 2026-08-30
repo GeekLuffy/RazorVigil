@@ -1,4 +1,4 @@
-﻿"""
+"""
 RazorShield Sentinel — Policy Blast Radius & Differential Inspector.
 
 Performs transaction-level differential analysis between the baseline policy and
@@ -65,17 +65,16 @@ def compute_blast_radius(
     
     # Newly Flagged (Baseline approved -> Candidate declines)
     for idx in np.where(newly_flagged_mask)[0]:
-        is_true_fraud = bool(y[idx] == 1)
+        is_true_fraud = bool(int(y[idx]) == 1)
         impact = "DEFENSE_CATCH" if is_true_fraud else "POTENTIAL_FRICTION"
-        # Genuine high-value declines represent friction that needs review
-        requires_review = not is_true_fraud and amounts[idx] > 3500.0
+        requires_review = bool(not is_true_fraud and float(amounts[idx]) > 3500.0)
         flip_records.append({
             "transaction_id": str(txn_ids[idx]),
             "flip_type": "NEWLY_FLAGGED",
-            "is_fraud": is_true_fraud,
+            "is_fraud": bool(is_true_fraud),
             "amount_rs": float(amounts[idx]),
-            "impact_category": impact,
-            "requires_human_attention": requires_review,
+            "impact_category": str(impact),
+            "requires_human_attention": bool(requires_review),
             "key_factors": {
                 "amount": float(amounts[idx]),
                 "cluster_risk": float(df["cluster_risk_score"].iloc[idx]) if "cluster_risk_score" in df.columns else 0.0,
@@ -85,14 +84,13 @@ def compute_blast_radius(
 
     # Newly Cleared (Baseline declined -> Candidate approves)
     for idx in np.where(newly_cleared_mask)[0]:
-        is_true_fraud = bool(y[idx] == 1)
+        is_true_fraud = bool(int(y[idx]) == 1)
         impact = "FRAUD_LEAKAGE" if is_true_fraud else "GENUINE_RECOVERY"
-        # Actual fraud cleared represents leakage that needs immediate review
-        requires_review = is_true_fraud
+        requires_review = bool(is_true_fraud)
         flip_records.append({
             "transaction_id": str(txn_ids[idx]),
             "flip_type": "NEWLY_CLEARED",
-            "is_fraud": is_true_fraud,
+            "is_fraud": bool(is_true_fraud),
             "amount_rs": float(amounts[idx]),
             "impact_category": impact,
             "requires_human_attention": requires_review,
