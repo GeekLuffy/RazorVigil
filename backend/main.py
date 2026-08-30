@@ -462,6 +462,7 @@ async def investigate_transaction_endpoint(transaction_id: str):
     if tx:
         return {
             "transaction_id": transaction_id,
+            "amount": tx.get("amount", 0.0),
             "tier": tx.get("tier", "safe"),
             "risk_score": tx.get("risk_score", 0.05),
             "explanation": tx.get("explanation", "Standard safe customer transaction"),
@@ -471,6 +472,7 @@ async def investigate_transaction_endpoint(transaction_id: str):
     # Return structured forensic profile for synthetic / demo transaction IDs
     return {
         "transaction_id": transaction_id,
+        "amount": 4999.00,  # Demo: realistic charge amount in INR
         "tier": "elevated_review",
         "risk_score": 0.742,
         "explanation": "High velocity burst across rotating residential proxies detected by Louvain graph clustering.",

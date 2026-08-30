@@ -111,10 +111,16 @@ async def tool_compile_dispute_evidence(transaction_id: str) -> dict[str, Any]:
     Compile a 5-domain draft evidence dossier.
     DRAFT only - requires merchant/human review before filing.
     """
+    # Step 0: Fetch real transaction data from the registry so the dossier
+    # reflects the actual charge amount and forensic signals — not placeholders.
+    tx_data = await _get(f"/investigate/{transaction_id}")
+    real_amount = float(tx_data.get("amount", 0.0))
+    real_telemetry = tx_data.get("signals", {})
+
     case_result = await _post("/cases/create-from-transaction", {
         "transaction_id": transaction_id,
-        "amount": 0.0,
-        "telemetry": {},
+        "amount": real_amount,
+        "telemetry": real_telemetry,
     })
     if "error" in case_result:
         return {"status": "error", "transaction_id": transaction_id,

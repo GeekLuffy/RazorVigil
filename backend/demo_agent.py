@@ -54,11 +54,33 @@ async def call_investigate_transaction(transaction_id: str) -> dict:
             return {"tier": "unknown", "error": str(e)}
 
 
+async def call_get_cluster_risk_score(device_fingerprint: str = None, ip_hash: str = None, card_hash: str = None) -> dict:
+    async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as c:
+        try:
+            r = await c.post("/cluster/risk-score", json={
+                "device_fingerprint": device_fingerprint,
+                "ip_hash": ip_hash,
+                "card_hash": card_hash,
+            })
+            return r.json() if r.status_code == 200 else {"cluster_score": 0.0, "note": "not found"}
+        except Exception as e:
+            return {"cluster_score": 0.0, "error": str(e)}
+
+
 async def call_compile_dispute_evidence(transaction_id: str) -> dict:
     async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=15.0) as c:
         try:
+            # Step 0: Fetch real transaction amount and telemetry from the registry
+            # so the evidence dossier reflects the actual transaction, not a placeholder.
+            inv_r = await c.get(f"/investigate/{transaction_id}")
+            inv_data = inv_r.json() if inv_r.status_code == 200 else {}
+            real_amount = float(inv_data.get("amount", 0.0))
+            real_telemetry = inv_data.get("signals", {})
+
             case_r = await c.post("/cases/create-from-transaction", json={
-                "transaction_id": transaction_id, "amount": 0.0, "telemetry": {}
+                "transaction_id": transaction_id,
+                "amount": real_amount,
+                "telemetry": real_telemetry,
             })
             case_id = case_r.json().get("case_id") if case_r.status_code == 200 else None
             if not case_id:
@@ -71,28 +93,49 @@ async def call_compile_dispute_evidence(transaction_id: str) -> dict:
 
 # ---------------------------------------------------------------------------
 # Demo agent orchestration (simulates Claude Agent SDK delegation pattern)
+# NOTE: Makes direct HTTP calls to the backend REST endpoints — which is
+# exactly what the MCP tool implementations in mcp_server.py do internally.
+# This demonstrates the delegation pattern without requiring a running MCP
+# stdio transport. For the actual MCP protocol round-trip, run mcp_server.py
+# and connect with a Claude Agent SDK client or Claude Desktop.
 # ---------------------------------------------------------------------------
 
 async def run_demo_agent(transaction_id: str):
     print("=" * 70)
     print("RAZORSHIELD SENTINEL — AGENT STUDIO MCP DEMO")
     print("Simulates Razorpay native agent delegating to RazorShield via MCP")
+    print("(HTTP simulation — backend endpoints are the same ones MCP tools call)")
     print("=" * 70)
     print(f"\n[Agent] Received suspicious transaction for investigation: {transaction_id}")
     print("[Agent] Delegating to RazorShield Sentinel specialist sub-agent...\n")
 
-    # Tool call 1: Investigate transaction
-    print(f"[MCP Tool Call] investigate_transaction('{transaction_id}')")
+    # Tool call 1: investigate_transaction — full 8-layer forensic pipeline
+    print(f"[MCP Tool Call 1/4] investigate_transaction('{transaction_id}')")
     inv = await call_investigate_transaction(transaction_id)
     tier = inv.get("tier", "unknown")
     risk_score = inv.get("risk_score", inv.get("final_risk", "N/A"))
     explanation = inv.get("explanation", inv.get("decision", ""))
-    print(f"  -> Tier: {tier} | Risk Score: {risk_score}")
+    amount = inv.get("amount", 0.0)
+    signals = inv.get("signals", {})
+    print(f"  -> Tier: {tier} | Risk Score: {risk_score} | Amount: INR {amount:,.2f}")
     print(f"  -> {explanation}\n")
 
-    # Tool call 2: Check canary status if elevated risk
+    # Tool call 2: get_cluster_risk_score — Louvain ring membership
+    device_fp = signals.get("device_fingerprint") or f"dev_{transaction_id[:8]}"
+    print(f"[MCP Tool Call 2/4] get_cluster_risk_score(device_fingerprint='{device_fp}')")
+    cluster = await call_get_cluster_risk_score(device_fingerprint=device_fp)
+    cluster_score = cluster.get("cluster_score", 0.0)
+    cluster_id = cluster.get("cluster_id", "c_0")
+    ring_size = cluster.get("ring_size", 1)
+    print(f"  -> Cluster: {cluster_id} | Ring Score: {cluster_score:.3f} | Ring Size: {ring_size} nodes")
+    if cluster_score > 0.5:
+        print(f"  -> WARNING: High community risk — device linked to a {ring_size}-node fraud ring.\n")
+    else:
+        print("  -> Low ring affiliation — no organized ring detected.\n")
+
+    # Tool call 3: check_canary_status — honeytoken detection
     if tier not in ("safe",):
-        print(f"[MCP Tool Call] check_canary_status('{transaction_id}')")
+        print(f"[MCP Tool Call 3/4] check_canary_status('{transaction_id}')")
         canary = await call_check_canary_status(transaction_id)
         is_canary = canary.get("is_canary", False)
         confidence = canary.get("confidence", 0.0)
@@ -102,9 +145,12 @@ async def run_demo_agent(transaction_id: str):
             print(f"  -> Canary Index #{idx} triggered. Deterministic block. 0.00% FPR.\n")
         else:
             print("  -> No canary hit. Proceeding to evidence compilation.\n")
+    else:
+        print(f"[MCP Tool Call 3/4] check_canary_status — skipped (tier=safe)\n")
 
-    # Tool call 3: Compile dispute evidence dossier
-    print(f"[MCP Tool Call] compile_dispute_evidence('{transaction_id}')")
+    # Tool call 4: compile_dispute_evidence — 5-domain forensic dossier
+    print(f"[MCP Tool Call 4/4] compile_dispute_evidence('{transaction_id}')")
+    print(f"  (using real amount=INR {amount:,.2f} and forensic signals from investigation)")
     evidence = await call_compile_dispute_evidence(transaction_id)
     pkg_id = evidence.get("package_id", "N/A")
     claims_count = len(evidence.get("claims", []))
@@ -121,8 +167,10 @@ async def run_demo_agent(transaction_id: str):
     print("[Agent] MCP tool delegation complete. Summary:")
     print("-" * 70)
     print(f"  Transaction:      {transaction_id}")
+    print(f"  Amount:           INR {amount:,.2f}")
     print(f"  Risk Tier:        {tier}")
     print(f"  Risk Score:       {risk_score}")
+    print(f"  Cluster Risk:     {cluster_score:.3f} (ring: {ring_size} nodes)")
     print(f"  Evidence Package: {pkg_id} ({claims_count} claims)")
     print(f"  Signal Strength:  {signal:.0%} (heuristic — human review required)")
     print()
