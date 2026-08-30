@@ -66,7 +66,7 @@ export default function ModelGovernance() {
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
               <CheckCircle2 size={14} />
-              RBI Master Direction Aligned
+              RBI Authentication Directions 2025 Aligned
             </span>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function ModelGovernance() {
           <div className="text-2xl font-bold font-mono text-indigo-400">
             {(data.metrics.ml_layer_pr_auc ?? data.metrics.pr_auc ?? 0).toFixed(4)}
           </div>
-          <div className="text-[11px] text-slate-500">ML-scored txns only (canary+rules excluded)</div>
+          <div className="text-[11px] text-slate-500">Base Rate: 22.3% (n=9,003, canary/rules excl)</div>
         </div>
 
         <div className="panel flex flex-col gap-1 border-emerald-500/20 bg-slate-900/90">
@@ -103,7 +103,7 @@ export default function ModelGovernance() {
           <div className="text-2xl font-bold font-mono text-amber-400">
             {(data.metrics.unseen_zero_day_catch_rate * 100).toFixed(1)}%
           </div>
-          <div className="text-[11px] text-slate-500">Tested on Unseen Attack Vectors</div>
+          <div className="text-[11px] text-slate-500">Leave-One-Attack-Out Cross-Validation</div>
         </div>
       </div>
 

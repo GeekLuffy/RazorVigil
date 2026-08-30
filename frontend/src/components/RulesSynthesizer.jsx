@@ -121,14 +121,14 @@ export default function RulesSynthesizer() {
       <div className="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
         <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-          RBI Master Direction Digital Payment Security &amp; Cyber Resilience Aligned
+          RBI Authentication Mechanisms Directions 2025 Aligned
         </div>
         <button
           onClick={() => {
             const report = {
               report_id: `RBI-AUDIT-${Date.now()}`,
               timestamp: new Date().toISOString(),
-              framework: 'RBI Master Direction on Cyber Resilience and Digital Payment Security in Payment System Operators (2025/2026)',
+              framework: 'Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)',
               system: 'RazorShield Sentinel Autonomous Risk Engine v1.0',
               active_threat_clusters: rulesData.active_clusters_detected,
               monitored_entities: rulesData.entities_tracked,

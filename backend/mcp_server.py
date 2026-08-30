@@ -1,4 +1,4 @@
-﻿"""
+"""
 RazorShield Sentinel - MCP Server for Razorpay Agent Studio Integration.
 
 Exposes 4 MCP tools callable by any Claude Agent SDK agent:
@@ -32,23 +32,24 @@ except ImportError:
     MCP_AVAILABLE = False
 
 RAZORSHIELD_API_URL = os.getenv("RAZORSHIELD_API_URL", "http://localhost:8000")
-_client = httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0)
 
 
 async def _get(path: str, params: dict | None = None) -> dict[str, Any]:
     try:
-        r = await _client.get(path, params=params or {})
-        r.raise_for_status()
-        return r.json()
+        async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as client:
+            r = await client.get(path, params=params or {})
+            r.raise_for_status()
+            return r.json()
     except httpx.HTTPError as exc:
         return {"error": str(exc), "path": path}
 
 
 async def _post(path: str, body: dict) -> dict[str, Any]:
     try:
-        r = await _client.post(path, json=body)
-        r.raise_for_status()
-        return r.json()
+        async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as client:
+            r = await client.post(path, json=body)
+            r.raise_for_status()
+            return r.json()
     except httpx.HTTPError as exc:
         return {"error": str(exc), "path": path}
 
@@ -187,7 +188,7 @@ TOOL_DEFINITIONS = [
         "description": (
             "Compile a 5-domain structured DRAFT evidence dossier: "
             "(1) Gateway HMAC, (2) ASN/JA3 telemetry, (3) biometrics, "
-            "(4) Louvain graph topology, (5) RBI regulatory context. "
+            "(4) Louvain graph topology, (5) RBI regulatory context (Authentication Mechanisms Directions 2025). "
             "DRAFT for merchant review only - not a formally filed document. "
             "Returns package_id, claims, signal_strength, dossier_draft."
         ),

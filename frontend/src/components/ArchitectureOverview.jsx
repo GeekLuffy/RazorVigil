@@ -45,7 +45,7 @@ export default function ArchitectureOverview() {
             <div className="bg-slate-900 p-2 rounded-lg border border-slate-800">
               <span className="text-slate-500 text-[11px] block">Webhook Idempotency:</span>
               <span className="text-slate-300 text-[11px]">
-                Validates <code className="text-amber-400">X-Razorpay-Signature</code> &amp; deduplicates <code className="text-amber-400">x-razorpay-event-id</code> in Redis.
+                Validates <code className="text-amber-400">X-Razorpay-Signature</code> &amp; deduplicates payload <code className="text-amber-400">id</code> in Redis.
               </span>
             </div>
           </div>

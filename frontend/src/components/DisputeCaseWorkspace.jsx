@@ -165,7 +165,7 @@ export default function DisputeCaseWorkspace() {
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-3xl">
               Zero-hallucination dispute defense compiler. Assembles 5-domain verifiable telemetry claims
-              (HMAC signatures, TLS JA3/JA4, kinetic biometrics, Louvain community rings, and RBI Master Direction 2025/2026 compliance context)
+              (HMAC signatures, TLS JA3/JA4, kinetic biometrics, Louvain community rings, and RBI Authentication Mechanisms Directions 2025 compliance context)
               into structured draft evidence dossiers for merchant/human review before filing.
             </p>
           </div>

@@ -69,13 +69,15 @@ Evaluated on a stratified 50,000-transaction testbed generated using Polars:
 
 | Metric | Score | Description |
 |---|---|---|
-| **Full-Funnel Catch Rate** | **100.00%** | Comprehensive multi-layer defense |
-| **ML-Layer PR-AUC** | **0.9983** | On ambiguous rows reaching ML (canary + rule overrides excluded) |
-| **Adversarial-Realistic PR-AUC** | **0.9991** | Stealth bots with realistic timing jitter & IP diversity |
-| **Zero-Day Generalization**| **91.76%** | Tested against unseen CVV-cycling attacks |
+| **Full-Funnel Catch Rate** | **100.00%** | Comprehensive multi-layer defense (Canary + Rules + ML) |
+| **ML-Layer PR-AUC** | **0.9983** | Ambiguous rows reaching ML (Base rate: 22.25%, n=9,003, canary/rules excl) |
+| **Adversarial-Realistic PR-AUC** | **0.9991** | Stealth bots with realistic timing jitter vs genuine (Base rate: 6.67%, n=7,500) |
+| **Zero-Day Generalization**| **91.76%** | Leave-one-attack-type-out cross-validation against unseen CVV-cycling attacks |
 | **Edge-Case False Declines** | **0.00%** | Zero false positives on genuine high-ticket purchases |
 | **Sequential Latency (p50 / p99)** | **9.08ms / 13.86ms** | 4x faster than the 50ms gateway SLA |
 | **Sustained 40 RPS Latency (p99)** | **28.06ms** | Sub-30ms performance under concurrent load |
+
+> **Methodological Rigor Note**: To guard against inductive bias from in-house synthetic attack design, out-of-distribution robustness is verified via leave-one-attack-type-out cross-validation across unseen attack distributions. All regulatory references align with the *Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)*.
 
 ---
 

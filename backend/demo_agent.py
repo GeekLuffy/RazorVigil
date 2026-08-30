@@ -1,4 +1,4 @@
-﻿"""
+"""
 RazorShield Sentinel - Demo Agent for Razorpay Agent Studio Integration.
 
 Demonstrates how Razorpay's Agent Studio (or any Claude Agent SDK agent) can
@@ -82,7 +82,7 @@ async def run_demo_agent(transaction_id: str):
     print("[Agent] Delegating to RazorShield Sentinel specialist sub-agent...\n")
 
     # Tool call 1: Investigate transaction
-    print("[MCP Tool Call] investigate_transaction({transaction_id!r})")
+    print(f"[MCP Tool Call] investigate_transaction('{transaction_id}')")
     inv = await call_investigate_transaction(transaction_id)
     tier = inv.get("tier", "unknown")
     risk_score = inv.get("risk_score", inv.get("final_risk", "N/A"))
@@ -92,7 +92,7 @@ async def run_demo_agent(transaction_id: str):
 
     # Tool call 2: Check canary status if elevated risk
     if tier not in ("safe",):
-        print(f"[MCP Tool Call] check_canary_status({transaction_id!r})")
+        print(f"[MCP Tool Call] check_canary_status('{transaction_id}')")
         canary = await call_check_canary_status(transaction_id)
         is_canary = canary.get("is_canary", False)
         confidence = canary.get("confidence", 0.0)
@@ -104,7 +104,7 @@ async def run_demo_agent(transaction_id: str):
             print("  -> No canary hit. Proceeding to evidence compilation.\n")
 
     # Tool call 3: Compile dispute evidence dossier
-    print(f"[MCP Tool Call] compile_dispute_evidence({transaction_id!r})")
+    print(f"[MCP Tool Call] compile_dispute_evidence('{transaction_id}')")
     evidence = await call_compile_dispute_evidence(transaction_id)
     pkg_id = evidence.get("package_id", "N/A")
     claims_count = len(evidence.get("claims", []))
