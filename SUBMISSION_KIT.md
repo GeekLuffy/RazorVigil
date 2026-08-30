@@ -40,7 +40,7 @@
 >   - **Sustained Throughput (40 req/s)**: **p50 = 9.44ms | p95 = 18.62ms | p99 = 28.06ms** (strictly below the 50ms gateway budget).
 > - **Ensemble Weight Ablation**:
 >   - Full Ensemble (0.70 LGB / 0.20 IF / 0.10 Louvain): **ML-Layer PR-AUC 0.9983 | Recall 99.1%**
->   - No LightGBM (IF + Cluster only: 0.00 / 0.65 / 0.35): PR-AUC **0.9983** and Recall **97.80%**, proving unsupervised IF/Cluster provide independent zero-day boundary defense.
+>   - No LightGBM (IF + Cluster only: 0.00 / 0.65 / 0.35): PR-AUC **0.9988** and Recall **97.43%**, proving unsupervised IF/Cluster provide independent zero-day boundary defense.
 > - **Pitch Metric**: **`Net_Value_Protected` = Fraud Loss Prevented − [False Positive Cost − Recovered GMV]**.
 
 ---
