@@ -18,9 +18,11 @@ from pathlib import Path
 import httpx
 import numpy as np
 
+import pytest
 API_URL = "http://localhost:8000/checkout"
 
 
+@pytest.mark.skip(reason="Standalone performance benchmark script, run via python tests/load_test.py")
 async def test_sequential(n: int = 100) -> dict:
     print(f"\n--- 1. Sequential Baseline ({n} requests, single client) ---")
     results = []
@@ -52,6 +54,7 @@ async def test_sequential(n: int = 100) -> dict:
     return {"p50_ms": round(float(p50), 2), "p95_ms": round(float(p95), 2), "p99_ms": round(float(p99), 2)}
 
 
+@pytest.mark.skip(reason="Standalone performance benchmark script, run via python tests/load_test.py")
 async def test_sustained(n: int = 200, target_rps: float = 50.0) -> dict:
     print(f"\n--- 2. Sustained Throughput ({n} requests at ~{target_rps} req/s) ---")
     interval = 1.0 / target_rps
