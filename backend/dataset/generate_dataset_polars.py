@@ -168,8 +168,28 @@ def generate_dataset(n_rows: int = 50000, seed: int = 42) -> pl.DataFrame:
 
     # Shuffle indices
     shuffle_idx = rng.permutation(n_rows)
+    # Base timestamp: 1700000000 + incrementing offset
+    base_ts = 1700000000.0 + np.arange(n_rows, dtype=np.float64) * 5.0
+    
+    # Generate realistic hashes for graph construction
+    n_unique_cards = max(n_rows // 10, 1000)
+    n_unique_ips = max(n_rows // 20, 500)
+    n_unique_devs = max(n_rows // 25, 400)
+    
+    card_pool = [f"card_{i:06d}" for i in range(n_unique_cards)]
+    ip_pool = [f"192.168.{(i//256)%256}.{i%256}" for i in range(n_unique_ips)]
+    dev_pool = [f"dev_{i:05d}" for i in range(n_unique_devs)]
+    
+    card_hashes = rng.choice(card_pool, size=n_rows)
+    ip_addrs = rng.choice(ip_pool, size=n_rows)
+    device_ids = rng.choice(dev_pool, size=n_rows)
+    dev_ip_counts = np.clip(dev_bins * 1.5, 1, 15).astype(np.float32)
 
     df = pl.DataFrame({
+        "timestamp": base_ts[shuffle_idx],
+        "card_hash": card_hashes[shuffle_idx],
+        "ip_address": ip_addrs[shuffle_idx],
+        "device_id": device_ids[shuffle_idx],
         "amount": amounts[shuffle_idx].astype(np.float32),
         "amount_zscore": amount_zscore[shuffle_idx],
         "hour_sin": hour_sin[shuffle_idx],
@@ -184,6 +204,7 @@ def generate_dataset(n_rows: int = 50000, seed: int = 42) -> pl.DataFrame:
         "bin_name_count": bin_names[shuffle_idx].astype(np.float32),
         "ip_distinct_pan_count": ip_pans[shuffle_idx].astype(np.float32),
         "device_distinct_bin_count": dev_bins[shuffle_idx].astype(np.float32),
+        "device_distinct_ip_count": dev_ip_counts[shuffle_idx],
         "cvv_cycle_attempts": cvv_attempts[shuffle_idx].astype(np.float32),
         "cluster_risk_score": clusters[shuffle_idx].astype(np.float32),
         "label": labels[shuffle_idx].astype(np.int32),
@@ -198,6 +219,7 @@ def generate_dataset(n_rows: int = 50000, seed: int = 42) -> pl.DataFrame:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n", type=int, default=50000, help="Number of rows to generate")
+    parser.add_argument("--out", type=str, default="", help="Output CSV path")
     args = parser.parse_args()
 
     data_dir = Path(__file__).parents[2] / "data"
@@ -205,12 +227,18 @@ if __name__ == "__main__":
 
     df = generate_dataset(n_rows=args.n)
 
-    # Save to Parquet and CSV
-    parquet_path = data_dir / "synthetic_transactions.parquet"
-    csv_path = data_dir / "synthetic_transactions.csv"
+    if args.out:
+        out_csv = Path(args.out)
+        out_csv.parent.mkdir(exist_ok=True, parents=True)
+        df.write_csv(out_csv)
+        print(f"[Dataset] Saved custom CSV -> {out_csv} ({os.path.getsize(out_csv) / 1024 / 1024:.2f} MB)")
+    else:
+        # Save to Parquet and CSV
+        parquet_path = data_dir / "synthetic_transactions.parquet"
+        csv_path = data_dir / "synthetic_transactions.csv"
 
-    df.write_parquet(parquet_path)
-    df.write_csv(csv_path)
+        df.write_parquet(parquet_path)
+        df.write_csv(csv_path)
 
-    print(f"[Dataset] Saved Parquet -> {parquet_path} ({os.path.getsize(parquet_path) / 1024 / 1024:.2f} MB)")
-    print(f"[Dataset] Saved CSV     -> {csv_path} ({os.path.getsize(csv_path) / 1024 / 1024:.2f} MB)")
+        print(f"[Dataset] Saved Parquet -> {parquet_path} ({os.path.getsize(parquet_path) / 1024 / 1024:.2f} MB)")
+        print(f"[Dataset] Saved CSV     -> {csv_path} ({os.path.getsize(csv_path) / 1024 / 1024:.2f} MB)")

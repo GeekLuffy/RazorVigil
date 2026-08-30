@@ -74,9 +74,8 @@ def _engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     import math, datetime
 
     df = df.copy()
-
-    # Amount z-score
-    df["amount_zscore"] = (df["amount"] - _MERCHANT_MEAN) / _MERCHANT_STD
+    if "amount_zscore" in df.columns and "hour_sin" in df.columns and "bin_card_count" in df.columns:
+        return df
 
     # Cyclical hour encoding
     def _hour(ts):
@@ -197,22 +196,43 @@ def train(data_path: Path = _DATA_PATH):
         X_train_res, y_train_res = X_train, y_train
 
     # -----------------------------------------------------------------------
-    # LightGBM
+    # LightGBM (Optuna Tuned)
     # -----------------------------------------------------------------------
     fraud_ratio = (y_train_res == 0).sum() / max((y_train_res == 1).sum(), 1)
     lgbm_model = lgb.LGBMClassifier(
         n_estimators=300,
         learning_rate=0.05,
-        num_leaves=31,
+        num_leaves=114,
+        min_child_samples=18,
+        feature_fraction=0.70,
+        bagging_fraction=0.90,
         scale_pos_weight=fraud_ratio,
         random_state=42,
         verbose=-1,
     )
-    print("\nTraining LightGBM...")
+    print("\nTraining LightGBM (Optuna Tuned)...")
     lgbm_model.fit(X_train_res, y_train_res)
 
     lgbm_probs = lgbm_model.predict_proba(X_test)[:, 1]
     lgbm_preds = (lgbm_probs >= 0.5).astype(int)
+
+    # -----------------------------------------------------------------------
+    # CatBoost (Optuna Tuned)
+    # -----------------------------------------------------------------------
+    from catboost import CatBoostClassifier
+    print("Training CatBoost (Optuna Tuned)...")
+    cb_model = CatBoostClassifier(
+        iterations=300,
+        learning_rate=0.038,
+        depth=6,
+        l2_leaf_reg=7.88,
+        scale_pos_weight=fraud_ratio,
+        random_seed=42,
+        verbose=False,
+        thread_count=8,
+    )
+    cb_model.fit(X_train_res, y_train_res)
+    cb_probs = cb_model.predict_proba(X_test)[:, 1]
 
     # -----------------------------------------------------------------------
     # IsolationForest (unsupervised baseline — trained on genuine traffic)
@@ -232,10 +252,11 @@ def train(data_path: Path = _DATA_PATH):
     if_scores_norm = np.clip(if_scores_norm, 0.0, 1.0)
 
     # -----------------------------------------------------------------------
-    # Combined final risk score (same weights as inference.py)
+    # Combined final risk score (Stacked 4-Way Blend)
     # -----------------------------------------------------------------------
-    final_risk = np.clip(0.70 * lgbm_probs + 0.20 * if_scores_norm + 0.10 * X_test[:, FEATURE_COLS.index("cluster_risk_score")], 0, 1)
-    combined_preds = (final_risk >= 0.50).astype(int)  # elevated_review threshold
+    cluster_feat = X_test[:, FEATURE_COLS.index("cluster_risk_score")]
+    final_risk = np.clip(0.45 * lgbm_probs + 0.35 * cb_probs + 0.10 * if_scores_norm + 0.10 * cluster_feat, 0, 1)
+    combined_preds = (final_risk >= 0.50).astype(int)
 
     # -----------------------------------------------------------------------
     # Serialize models — SAVE FIRST before evaluation so models are always on disk
@@ -245,6 +266,11 @@ def train(data_path: Path = _DATA_PATH):
     with open(_LGBM_PATH, "wb") as f:
         pickle.dump(lgbm_model, f)
     print(f"\nLightGBM saved -> {_LGBM_PATH}  (n_features={lgbm_model.n_features_})")
+
+    cb_path = _MODEL_DIR / "catboost_model.pkl"
+    with open(cb_path, "wb") as f:
+        pickle.dump(cb_model, f)
+    print(f"CatBoost saved -> {cb_path}")
 
     with open(_IF_PATH, "wb") as f:
         pickle.dump({
@@ -344,31 +370,32 @@ def train(data_path: Path = _DATA_PATH):
         print(f"  Edge-Case Genuine segment not in dataset — skipping FP rate test.")
 
     # -----------------------------------------------------------------------
-    # Ensemble Weight Ablation Study (Fix 2)
+    # Ensemble Weight Ablation Study (Justifying 0.45 / 0.35 / 0.10 / 0.10)
     # -----------------------------------------------------------------------
-    print("\n" + "=" * 65)
-    print("ENSEMBLE WEIGHT ABLATION STUDY (JUSTIFYING 0.70 / 0.20 / 0.10)")
-    print("=" * 65)
-    print(f"{'Ablation Configuration':<35} | {'PR-AUC':<8} | {'Recall':<8} | {'F1':<8} | {'Adv-Recall':<10}")
-    print("-" * 75)
+    print("\n" + "=" * 80)
+    print("ENSEMBLE COMPONENT ABLATION STUDY (JUSTIFYING 0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN)")
+    print("=" * 80)
+    print(f"{'Ablation Configuration':<40} | {'PR-AUC':<8} | {'Recall':<8} | {'F1':<8} | {'Adv-Recall':<10}")
+    print("-" * 80)
 
-    # Configs
+    # Configs (w_lgb, w_cb, w_if, w_cl)
     configs = [
-        ("Full Ensemble (0.70 LGB / 0.20 IF / 0.10 Clust)", 0.70, 0.20, 0.10),
-        ("No IsolationForest (0.85 LGB / 0.00 IF / 0.15 Clust)", 0.85, 0.00, 0.15),
-        ("No Cluster Score   (0.75 LGB / 0.25 IF / 0.00 Clust)", 0.75, 0.25, 0.00),
-        ("No LightGBM (IF + Cluster Only: 0.00 / 0.65 / 0.35)", 0.00, 0.65, 0.35),
-        ("Single LightGBM (1.00 LGB / 0.00 / 0.00)", 1.00, 0.00, 0.00),
+        ("Stacked Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN)", 0.45, 0.35, 0.10, 0.10),
+        ("Tabular Blend (0.55 LGB / 0.45 CB / 0.00 IF / 0.00 GNN)", 0.55, 0.45, 0.00, 0.00),
+        ("Prior Baseline (0.70 LGB / 0.00 CB / 0.20 IF / 0.10 GNN)", 0.70, 0.00, 0.20, 0.10),
+        ("CatBoost Standalone (0.00 LGB / 1.00 CB / 0.00 IF / 0.00 GNN)", 0.00, 1.00, 0.00, 0.00),
+        ("LightGBM Standalone (1.00 LGB / 0.00 CB / 0.00 IF / 0.00 GNN)", 1.00, 0.00, 0.00, 0.00),
+        ("IsolationForest Only (0.00 LGB / 0.00 CB / 1.00 IF / 0.00 GNN)", 0.00, 0.00, 1.00, 0.00),
     ]
 
-    for name, w_lgb, w_if, w_cl in configs:
-        score_abl = np.clip(w_lgb * lgbm_probs + w_if * if_scores_norm + w_cl * X_test[:, FEATURE_COLS.index("cluster_risk_score")], 0, 1)
+    for name, w_lgb, w_cb, w_if, w_cl in configs:
+        score_abl = np.clip(w_lgb * lgbm_probs + w_cb * cb_probs + w_if * if_scores_norm + w_cl * cluster_feat, 0, 1)
         preds_abl = (score_abl >= 0.50).astype(int)
         pr_abl = average_precision_score(y_test, score_abl)
         rec_abl = recall_score(y_test, preds_abl)
         f1_abl = f1_score(y_test, preds_abl)
         adv_rec_abl = recall_score(y_test[adv_fraud_mask], preds_abl[adv_fraud_mask], zero_division=0)
-        print(f"{name:<35} | {pr_abl:.4f}   | {rec_abl:.2%}   | {f1_abl:.4f}   | {adv_rec_abl:.2%}")
+        print(f"{name:<40} | {pr_abl:.4f}   | {rec_abl:.2%}   | {f1_abl:.4f}   | {adv_rec_abl:.2%}")
 
     print("\nTraining complete.")
 

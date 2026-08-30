@@ -316,12 +316,10 @@ async def checkout(
     # 4. Louvain Community Cluster Scoring
     cluster_score, cluster_id = await cluster_engine.get_cluster_score(req.device_fingerprint)
 
-    # 5. Hybrid ML Model Scoring
+    # 5. Hybrid ML Model Scoring (Stacked 4-Way Blend)
     feature_vec = build_feature_vector(req, vel_features, cluster_score)
-    lgbm_prob, if_score = risk_scorer.score(feature_vec)
-
-    final_risk = 0.70 * lgbm_prob + 0.20 * if_score + 0.10 * cluster_score
-    final_risk = float(min(1.0, max(0.0, final_risk)))
+    lgbm_prob, cb_prob, if_score = risk_scorer.score(feature_vec)
+    final_risk = risk_scorer.compute_risk(lgbm_prob, cb_prob, if_score, cluster_score)
 
     # 6. Decision Tiering
     tier, action, explanation = decision_engine.decide(final_risk, req)
