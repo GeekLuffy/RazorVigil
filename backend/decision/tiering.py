@@ -116,6 +116,14 @@ class DecisionEngine:
                 ),
             )
 
+        # Datacenter ASN with human biometrics → Soft Risk (Track 03 Zero False Decline Recovery)
+        if is_datacenter and not zero_biometrics and risk_score < _T_SOFT:
+            return (
+                "soft_risk",
+                "step_up",
+                "Track 03 Recovery: Datacenter/VPN ASN detected for legitimate human shopper. Routing to Out-of-Band UPI QR (5-min inventory hold).",
+            )
+
         # ----------------------------------------------------------------
         # Standard ML-score thresholds
         # ----------------------------------------------------------------
