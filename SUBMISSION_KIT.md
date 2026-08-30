@@ -19,8 +19,8 @@
 
 ### Solution & Architecture (How does it work?)
 > RazorShield Sentinel is a multi-layered autonomous risk engine designed for a **strict <50ms synchronous decision budget** (averaging ~10ms p99):
-> 1. **Optuna-Tuned Hybrid ML Scoring**: LightGBM Classifier + Calibrated Isolation Forest trained on 50,000+ transactions with SMOTE, achieving **PR-AUC 0.9983** on held-out ML-only evaluation (after excluding canary hits and deterministic rule overrides).
-> 2. **Sliding-Window Velocity & Graph Clustering**: Real-time Redis counters paired with an asynchronous NetworkX Louvain community detection engine to identify coordinated carding rings across rotating proxies.
+> 1. **4-Way Stacked Ensemble Scoring**: LightGBM + CatBoost + Calibrated Isolation Forest + Graph Neural Network trained on a strict 3-way split (60% Train / 20% Val / 20% Held-Out Test), achieving **PR-AUC 0.9985 `[0.9976, 0.9992]`** and **ROC-AUC 0.9993 `[0.9988, 0.9997]`** with 1,000 bootstrap resamples on the held-out test partition.
+> 2. **Sliding-Window Velocity & Graph Clustering**: Real-time Redis counters paired with an asynchronous NetworkX Louvain / PyG HeteroGraphSAGE community detection engine to identify coordinated carding rings across rotating proxies.
 > 3. **50 Luhn-Valid Canary Honeytokens**: Synthetic PANs seeded exclusively within our own decoy inventory and honeytoken check endpoint — discoverable only via BIN-enumeration or scraping directed at our own system. Any match triggers a deterministic 1.0-confidence block. The **0.00% FPR guarantee applies strictly to the canary detection layer**, not the ML layer.
 > 4. **Agent-Aware Risk Layer**: Distinguishes malicious headless bots from legitimate AI shopping agents via signed JWT attestation headers (Google AP2 Protocol).
 > 5. **Track 03 Revenue Recovery Bridge**: Borderline anomalies (VPN users, travelers) are never hard-declined. They are routed to `soft_risk` and issued single-use signed UPI QR recovery links that rescue lost GMV, confirmed by Razorpay Webhooks.
@@ -29,18 +29,21 @@
 > 8. **AI Dispute Evidence Dossier Synthesizer**: Compiles zero-hallucination, 5-domain verifiable draft evidence packages (HMAC signatures, TLS JA3/JA4, biometrics, Louvain graph rings, and Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026) compliance context) for merchant/human review. Output is a structured draft dossier — not a formally filed document.
 > 9. **Human-in-the-Loop (HITL) Case Resolution & Model Governance**: Interactive SOC dispute management workspace allowing one-click evidence review, Track 03 UPI recovery routing, and live held-out model evaluation analytics (Confusion Matrix, Feature Importances, and Ablation Matrices).
 
-### Key Metrics & Impact (50,000-Row Stratified Reporting)
-> - **Full-Funnel Catch Rate**: **100.00%** (Combined defense: 50 Canary Honeytokens + Deterministic Rules + ML Pipeline).
-> - **ML-Layer PR-AUC**: **0.9983** (Fraud Base Rate / Prevalence: **22.25%**, evaluated on the 9,003 ambiguous transactions reaching ML scoring after excluding canary hits and deterministic rule overrides).
-> - **Adversarial-Realistic PR-AUC**: **0.9991** (Fraud Base Rate / Prevalence: **6.67%**, evaluated on stealth carding bots with injected timing jitter against genuine shoppers).
-> - **Zero-Day Generalization Catch Rate**: **91.76%** (Trained *without* CVV-cycling examples; model successfully intercepted unseen CVV-cycling attacks via velocity & anomaly signals).
-> - **Methodological Rigor Note**: To guard against inductive bias from in-house synthetic attack design ("grading our own homework"), out-of-distribution robustness is verified via leave-one-attack-type-out cross-validation across unseen attack distributions.
+### Key Metrics & Impact (Strict 3-Way Held-Out Test Reporting, N=10,000, 1,000 Bootstrap CIs)
+> - **Overall Test PR-AUC**: **0.9985** `[0.9976, 0.9992]` (Signal Lift: **3.33x** `[3.23x, 3.42x]`, Prevalence: 30.00%).
+> - **Overall Test ROC-AUC**: **0.9993** `[0.9988, 0.9997]` (Global discrimination on strictly isolated test holdout).
+> - **ML-Layer PR-AUC**: **0.9984** `[0.9974, 0.9992]` (Evaluated on the 9,877 ambiguous transactions reaching ML scoring after excluding deterministic rule overrides).
+> - **Adversarial-Realistic PR-AUC**: **0.9637** `[0.9381, 0.9832]` (Recall: **97.20%**, evaluated on human-mimicking stealth bots with realistic biometric jitter).
+> - **Full-Funnel Fraud Catch Rate**: **99.53%** `[99.30%, 99.77%]` (Multi-layer defense: 50 Canary Honeytokens + Sliding-Window Velocity + 4-Way Stacked ML).
+> - **Methodological Rigor & Leakage Guardrails**: All hyperparameter tuning (5-GPU Optuna) and ensemble blend-weight selection were restricted strictly to the 20% validation partition. The test partition was held strictly unobserved until final reporting. Standing automated evaluation guardrails enforce non-zero CI widths and flag unverified perfection.
 > - **Synchronous Latency Budget**:
 >   - **Sequential Baseline**: **p50 = 9.08ms | p95 = 11.81ms | p99 = 13.86ms** (tested on 100 sequential checkout transactions).
 >   - **Sustained Throughput (40 req/s)**: **p50 = 9.44ms | p95 = 18.62ms | p99 = 28.06ms** (strictly below the 50ms gateway budget).
-> - **Ensemble Weight Ablation**:
->   - Full Ensemble (0.70 LGB / 0.20 IF / 0.10 Louvain): **ML-Layer PR-AUC 0.9983 | Recall 99.1%**
->   - No LightGBM (IF + Cluster only: 0.00 / 0.65 / 0.35): PR-AUC **0.9988** and Recall **97.43%**, proving unsupervised IF/Cluster provide independent zero-day boundary defense.
+> - **Ensemble Component Ablation Matrix**:
+>   - Stacked 4-Way Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN): **PR-AUC 0.9985 `[0.9976, 0.9992]` | ROC-AUC 0.9993 `[0.9988, 0.9997]`**
+>   - Tabular GBDT Blend (0.55 LGB / 0.45 CB): **PR-AUC 0.9997 `[0.9996, 0.9999]` | ROC-AUC 0.9999 `[0.9998, 0.9999]`**
+>   - Isolation Forest Standalone (Unsupervised): **PR-AUC 0.9387 `[0.9328, 0.9445]` | ROC-AUC 0.9722 `[0.9694, 0.9748]`**
+>   - HeteroGraphSAGE Graph Standalone: **PR-AUC 0.8556 `[0.8449, 0.8654]` | ROC-AUC 0.8764 `[0.8673, 0.8847]`**
 > - **Pitch Metric**: **`Net_Value_Protected` = Fraud Loss Prevented − [False Positive Cost − Recovered GMV]**.
 
 ---

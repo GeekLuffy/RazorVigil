@@ -65,19 +65,28 @@ Rather than competing with Razorpay's own native fraud agents, RazorShield provi
 
 ## 📊 Benchmark & Evaluation Results
 
-Evaluated on a stratified 50,000-transaction testbed generated using Polars:
+Evaluated on a strictly isolated 3-way stratified partition (**60% Train / 20% Validation / 20% Held-Out Test, N=10,000 test holdout**) with **1,000 nonparametric bootstrap resamples**:
 
-| Metric | Score | Description |
-|---|---|---|
-| **Full-Funnel Catch Rate** | **100.00%** | Comprehensive multi-layer defense (Canary + Rules + ML) |
-| **ML-Layer PR-AUC** | **0.9983** | Ambiguous rows reaching ML (Base rate: 22.25%, n=9,003, canary/rules excl) |
-| **Adversarial-Realistic PR-AUC** | **0.9991** | Stealth bots with realistic timing jitter vs genuine (Base rate: 6.67%, n=7,500) |
-| **Zero-Day Generalization**| **91.76%** | Leave-one-attack-type-out cross-validation against unseen CVV-cycling attacks |
-| **Edge-Case False Declines** | **0.00%** | Zero false positives on genuine high-ticket purchases |
-| **Sequential Latency (p50 / p99)** | **9.08ms / 13.86ms** | 4x faster than the 50ms gateway SLA |
-| **Sustained 40 RPS Latency (p99)** | **28.06ms** | Sub-30ms performance under concurrent load |
+| Metric | Point Estimate | 95% Bootstrap CI | Description |
+|---|---|---|---|
+| **Overall Test PR-AUC** | **0.9985** | `[0.9976, 0.9992]` | 4-Way Stacked Blend on held-out test split (Lift: **3.33x**) |
+| **Overall Test ROC-AUC** | **0.9993** | `[0.9988, 0.9997]` | Global ranking discrimination on held-out test partition |
+| **ML-Layer PR-AUC** | **0.9984** | `[0.9974, 0.9992]` | Ambiguous traffic reaching ML (n=9,877 / 10,000, rules excluded) |
+| **Adversarial-Realistic PR-AUC** | **0.9637** | `[0.9381, 0.9832]` | Stealth human-mimicking bot segment (Recall: **97.20%**, n=500) |
+| **Full-Funnel Fraud Catch Rate** | **99.53%** | `[99.30%, 99.77%]` | Multi-layer defense (Canary Traps + Velocity + 4-Way Stacked ML) |
+| **Sequential Latency (p50 / p99)** | **9.08ms / 13.86ms** | — | 4x faster than the 50ms gateway SLA |
+| **Sustained 40 RPS Latency (p99)** | **28.06ms** | — | Sub-30ms performance under concurrent load |
 
-> **Methodological Rigor Note**: To guard against inductive bias from in-house synthetic attack design, out-of-distribution robustness is verified via leave-one-attack-type-out cross-validation across unseen attack distributions. All regulatory references align with the *Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)*.
+### Stacked Ensemble Component Ablation (Held-Out Test Partition)
+- **Stacked 4-Way Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN)**: PR-AUC **0.9985** `[0.9976, 0.9992]`, ROC-AUC **0.9993** `[0.9988, 0.9997]`
+- **Tabular GBDT Blend (0.55 LGB / 0.45 CB)**: PR-AUC **0.9997** `[0.9996, 0.9999]`, ROC-AUC **0.9999** `[0.9998, 0.9999]`
+- **Isolation Forest Standalone (Unsupervised)**: PR-AUC **0.9387** `[0.9328, 0.9445]`, ROC-AUC **0.9722** `[0.9694, 0.9748]`
+- **Graph Neural Network (HeteroGraphSAGE)**: PR-AUC **0.8556** `[0.8449, 0.8654]`, ROC-AUC **0.8764** `[0.8673, 0.8847]`
+
+> **Methodological Rigor & Guardrails**:
+> 1. **Strict 3-Way Split**: Model training occurs on 60% Train; hyperparameter tuning (Optuna) and ensemble blend-weight selection occur exclusively on 20% Validation; final reporting occurs strictly on 20% Held-Out Test (never touched during tuning).
+> 2. **Automated Pipeline Integrity Guardrail**: The evaluation harness automatically executes `check_evaluation_integrity()`, raising warnings if bootstrap CI widths are degenerate (<0.001) or if point estimates touch unverified 1.0000s, preventing synthetic feature separability leakage.
+> 3. **Regulatory Context**: All compliance mechanisms align with the *Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)*.
 
 ---
 

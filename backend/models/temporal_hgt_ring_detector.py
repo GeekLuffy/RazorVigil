@@ -1,9 +1,9 @@
-"""
-Temporal Heterogeneous Graph Transformer (HGT) / Relational GAT with Edge Features
-for Carding Ring and Attack Cluster Detection.
+﻿"""
+Temporal Heterogeneous Graph Transformer (HGT) & Relational GAT Ring Detector.
 
-Trains on synthetic transaction-entity graphs with edge-conditioned relational attention
-(amount, timestamp delta, hour of day) on NVIDIA RTX 2080 Ti GPU 2 (cuda:2).
+Edge features: log(amount), timestamp delta, cyclical hour (sin/cos).
+Strict 3-Way Node Split: Train (60%) -> Validation (20%) -> Test (20% held-out).
+Evaluated with 1,000 Bootstrap Confidence Intervals and Evaluation Guardrail.
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ import time
 import pickle
 from pathlib import Path
 from typing import Dict, Tuple, List
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -21,6 +22,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.model_selection import train_test_split
 from joblib import Parallel, delayed
 
 import torch_geometric.nn as pyg_nn
@@ -30,6 +32,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 DATA_PATH = REPO_ROOT / "data" / "synthetic_transactions.csv"
 MODEL_DIR = REPO_ROOT / "backend" / "models"
+
+from backend.models.eval_guardrail import check_evaluation_integrity
 
 
 def _single_boot(y_true, scores, seed, n):
@@ -51,43 +55,31 @@ def compute_bootstrap_ci(y_true, scores, n_boot=1000, seed=42):
     point_pr = average_precision_score(y_true, scores)
     point_roc = roc_auc_score(y_true, scores)
     point_lift = point_pr / max(y_true.mean(), 1e-6)
-    
+
     seeds = [seed + i for i in range(n_boot)]
     results = Parallel(n_jobs=8, batch_size=25)(
         delayed(_single_boot)(y_true, scores, s, n) for s in seeds
     )
     valid = [r for r in results if r is not None]
+    pr_ci = (np.percentile([r[0] for r in valid], 2.5), np.percentile([r[0] for r in valid], 97.5))
+    roc_ci = (np.percentile([r[1] for r in valid], 2.5), np.percentile([r[1] for r in valid], 97.5))
+    lift_ci = (np.percentile([r[2] for r in valid], 2.5), np.percentile([r[2] for r in valid], 97.5))
+
+    check_evaluation_integrity("Graph PR-AUC", point_pr, pr_ci)
+    check_evaluation_integrity("Graph ROC-AUC", point_roc, roc_ci)
+
     return {
         "pr_point": point_pr,
-        "pr_ci": (np.percentile([r[0] for r in valid], 2.5), np.percentile([r[0] for r in valid], 97.5)),
+        "pr_ci": pr_ci,
         "roc_point": point_roc,
-        "roc_ci": (np.percentile([r[1] for r in valid], 2.5), np.percentile([r[1] for r in valid], 97.5)),
+        "roc_ci": roc_ci,
         "lift_point": point_lift,
-        "lift_ci": (np.percentile([r[2] for r in valid], 2.5), np.percentile([r[2] for r in valid], 97.5)),
+        "lift_ci": lift_ci,
     }
 
 
-class EdgeConditionedGATConv(nn.Module):
-    """GATv2 convolution with linear edge feature conditioning."""
-    def __init__(self, in_channels: int, out_channels: int, edge_dim: int, heads: int = 4):
-        super().__init__()
-        self.conv = pyg_nn.GATv2Conv(
-            in_channels=in_channels,
-            out_channels=out_channels // heads,
-            heads=heads,
-            edge_dim=edge_dim,
-            concat=True,
-            add_self_loops=False
-        )
-
-    def forward(self, x, edge_index, edge_attr):
-        return self.conv(x, edge_index, edge_attr=edge_attr)
-
-
 class TemporalHeteroGAT(nn.Module):
-    """
-    Heterogeneous Relational GAT with Edge Features (Amount, Time Delta, Cyclical Hour).
-    """
+    """Heterogeneous Relational GAT with Edge Features."""
     def __init__(self, in_channels_dict: Dict[str, int], edge_dim: int = 4, hidden_channels: int = 64):
         super().__init__()
         self.proj_dict = nn.ModuleDict({
@@ -134,7 +126,6 @@ class TemporalHeteroGAT(nn.Module):
         )
 
     def _layer_forward(self, convs, h_dict, edge_index_dict, edge_attr_dict):
-        from collections import defaultdict
         out_dict = defaultdict(list)
         for s, r, d in self.edge_types:
             key = (s, r, d)
@@ -165,10 +156,9 @@ class TemporalHeteroGAT(nn.Module):
         logits = self.classifier(h_dict['transaction']).squeeze(-1)
         return logits
 
+
 class BaselineHeteroGraphSAGE(nn.Module):
-    """
-    Standard Heterogeneous GraphSAGE baseline (structural adjacency without edge attributes).
-    """
+    """Standard Heterogeneous GraphSAGE baseline."""
     def __init__(self, in_channels_dict: Dict[str, int], hidden_channels: int = 64):
         super().__init__()
         self.proj_dict = nn.ModuleDict({
@@ -203,7 +193,6 @@ class BaselineHeteroGraphSAGE(nn.Module):
         )
 
     def _layer_forward(self, convs, h_dict, edge_index_dict):
-        from collections import defaultdict
         out_dict = defaultdict(list)
         for s, r, d in self.edge_types:
             key = (s, r, d)
@@ -230,135 +219,109 @@ class BaselineHeteroGraphSAGE(nn.Module):
 
         h2 = self._layer_forward(self.conv2_dict, h_dict, edge_index_dict)
         h_dict = {k: self.ln2(F.relu(h2[k]) + h_dict[k]) for k in h_dict if k in h2}
-
         logits = self.classifier(h_dict['transaction']).squeeze(-1)
         return logits
 
 
-def build_synthetic_pyg_graph(df: pd.DataFrame) -> Tuple[HeteroData, np.ndarray, np.ndarray]:
-    """Construct PyG HeteroData with transaction and entity nodes + edge attributes."""
+def build_synthetic_pyg_graph(df: pd.DataFrame) -> HeteroData:
+    data = HeteroData()
     n_tx = len(df)
-    
-    # 1. Map entities to unique integers
+
     card_map = {c: i for i, c in enumerate(df["card_hash"].unique())}
     ip_map = {ip: i for i, ip in enumerate(df["ip_address"].unique())}
     dev_map = {d: i for i, d in enumerate(df["device_id"].unique())}
 
-    tx_nodes = np.arange(n_tx, dtype=np.int64)
-    card_nodes = df["card_hash"].map(card_map).values.astype(np.int64)
-    ip_nodes = df["ip_address"].map(ip_map).values.astype(np.int64)
-    dev_nodes = df["device_id"].map(dev_map).values.astype(np.int64)
-
-    # Edge features: [log(amount), time_delta, hour_sin, hour_cos]
-    amt = np.log1p(df["amount"].values.astype(np.float32)).reshape(-1, 1)
-    ts = df["timestamp"].values.astype(np.float32)
-    ts_norm = ((ts - ts.min()) / max(ts.max() - ts.min(), 1.0)).reshape(-1, 1)
-    h_sin = df["hour_sin"].values.astype(np.float32).reshape(-1, 1)
-    h_cos = df["hour_cos"].values.astype(np.float32).reshape(-1, 1)
-    edge_feats = np.hstack([amt, ts_norm, h_sin, h_cos])
-
-    # Tabular node features for transactions
     from backend.models.train import FEATURE_COLS
-    tx_features = df[FEATURE_COLS].values.astype(np.float32)
+    tx_feat_cols = [c for c in FEATURE_COLS if c != "cluster_risk_score"]
+    data['transaction'].x = torch.tensor(df[tx_feat_cols].values, dtype=torch.float32)
+    y_vals = df["label"].values if "label" in df.columns else df["is_fraud"].values
+    data['transaction'].y = torch.tensor(y_vals, dtype=torch.float32)
 
-    data = HeteroData()
-    data['transaction'].x = torch.from_numpy(tx_features)
-    data['transaction'].y = torch.from_numpy(df["label"].values.astype(np.float32))
+    data['card'].x = torch.ones((len(card_map), 8), dtype=torch.float32)
+    data['ip'].x = torch.ones((len(ip_map), 8), dtype=torch.float32)
+    data['device'].x = torch.ones((len(dev_map), 8), dtype=torch.float32)
 
-    # Entity initial embeddings (ones / learned)
-    data['card'].x = torch.ones((len(card_map), 16), dtype=torch.float32)
-    data['ip'].x = torch.ones((len(ip_map), 16), dtype=torch.float32)
-    data['device'].x = torch.ones((len(dev_map), 16), dtype=torch.float32)
+    tx_idx = np.arange(n_tx)
+    c_idx = np.array([card_map[c] for c in df["card_hash"]])
+    ip_idx = np.array([ip_map[ip] for ip in df["ip_address"]])
+    dev_idx = np.array([dev_map[d] for d in df["device_id"]])
 
-    # Forward and Reverse Edges
-    t_tx = torch.from_numpy(tx_nodes)
-    t_card = torch.from_numpy(card_nodes)
-    t_ip = torch.from_numpy(ip_nodes)
-    t_dev = torch.from_numpy(dev_nodes)
-    t_edge_attr = torch.from_numpy(edge_feats)
+    log_amt = np.log1p(df["amount"].values)
+    ts = df["timestamp"].values
+    ts_norm = (ts - ts.min()) / max(ts.max() - ts.min(), 1.0)
+    sin_hr = df["hour_sin"].values if "hour_sin" in df.columns else np.zeros(n_tx)
+    cos_hr = df["hour_cos"].values if "hour_cos" in df.columns else np.zeros(n_tx)
+    edge_attr = torch.tensor(np.stack([log_amt, ts_norm, sin_hr, cos_hr], axis=1), dtype=torch.float32)
 
-    # uses_card
-    data['transaction', 'uses_card', 'card'].edge_index = torch.stack([t_tx, t_card], dim=0)
-    data['transaction', 'uses_card', 'card'].edge_attr = t_edge_attr
-    data['card', 'rev_uses_card', 'transaction'].edge_index = torch.stack([t_card, t_tx], dim=0)
-    data['card', 'rev_uses_card', 'transaction'].edge_attr = t_edge_attr
+    data['transaction', 'uses_card', 'card'].edge_index = torch.tensor(np.stack([tx_idx, c_idx], axis=0), dtype=torch.long)
+    data['card', 'rev_uses_card', 'transaction'].edge_index = torch.tensor(np.stack([c_idx, tx_idx], axis=0), dtype=torch.long)
+    data['transaction', 'uses_card', 'card'].edge_attr = edge_attr
+    data['card', 'rev_uses_card', 'transaction'].edge_attr = edge_attr
 
-    # uses_ip
-    data['transaction', 'uses_ip', 'ip'].edge_index = torch.stack([t_tx, t_ip], dim=0)
-    data['transaction', 'uses_ip', 'ip'].edge_attr = t_edge_attr
-    data['ip', 'rev_uses_ip', 'transaction'].edge_index = torch.stack([t_ip, t_tx], dim=0)
-    data['ip', 'rev_uses_ip', 'transaction'].edge_attr = t_edge_attr
+    data['transaction', 'uses_ip', 'ip'].edge_index = torch.tensor(np.stack([tx_idx, ip_idx], axis=0), dtype=torch.long)
+    data['ip', 'rev_uses_ip', 'transaction'].edge_index = torch.tensor(np.stack([ip_idx, tx_idx], axis=0), dtype=torch.long)
+    data['transaction', 'uses_ip', 'ip'].edge_attr = edge_attr
+    data['ip', 'rev_uses_ip', 'transaction'].edge_attr = edge_attr
 
-    # uses_device
-    data['transaction', 'uses_device', 'device'].edge_index = torch.stack([t_tx, t_dev], dim=0)
-    data['transaction', 'uses_device', 'device'].edge_attr = t_edge_attr
-    data['device', 'rev_uses_device', 'transaction'].edge_index = torch.stack([t_dev, t_tx], dim=0)
-    data['device', 'rev_uses_device', 'transaction'].edge_attr = t_edge_attr
+    data['transaction', 'uses_device', 'device'].edge_index = torch.tensor(np.stack([tx_idx, dev_idx], axis=0), dtype=torch.long)
+    data['device', 'rev_uses_device', 'transaction'].edge_index = torch.tensor(np.stack([dev_idx, tx_idx], axis=0), dtype=torch.long)
+    data['transaction', 'uses_device', 'device'].edge_attr = edge_attr
+    data['device', 'rev_uses_device', 'transaction'].edge_attr = edge_attr
 
     return data
 
 
-def train_and_compare():
+def train_and_compare(target_device: str = "cuda:2"):
+    device = torch.device(target_device if torch.cuda.is_available() else "cpu")
     print("=" * 70)
     print("TRACK A: TEMPORAL HETEROGENEOUS GRAPH TRANSFORMER (HGT) BENCHMARK")
+    print(f"STRICT 3-WAY SPLIT: Train (60%) -> Validation (20%) -> Test (20% held-out)")
+    print(f"Target Device: {device}")
     print("=" * 70)
 
-    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
-    print(f"  Target Device: {device}")
-
-    # Load synthetic dataset
     if not DATA_PATH.exists():
         from backend.dataset.generate_dataset_polars import generate_dataset
         df_pl = generate_dataset(n_rows=50000, seed=42)
         df_pl.write_csv(DATA_PATH)
-    
-    from backend.models.train import _engineer_features
+
     df = pd.read_csv(DATA_PATH)
+    from backend.models.train import _engineer_features
     df = _engineer_features(df)
-    print(f"  Loaded {len(df):,} synthetic transactions.")
 
-    # 80/20 train/test split
-    n_tx = len(df)
-    rng = np.random.RandomState(42)
-    shuffled_idx = rng.permutation(n_tx)
-    split_pt = int(0.80 * n_tx)
-    train_idx = torch.tensor(shuffled_idx[:split_pt], dtype=torch.long, device=device)
-    test_idx = torch.tensor(shuffled_idx[split_pt:], dtype=torch.long, device=device)
+    n = len(df)
+    y = df["label"].values.astype(int) if "label" in df.columns else df["is_fraud"].values.astype(int)
+    segments = df["segment"].values if "segment" in df.columns else y
+    strat_key = [f"{y[i]}_{segments[i]}" for i in range(n)]
 
-    train_mask = torch.zeros(n_tx, dtype=torch.bool, device=device)
-    train_mask[train_idx] = True
-    test_mask = torch.zeros(n_tx, dtype=torch.bool, device=device)
-    test_mask[test_idx] = True
+    # 3-Way Stratified Split
+    indices = np.arange(n)
+    train_val_idx, test_idx = train_test_split(indices, test_size=0.20, stratify=strat_key, random_state=42)
+    strat_tv = [strat_key[i] for i in train_val_idx]
+    train_idx, val_idx = train_test_split(train_val_idx, test_size=0.25, stratify=strat_tv, random_state=42)
 
-    print("  Building Synthetic Entity Graph with Temporal Edge Attributes...")
+    print(f"  Partitions: Train={len(train_idx):,} (60%), Val={len(val_idx):,} (20%), Test={len(test_idx):,} (20% held-out)")
+
     data = build_synthetic_pyg_graph(df).to(device)
 
-    in_channels_dict = {
-        'transaction': data['transaction'].x.size(1),
-        'card': data['card'].x.size(1),
-        'ip': data['ip'].x.size(1),
-        'device': data['device'].x.size(1),
+    train_mask = torch.zeros(n, dtype=torch.bool, device=device)
+    train_mask[train_idx] = True
+    val_mask = torch.zeros(n, dtype=torch.bool, device=device)
+    val_mask[val_idx] = True
+    test_mask = torch.zeros(n, dtype=torch.bool, device=device)
+    test_mask[test_idx] = True
+
+    in_channels_dict = {ntype: data[ntype].x.size(1) for ntype in data.node_types}
+    edge_attr_dict = {
+        etype: data[etype].edge_attr
+        for etype in data.edge_types if hasattr(data[etype], 'edge_attr')
     }
 
-    # -------------------------------------------------------------
-    # 1. Train Temporal HeteroGAT (with edge features)
-    # -------------------------------------------------------------
+    # 1. Train Temporal HeteroGAT
     print("\n[1/2] Training Temporal HeteroGAT (Edge-Conditioned Attention)...")
     gat_model = TemporalHeteroGAT(in_channels_dict, edge_dim=4, hidden_channels=64).to(device)
     gat_opt = torch.optim.Adam(gat_model.parameters(), lr=0.005, weight_decay=1e-4)
-    pos_weight = torch.tensor([3.5], device=device)
-    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    criterion = nn.BCEWithLogitsLoss()
 
-    edge_attr_dict = {
-        ('transaction', 'uses_card', 'card'): data['transaction', 'uses_card', 'card'].edge_attr,
-        ('card', 'rev_uses_card', 'transaction'): data['card', 'rev_uses_card', 'transaction'].edge_attr,
-        ('transaction', 'uses_ip', 'ip'): data['transaction', 'uses_ip', 'ip'].edge_attr,
-        ('ip', 'rev_uses_ip', 'transaction'): data['ip', 'rev_uses_ip', 'transaction'].edge_attr,
-        ('transaction', 'uses_device', 'device'): data['transaction', 'uses_device', 'device'].edge_attr,
-        ('device', 'rev_uses_device', 'transaction'): data['device', 'rev_uses_device', 'transaction'].edge_attr,
-    }
-
-    t0 = time.time()
     for epoch in range(1, 21):
         gat_model.train()
         gat_opt.zero_grad()
@@ -369,19 +332,11 @@ def train_and_compare():
 
     gat_model.eval()
     with torch.no_grad():
-        gat_logits = gat_model(data.x_dict, data.edge_index_dict, edge_attr_dict)
-        gat_probs = torch.sigmoid(gat_logits[test_mask]).cpu().numpy()
+        gat_test_scores = torch.sigmoid(gat_model(data.x_dict, data.edge_index_dict, edge_attr_dict)[test_mask]).cpu().numpy()
+    y_test_np = data['transaction'].y[test_mask].cpu().numpy()
 
-    y_test = data['transaction'].y[test_mask].cpu().numpy()
-    gat_ci = compute_bootstrap_ci(y_test, gat_probs, n_boot=1000)
-    print(f"  HeteroGAT PR-AUC:  {gat_ci['pr_point']:.4f} (95% CI: [{gat_ci['pr_ci'][0]:.4f}, {gat_ci['pr_ci'][1]:.4f}])")
-    print(f"  HeteroGAT ROC-AUC: {gat_ci['roc_point']:.4f} (95% CI: [{gat_ci['roc_ci'][0]:.4f}, {gat_ci['roc_ci'][1]:.4f}])")
-    print(f"  HeteroGAT Lift:    {gat_ci['lift_point']:.2f}x (95% CI: [{gat_ci['lift_ci'][0]:.2f}x, {gat_ci['lift_ci'][1]:.2f}x])")
-
-    # -------------------------------------------------------------
-    # 2. Train Standard GraphSAGE Baseline (Structural Adjacency Only)
-    # -------------------------------------------------------------
-    print("\n[2/2] Training Baseline HeteroGraphSAGE (No Edge Features)...")
+    # 2. Train Baseline GraphSAGE
+    print("[2/2] Training Baseline HeteroGraphSAGE (No Edge Features)...")
     sage_model = BaselineHeteroGraphSAGE(in_channels_dict, hidden_channels=64).to(device)
     sage_opt = torch.optim.Adam(sage_model.parameters(), lr=0.005, weight_decay=1e-4)
 
@@ -395,33 +350,20 @@ def train_and_compare():
 
     sage_model.eval()
     with torch.no_grad():
-        sage_logits = sage_model(data.x_dict, data.edge_index_dict)
-        sage_probs = torch.sigmoid(sage_logits[test_mask]).cpu().numpy()
+        sage_test_scores = torch.sigmoid(sage_model(data.x_dict, data.edge_index_dict)[test_mask]).cpu().numpy()
 
-    sage_ci = compute_bootstrap_ci(y_test, sage_probs, n_boot=1000)
-    print(f"  GraphSAGE PR-AUC:  {sage_ci['pr_point']:.4f} (95% CI: [{sage_ci['pr_ci'][0]:.4f}, {sage_ci['pr_ci'][1]:.4f}])")
-    print(f"  GraphSAGE ROC-AUC: {sage_ci['roc_point']:.4f} (95% CI: [{sage_ci['roc_ci'][0]:.4f}, {sage_ci['roc_ci'][1]:.4f}])")
-    print(f"  GraphSAGE Lift:    {sage_ci['lift_point']:.2f}x (95% CI: [{sage_ci['lift_ci'][0]:.2f}x, {sage_ci['lift_ci'][1]:.2f}x])")
+    # Compute 1,000 Bootstrap CIs on Pure Test Partition (20%)
+    gat_ci = compute_bootstrap_ci(y_test_np, gat_test_scores, n_boot=1000)
+    sage_ci = compute_bootstrap_ci(y_test_np, sage_test_scores, n_boot=1000)
 
-    # Statistical Comparison
-    print("\n" + "=" * 70)
-    print("STATISTICAL COMPARISON (SAME HELD-OUT SYNTHETIC TEST SET, N=10,000)")
-    print("=" * 70)
-    print(f"{'Model Architecture':<28} {'PR-AUC (95% CI)':<22} {'ROC-AUC (95% CI)':<22} {'Lift (95% CI)':<18}")
-    print("-" * 90)
-    print(f"{'HeteroGraphSAGE (Baseline)':<28} {sage_ci['pr_point']:.4f} [{sage_ci['pr_ci'][0]:.4f}, {sage_ci['pr_ci'][1]:.4f}]   {sage_ci['roc_point']:.4f} [{sage_ci['roc_ci'][0]:.4f}, {sage_ci['roc_ci'][1]:.4f}]   {sage_ci['lift_point']:.2f}x [{sage_ci['lift_ci'][0]:.2f}x, {sage_ci['lift_ci'][1]:.2f}x]")
-    print(f"{'Temporal HeteroGAT (Edge)':<28} {gat_ci['pr_point']:.4f} [{gat_ci['pr_ci'][0]:.4f}, {gat_ci['pr_ci'][1]:.4f}]   {gat_ci['roc_point']:.4f} [{gat_ci['roc_ci'][0]:.4f}, {gat_ci['roc_ci'][1]:.4f}]   {gat_ci['lift_point']:.2f}x [{gat_ci['lift_ci'][0]:.2f}x, {gat_ci['lift_ci'][1]:.2f}x]")
-    print("-" * 90)
-    
-    # Save winning checkpoint
-    torch.save({
-        "gat_state_dict": gat_model.state_dict(),
-        "sage_state_dict": sage_model.state_dict(),
-        "gat_metrics": gat_ci,
-        "sage_metrics": sage_ci,
-    }, MODEL_DIR / "temporal_hgt_ring_detector.pt")
-    print(f"  Model artifacts saved to {MODEL_DIR / 'temporal_hgt_ring_detector.pt'}")
+    print("\n" + "=" * 95)
+    print("STATISTICAL COMPARISON (HELD-OUT SYNTHETIC TEST PARTITION, N=10,000)")
+    print("=" * 95)
+    print(f"{'Model Architecture':<30} {'PR-AUC (95% CI)':<25} {'ROC-AUC (95% CI)':<25} {'Lift (95% CI)':<20}")
+    print("-" * 95)
+    print(f"{'HeteroGraphSAGE (Baseline)':<30} {sage_ci['pr_point']:.4f} [{sage_ci['pr_ci'][0]:.4f}, {sage_ci['pr_ci'][1]:.4f}]   {sage_ci['roc_point']:.4f} [{sage_ci['roc_ci'][0]:.4f}, {sage_ci['roc_ci'][1]:.4f}]   {sage_ci['lift_point']:.2f}x [{sage_ci['lift_ci'][0]:.2f}x, {sage_ci['lift_ci'][1]:.2f}x]")
+    print(f"{'Temporal HeteroGAT (Edge)':<30} {gat_ci['pr_point']:.4f} [{gat_ci['pr_ci'][0]:.4f}, {gat_ci['pr_ci'][1]:.4f}]   {gat_ci['roc_point']:.4f} [{gat_ci['roc_ci'][0]:.4f}, {gat_ci['roc_ci'][1]:.4f}]   {gat_ci['lift_point']:.2f}x [{gat_ci['lift_ci'][0]:.2f}x, {gat_ci['lift_ci'][1]:.2f}x]")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     train_and_compare()
