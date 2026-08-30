@@ -1,4 +1,4 @@
-﻿"""
+"""
 External Validation Pipeline — RazorShield Sentinel
 =====================================================
 Cold-transfer evaluation of the existing trained ensemble against two
@@ -236,36 +236,43 @@ def build_ieee_entity_graph(df: pd.DataFrame) -> dict:
 
     edge_list = []
     node_meta = {}
-    tx_ids = df.index.tolist()
 
-    for i, (idx, row) in enumerate(df.iterrows()):
+    c1 = df["card1"].fillna("unk").astype(str).values
+    c2 = df["card2"].fillna("unk").astype(str).values
+    a1 = df["addr1"].fillna("unk").astype(str).values
+    a2 = df["addr2"].fillna("unk").astype(str).values
+    p_email = df["P_emaildomain"].fillna("unk").astype(str).values
+    is_fraud = df["isFraud"].fillna(0).astype(int).values
+    amt = df["TransactionAmt"].fillna(0.0).astype(float).values
+    indices = df.index.values
+
+    for idx, fraud_val, amt_val, card1_val, card2_val, addr1_val, addr2_val, email_val in zip(
+        indices, is_fraud, amt, c1, c2, a1, a2, p_email
+    ):
         tx_node = f"tx_{idx}"
         node_meta[tx_node] = {
             "type": "transaction",
-            "is_fraud": int(row.get("isFraud", 0)),
-            "amount": float(row.get("TransactionAmt", 0)),
+            "is_fraud": int(fraud_val),
+            "amount": float(amt_val),
         }
 
         # Card entity node
-        card_node = f"card_{row.get('card1', 'unk')}_{row.get('card2', 'unk')}"
+        card_node = f"card_{card1_val}_{card2_val}"
         if card_node not in node_meta:
             node_meta[card_node] = {"type": "card"}
         edge_list.append((tx_node, card_node, "uses_card"))
 
         # Address entity node
-        addr_node = f"addr_{row.get('addr1', 'unk')}_{row.get('addr2', 'unk')}"
+        addr_node = f"addr_{addr1_val}_{addr2_val}"
         if addr_node not in node_meta:
             node_meta[addr_node] = {"type": "address"}
         edge_list.append((tx_node, addr_node, "uses_address"))
 
         # Email domain entity node
-        email_node = f"email_{row.get('P_emaildomain', 'unk')}"
+        email_node = f"email_{email_val}"
         if email_node not in node_meta:
             node_meta[email_node] = {"type": "email_domain"}
         edge_list.append((tx_node, email_node, "uses_email_domain"))
-
-        if i % 50000 == 0:
-            print(f"  Graph build: {i:,}/{len(df):,} rows processed...")
 
     graph_data = {
         "edge_list": edge_list,
@@ -282,7 +289,7 @@ def build_ieee_entity_graph(df: pd.DataFrame) -> dict:
         pickle.dump(graph_data, f)
 
     elapsed = time.time() - t0
-    print(f"  Graph saved → {GRAPH_OUT}")
+    print(f"  Graph saved -> {GRAPH_OUT}")
     print(f"  Nodes: {len(node_meta):,}  |  Edges: {len(edge_list):,}  |  {elapsed:.1f}s")
     return graph_data
 
