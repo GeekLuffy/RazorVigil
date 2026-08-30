@@ -18,4 +18,5 @@ data/load_test_results.json
 threat_intelligence/
 evidence/
 notes/
+scripts/
 *.log
