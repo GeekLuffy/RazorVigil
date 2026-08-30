@@ -4,7 +4,7 @@ Model training script.
 Trains LightGBM classifier + IsolationForest on the synthetic dataset,
 evaluates on a held-out test split, and serializes both models.
 
-Research doc reference: §2 Layer 3 — Model selection, §4.2 — Evaluation metrics.
+Model training and evaluation framework.
 
 Run:
   python -m backend.models.train

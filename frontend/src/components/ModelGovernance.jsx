@@ -66,7 +66,7 @@ export default function ModelGovernance() {
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
               <CheckCircle2 size={14} />
-              RBI §4.2 Compliant
+              RBI Master Direction Aligned
             </span>
           </div>
         </div>
@@ -75,11 +75,11 @@ export default function ModelGovernance() {
       {/* KPI Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="panel flex flex-col gap-1 border-indigo-500/20 bg-slate-900/90">
-          <div className="text-xs uppercase tracking-wider text-slate-400">PR-AUC (Held-out Test)</div>
+          <div className="text-xs uppercase tracking-wider text-slate-400">ML-Layer PR-AUC</div>
           <div className="text-2xl font-bold font-mono text-indigo-400">
-            {data.metrics.pr_auc.toFixed(4)}
+            {(data.metrics.ml_layer_pr_auc ?? data.metrics.pr_auc ?? 0).toFixed(4)}
           </div>
-          <div className="text-[11px] text-slate-500">Precision-Recall Area under Curve</div>
+          <div className="text-[11px] text-slate-500">ML-scored txns only (canary+rules excluded)</div>
         </div>
 
         <div className="panel flex flex-col gap-1 border-emerald-500/20 bg-slate-900/90">
@@ -93,9 +93,9 @@ export default function ModelGovernance() {
         <div className="panel flex flex-col gap-1 border-sky-500/20 bg-slate-900/90">
           <div className="text-xs uppercase tracking-wider text-slate-400">F1 Score &amp; Recall</div>
           <div className="text-2xl font-bold font-mono text-sky-400">
-            {data.metrics.f1_score.toFixed(4)}
+            {(data.metrics.ml_layer_f1_score ?? data.metrics.f1_score ?? 0).toFixed(4)}
           </div>
-          <div className="text-[11px] text-slate-500">Recall: 100.0% on Adversarial Bots</div>
+          <div className="text-[11px] text-slate-500">ML layer recall: {((data.metrics.ml_layer_recall ?? data.metrics.recall ?? 0) * 100).toFixed(1)}% on Adversarial Bots</div>
         </div>
 
         <div className="panel flex flex-col gap-1 border-amber-500/20 bg-slate-900/90">

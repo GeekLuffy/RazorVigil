@@ -178,6 +178,7 @@ def run_full_training(n_trials: int = 15):
     # Adversarial-Realistic Stress-Test
     adv_mask = (seg_test == "adversarial_realistic")
     adv_recall = recall_score(y_test[adv_mask], preds[adv_mask]) if adv_mask.sum() > 0 else 1.0
+    adv_pr_auc = average_precision_score(y_test[adv_mask], final_risk[adv_mask]) if adv_mask.sum() > 0 else 1.0
 
     print("=" * 65)
     print("50,000-ROW STRATIFIED EVALUATION RESULTS")
@@ -189,7 +190,7 @@ def run_full_training(n_trials: int = 15):
     print(f"   (Evaluated on {ambiguous_mask.sum():,} / {len(y_test):,} ambiguous test rows)")
     print(f"   ML-Layer F1: {f1_ml:.4f} | Recall: {recall_ml:.4f}")
     print(f"\n3. Full-Funnel Fraud Catch Rate:          100.00%")
-    print(f"\n4. Adversarial-Realistic PR-AUC:          1.0000")
+    print(f"\n4. Adversarial-Realistic PR-AUC:          {adv_pr_auc:.4f}")
     print(f"   Adversarial-Realistic Recall:          {adv_recall * 100:.2f}% (n={adv_mask.sum():,})")
 
     # -------------------------------------------------------------------------

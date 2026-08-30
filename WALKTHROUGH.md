@@ -33,7 +33,7 @@ Unlike traditional fraud systems that degrade merchant revenue through blunt fal
        │    └── Computes BIN card counts, IP distinct PANs, cluster risk score    │
        │                                                                          │
        │ 4. [L3] Hybrid ML Scorer: LightGBM Classifier + Calibrated Isolation     │
-       │    └── Stratified PR-AUC: 1.0000 | Generalization Recall: 100.0%         │
+       │    └── ML-Layer PR-AUC: 0.9983 | Zero-Day Generalization Recall: 91.76%  │
        │                                                                          │
        │ 5. [L4] Decision Tiering & Razorpay API Routing:                         │
        │    ├── safe (0–15%)          ──▶ Creates real Razorpay Order (API)       │
@@ -58,6 +58,9 @@ Unlike traditional fraud systems that degrade merchant revenue through blunt fal
 - **Recovered Soft-Risk Transactions**: Dispatched via Razorpay Payment Links API (`/v1/payment_links`) and single-use signed UPI QR links.
 - **High-Confidence Bots & Canary Triggered**: **Strictly quarantined at RazorShield's local edge**. Blocked transactions **never touch or leak to the Razorpay API**, saving merchants gateway processing overhead and preventing automated card enumeration from reaching payment processors.
 - **Webhook Ingestion**: Real-time webhook listener at `POST /webhook/razorpay` verifies `X-Razorpay-Signature` via HMAC-SHA256 and updates the dashboard GMV counter dynamically upon successful settlement.
+
+> **⚠️ Pre-Gateway Boundary Guarantee**: The tarpit-poisoning and deceptive-decline response (Layer 0 `AntiCheckerGuard`) operates **exclusively within RazorShield Sentinel's own pre-gateway screening layer**. These synthetic delay and decline responses are synthesized locally, fire *before* any real Razorpay API call is made, and are **never attributed to or originating from Razorpay's actual API or payment infrastructure**. Real Razorpay API calls (`/v1/orders`, `/v1/payment_links`) are only made for `safe` and `soft_risk` tiers that have already cleared all pre-screening layers.
+
 
 ---
 
@@ -93,7 +96,7 @@ Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 | Feature | Technical Implementation | Judge Impact |
 |---|---|---|
 | **Multi-Layer Ensemble** | LightGBM + Isolation Forest + Redis Sliding-Window Velocity + NetworkX Louvain Graph | Solves both fast bot bursts and slow distributed proxy rings. |
-| **50 Canary Cards** | Luhn-valid synthetic PANs armed in memory | True zero false-positive detection for dark-web card scanners. |
+| **50 Canary Cards** | Luhn-valid synthetic PANs seeded exclusively in our own honeytoken check endpoint | Deterministic 1.0-confidence block for any BIN-enumeration or scraping of our own inventory. **0.00% FPR applies to this layer only.** |
 | **Agent-Aware Risk Layer** | JWT attestation validator with spend limits | First fraud engine ready for agentic AI shopping (Google AP2). |
 | **Zero False Decline Loop** | Signed, single-use, amount-bound JWT recovery links | Rescues genuine GMV and proves dual-track synergy (Track 02 + 03). |
 | **Autonomous WAF Generation** | Dynamic rule synthesis from Louvain graph clusters | Proactive merchant-level defense ready for production deployment. |

@@ -7,10 +7,11 @@ Automated, zero-hallucination dispute evidence compilation grounded in:
   2. Network & ASN Telemetry (Residential/Datacenter ASN, IP hash, JA3/JA4 TLS fingerprint)
   3. Behavioral Biometrics (Keystroke dynamics entropy, Mouse trajectory jitter, Time-on-page)
   4. Graph Community Topology (NetworkX Louvain cluster membership, Mule ring isolation)
-  5. Regulatory & CoFT Compliance (RBI 2025/2026 Master Direction Digital Security §4.2, CoFT)
+  5. Regulatory & CoFT Compliance (RBI Master Direction on Digital Payment Security and Cyber Resilience 2025/2026, CoFT)
 
-Generates publication-ready, formal Razorpay Chargeback Representation Letters
-with empirical Win Probability Scoring and Human-in-the-Loop (HITL) decision support.
+Generates structured draft evidence dossiers for merchant/human review and
+Human-in-the-Loop (HITL) dispute decision support. Output is a draft forensic
+package for merchant review — not a formally filed legal document.
 """
 
 from __future__ import annotations
@@ -363,7 +364,7 @@ class ChargebackEvidenceSynthesizer:
         is_canary = bool(t.get("is_canary", False))
 
         if is_canary:
-            graph_verdict = f"Construction-level Canary Honeytoken match (Index #7, synthetic unissued PAN). Zero false-positive rate by construction. Proof of dark-web/Telegram leaked database scan."
+            graph_verdict = f"Construction-level Canary Honeytoken match (Index #7, synthetic unissued PAN seeded exclusively within our own honeytoken check endpoint). Zero false-positive rate by construction. Proof of BIN-enumeration or scraping directed at our own decoy inventory — card was never issued to any real cardholder."
             graph_conf = 1.0
         elif cluster_score > 0.50:
             graph_verdict = f"Heterogeneous graph community detection isolated transaction into Coordinated Carding Ring Cluster (Louvain modularity score: {cluster_score:.2f}). Linked to {proxy_count} cycling proxies."
@@ -388,8 +389,8 @@ class ChargebackEvidenceSynthesizer:
         is_agent = bool(t.get("is_agent", False))
         claims.append(VerifiableClaim(
             domain="Regulatory & CoFT Compliance",
-            claim_title="RBI Master Direction §4.2 & CoFT Tokenization Audit",
-            factual_content=f"Fully compliant with RBI Master Directions on Digital Payment Security & Cyber Resilience §4.2. Card-on-File Tokenization (CoFT) active. {'Cryptographic AP2 Agent Mandate Verified.' if is_agent else '2FA AFA OTP challenge verification recorded.'}",
+            claim_title="RBI Master Direction & CoFT Tokenization Audit",
+            factual_content=f"Transaction processed under the RBI Master Directions on Digital Payment Security and Cyber Resilience (2025/2026). Card-on-File Tokenization (CoFT) active. {'Cryptographic AP2 Agent Mandate Verified.' if is_agent else '2FA AFA OTP challenge verification recorded.'} Note: specific clause reference should be verified against the official RBI direction document before citing in any formal submission.",
             source_table="rbi_audit_logs",
             source_id=f"rbi_{case.transaction_id[:8]}",
             verification_status="VERIFIED_GATEWAY_TELEMETRY",
@@ -397,59 +398,66 @@ class ChargebackEvidenceSynthesizer:
         ))
 
         # -------------------------------------------------------------------
-        # Win Probability Calculation & Recommendation
+        # Evidence Strength Indicator & Recommendation
+        # Note: signal_strength is a heuristic indicator for merchant review,
+        # not a validated empirical win-probability. Actual dispute outcomes
+        # depend on issuer policies and are determined by human reviewers.
         # -------------------------------------------------------------------
         if is_canary:
-            win_prob = 1.0
-            recommendation = "REPRESENT_DEFINITIVE_WIN_CANARY"
-            action_text = "Submit Formal Dispute Defense — Conclusive Honeytoken Canary Trap Proof"
+            signal_strength = 0.99
+            recommendation = "STRONG_EVIDENCE_CANARY_TRAP"
+            action_text = "Submit evidence dossier for human review — conclusive honeytoken trap proof (draft, requires merchant/legal review before filing)"
         elif case.dispute_reason_code == "13.1" and entropy > 1.5:  # Friendly fraud
-            win_prob = 0.91
-            recommendation = "REPRESENT_FIRST_PARTY_FRIENDLY_FRAUD"
-            action_text = "Submit Formal Representment with Biometric Kinetic Proof & Delivery Confirmation"
+            signal_strength = 0.88
+            recommendation = "STRONG_EVIDENCE_FIRST_PARTY_FRAUD"
+            action_text = "Submit evidence dossier for human review — biometric kinetic proof & delivery confirmation (draft, requires merchant/legal review before filing)"
         elif is_agent:
-            win_prob = 0.96
-            recommendation = "REPRESENT_VALID_AP2_AGENT_MANDATE"
-            action_text = "Submit Signed Cryptographic Agent Delegation Mandate to Issuing Bank"
+            signal_strength = 0.92
+            recommendation = "STRONG_EVIDENCE_AP2_AGENT_MANDATE"
+            action_text = "Submit evidence dossier for human review — signed cryptographic agent delegation mandate (draft, requires merchant/legal review before filing)"
         elif asn_type == "datacenter" or ja3_mismatch:
-            win_prob = 0.985
-            recommendation = "SUBMIT_BOTNET_FORENSIC_DEFENSE"
-            action_text = "Submit Automated Botnet Forensic Dossier & Network Mismatch Evidence"
+            signal_strength = 0.95
+            recommendation = "STRONG_EVIDENCE_BOTNET_FORENSIC"
+            action_text = "Submit evidence dossier for human review — botnet forensic dossier & network mismatch evidence (draft, requires merchant/legal review before filing)"
         else:
-            win_prob = 0.78
-            recommendation = "MANUAL_MERCHANT_REPRESENTMENT"
-            action_text = "Submit Standard Razorpay Representment Package"
+            signal_strength = 0.72
+            recommendation = "STANDARD_EVIDENCE_FOR_REVIEW"
+            action_text = "Submit standard evidence dossier for merchant review — human decision required before any filing"
 
         # -------------------------------------------------------------------
-        # Formal Razorpay Chargeback Representation Letter
+        # Draft Evidence Dossier Summary
+        # This is a DRAFT forensic package generated for merchant/human review.
+        # It is NOT a formally filed legal document. A human reviewer must
+        # assess the evidence and decide whether and how to file a response.
         # -------------------------------------------------------------------
         representation_letter = (
-            f"FORMAL CHARGEBACK DISPUTE REPRESENTATION\n"
+            f"DRAFT DISPUTE EVIDENCE DOSSIER — FOR MERCHANT REVIEW ONLY\n"
+            f"[This document is a draft prepared by RazorShield Sentinel for human review. "
+            f"It is not a formally filed chargeback representation. A qualified merchant "
+            f"representative should review all claims before submitting to Razorpay or any issuer.]\n\n"
             f"Merchant: {case.merchant_name}\n"
             f"Case ID: {case.case_id} | Dispute Reason Code: {case.dispute_reason_code} ({case.dispute_reason_text})\n"
             f"Transaction ID: {case.transaction_id} | Amount: {case.currency} {case.amount:,.2f}\n"
             f"Razorpay Order ID: {order_id} | Payment ID: {payment_id}\n\n"
-            f"TO: Razorpay Dispute & Risk Operations / Issuing Bank Representment Committee\n\n"
-            f"EXECUTIVE SUMMARY:\n"
-            f"The merchant respectfully contests Dispute {case.case_id}. The transaction was authenticated, verified, "
-            f"and executed in strict compliance with the RBI Master Direction on Digital Payment Security §4.2 and "
-            f"Razorpay Payment Gateway API verification specifications. Our defense is established on five verifiable evidence domains:\n\n"
-            f"1. GATEWAY INTEGRITY: Cryptographic HMAC-SHA256 signature verification was successfully executed "
-            f"at gateway level ({order_id}). Payment settled under tokenized CoFT framework.\n"
-            f"2. TELEMETRY & ASN: Client IP ({ip_hash}) and TLS JA3 fingerprint confirmed "
-            f"{'adversarial automation signature' if ja3_mismatch else 'legitimate genuine consumer browsing session'}.\n"
-            f"3. BIOMETRIC PROOF: Real-time kinetic biometric tracking recorded keystroke entropy {entropy:.2f} "
-            f"and trajectory jitter {jitter:.2f}, establishing {'direct physical cardholder interaction' if entropy > 1.0 else 'automated script execution'}.\n"
-            f"4. GRAPH TOPOLOGY: Heterogeneous Louvain community detection isolated transaction risk score ({cluster_score:.2f}).\n"
-            f"5. REGULATORY COMPLIANCE: Validated against CoFT tokenization mandate and RBI Cyber Resilience Guidelines.\n\n"
-            f"REQUESTED ACTION: The merchant requests immediate reversal of the provisional chargeback debit "
-            f"and release of held funds of {case.currency} {case.amount:,.2f} in accordance with Visa/Mastercard Core Dispute Rules.\n\n"
-            f"Generated by: RazorShield Sentinel Autonomous AI Risk & Evidence Response Agent v1.2"
+            f"SUMMARY OF EVIDENCE COLLECTED:\n"
+            f"The following five domains of evidence were collected and structured for merchant review:\n\n"
+            f"1. GATEWAY INTEGRITY: Cryptographic HMAC-SHA256 signature verified at gateway level ({order_id}). "
+            f"Payment settled under tokenized CoFT framework.\n"
+            f"2. TELEMETRY & ASN: Client IP ({ip_hash}) and TLS JA3 fingerprint show "
+            f"{'adversarial automation signature' if ja3_mismatch else 'consistent genuine consumer browsing session'}.\n"
+            f"3. BIOMETRIC: Keystroke entropy {entropy:.2f}, trajectory jitter {jitter:.2f} — "
+            f"{'indicates direct physical cardholder interaction' if entropy > 1.0 else 'indicates automated script execution'}.\n"
+            f"4. GRAPH TOPOLOGY: Louvain community detection risk score ({cluster_score:.2f}).\n"
+            f"5. REGULATORY CONTEXT: Transaction processed under RBI Master Direction on Digital Payment Security and "
+            f"Cyber Resilience (2025/2026) and CoFT tokenization mandate. Clause verification recommended before citing.\n\n"
+            f"RECOMMENDED NEXT STEP: {action_text}\n\n"
+            f"Generated by: RazorShield Sentinel AI Evidence Dossier Generator v1.2 — DRAFT ONLY"
         )
 
         rbi_attestation = (
-            f"RBI-CERT-{case.case_id}: Certified compliant under RBI Master Direction on Cyber Resilience "
-            f"and Digital Payment Security in Payment System Operators §4.2. Zero unauthorized data leakage. "
+            f"RBI-DRAFT-{case.case_id}: Evidence collected under framework aligned with RBI Master Direction on "
+            f"Cyber Resilience and Digital Payment Security in Payment System Operators (2025/2026). "
+            f"Specific clause numbers should be verified against the official RBI direction document before citing in any submission. "
             f"Cryptographic hash chain verified."
         )
 
@@ -459,9 +467,9 @@ class ChargebackEvidenceSynthesizer:
             version=1,
             generated_at=time.time(),
             claims=claims,
-            summary=f"Automated 5-domain forensic audit completed with {len(claims)} verifiable claims. Win Probability: {win_prob:.1%}.",
+            summary=f"Automated 5-domain forensic audit completed with {len(claims)} verifiable claims. Evidence signal strength (heuristic indicator for human review, not a predicted win rate): {signal_strength:.0%}.",
             recommended_action=action_text,
-            win_probability=win_prob,
+            win_probability=signal_strength,
             representation_letter=representation_letter,
             rbi_compliance_attestation=rbi_attestation,
         )

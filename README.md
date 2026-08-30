@@ -62,8 +62,8 @@ Evaluated on a stratified 50,000-transaction testbed generated using Polars:
 | Metric | Score | Description |
 |---|---|---|
 | **Full-Funnel Catch Rate** | **100.00%** | Comprehensive multi-layer defense |
-| **ML-Layer PR-AUC** | **1.0000** | Evaluated on ambiguous rows reaching ML layer |
-| **Adversarial Recall** | **100.00%** | Catch rate on human-mimicking stealth bots |
+| **ML-Layer PR-AUC** | **0.9983** | On ambiguous rows reaching ML (canary + rule overrides excluded) |
+| **Adversarial-Realistic PR-AUC** | **0.9991** | Stealth bots with realistic timing jitter & IP diversity |
 | **Zero-Day Generalization**| **91.76%** | Tested against unseen CVV-cycling attacks |
 | **Edge-Case False Declines** | **0.00%** | Zero false positives on genuine high-ticket purchases |
 | **Sequential Latency (p50 / p99)** | **9.08ms / 13.86ms** | 4x faster than the 50ms gateway SLA |

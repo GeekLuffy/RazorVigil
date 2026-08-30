@@ -165,8 +165,8 @@ export default function DisputeCaseWorkspace() {
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-3xl">
               Zero-hallucination dispute defense compiler. Assembles 5-domain verifiable telemetry claims
-              (HMAC signatures, TLS JA3/JA4, kinetic biometrics, Louvain community rings, and RBI §4.2 compliance)
-              into formal Razorpay Representation Letters.
+              (HMAC signatures, TLS JA3/JA4, kinetic biometrics, Louvain community rings, and RBI Master Direction 2025/2026 compliance context)
+              into structured draft evidence dossiers for merchant/human review before filing.
             </p>
           </div>
 
@@ -355,10 +355,11 @@ export default function DisputeCaseWorkspace() {
                       </div>
 
                       <div className="text-center bg-slate-950 px-4 py-2.5 rounded-xl border border-indigo-500/30">
-                        <div className="text-[10px] font-mono text-slate-400 uppercase">Win Probability</div>
+                        <div className="text-[10px] font-mono text-slate-400 uppercase">Evidence Signal</div>
                         <div className="text-2xl font-bold font-mono text-emerald-400">
-                          {(selectedCase.evidence_package.win_probability * 100).toFixed(1)}%
+                          {(selectedCase.evidence_package.win_probability * 100).toFixed(0)}%
                         </div>
+                        <div className="text-[9px] text-slate-500">Heuristic — human review required</div>
                       </div>
                     </div>
 
@@ -411,12 +412,12 @@ export default function DisputeCaseWorkspace() {
                     </div>
                   </div>
 
-                  {/* Formal Razorpay Representation Letter Preview */}
+                  {/* Draft Evidence Dossier Preview */}
                   <div className="panel bg-slate-900/90 border border-slate-800">
                     <div className="flex items-center justify-between mb-2">
                       <div className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                         <Scale size={15} className="text-indigo-400" />
-                        Formal Razorpay Dispute Representation Letter
+                        Draft Evidence Dossier — For Merchant Review Before Filing
                       </div>
                       <div className="flex items-center gap-2">
                         <button
