@@ -1,5 +1,6 @@
 import React from 'react'
 import { Shield, Zap, TrendingUp, Cpu, Award, ArrowUpRight, CheckCircle2, XCircle, Terminal, Network, Database, Lock, Key, Scale } from 'lucide-react'
+import { GENERATED_METRICS } from '../generatedMetrics'
 
 export default function ArchitectureOverview() {
   return (
@@ -85,36 +86,36 @@ export default function ArchitectureOverview() {
         <div className="flex items-center justify-between mb-3">
           <div className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
             <TrendingUp size={15} />
-            Stratified Performance &amp; Evaluation Metrics (50,000 Transactions)
+            Stratified Performance &amp; Canonical Evaluation (Held-Out N={GENERATED_METRICS.meta.heldOutTestCount.toLocaleString()})
           </div>
           <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-            Held-out Test Dataset
+            1,000 Bootstrap CIs
           </span>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center font-mono">
           <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
             <div className="text-[10px] text-slate-500">Full-Funnel Catch Rate</div>
-            <div className="text-base font-bold text-emerald-400">100.0%</div>
-            <div className="text-[9px] text-slate-600">Canary + Rules + ML</div>
+            <div className="text-base font-bold text-emerald-400">{(GENERATED_METRICS.fullFunnelCatchRate * 100).toFixed(2)}%</div>
+            <div className="text-[9px] text-slate-600">Canary + Velocity + ML</div>
           </div>
 
           <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
             <div className="text-[10px] text-slate-500">ML-Layer PR-AUC</div>
-            <div className="text-base font-bold text-indigo-400">0.9983</div>
-            <div className="text-[9px] text-slate-600">Ambiguous Set (n=9,003)</div>
+            <div className="text-base font-bold text-indigo-400">{GENERATED_METRICS.mlLayerPrAuc.toFixed(4)}</div>
+            <div className="text-[9px] text-slate-600">Ambiguous Set (n=9,877)</div>
           </div>
 
           <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
             <div className="text-[10px] text-slate-500">Adversarial Recall</div>
-            <div className="text-base font-bold text-amber-400">99.1%</div>
-            <div className="text-[9px] text-slate-600">Stealth Jitter Bots</div>
+            <div className="text-base font-bold text-amber-400">{(GENERATED_METRICS.adversarialRealisticRecall * 100).toFixed(2)}%</div>
+            <div className="text-[9px] text-slate-600">Stealth Human-Mimicking Bots</div>
           </div>
 
           <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-            <div className="text-[10px] text-slate-500">Generalization Catch</div>
-            <div className="text-base font-bold text-purple-400">91.76%</div>
-            <div className="text-[9px] text-slate-600">Unseen Zero-Day Attacks</div>
+            <div className="text-[10px] text-slate-500">Zero-Day Generalization</div>
+            <div className="text-base font-bold text-purple-400">{(GENERATED_METRICS.zeroDayRecall * 100).toFixed(2)}%</div>
+            <div className="text-[9px] text-slate-600">Unseen Attack Geometry</div>
           </div>
         </div>
       </div>

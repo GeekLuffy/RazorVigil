@@ -30,21 +30,22 @@
 > 9. **Human-in-the-Loop (HITL) Case Resolution & Model Governance**: Interactive SOC dispute management workspace allowing one-click evidence review, Track 03 UPI recovery routing, and live held-out model evaluation analytics (Confusion Matrix, Feature Importances, and Ablation Matrices).
 
 ### Key Metrics & Impact (Strict 3-Way Held-Out Test Reporting, N=10,000, 1,000 Bootstrap CIs)
+<!-- METRICS_SUMMARY:START -->
 > - **Overall Test PR-AUC**: **0.9997** `[0.9995, 0.9999]` (Tabular GBDT Blend) | **0.9991** `[0.9983, 0.9997]` (4-Way Stacked Blend) (Signal Lift: **3.33x**, Prevalence: 30.00%).
 > - **Overall Test ROC-AUC**: **0.9999** `[0.9998, 0.9999]` (Tabular GBDT Blend) | **0.9996** `[0.9991, 0.9999]` (4-Way Stacked Blend).
 > - **ML-Layer PR-AUC**: **0.9996** `[0.9994, 0.9998]` (Evaluated on the 9,877 ambiguous transactions reaching ML scoring after excluding deterministic rule overrides).
 > - **Adversarial-Realistic Catch Rate**: **97.60%** `[96.20%, 98.80%]` (Recall on stealth human-mimicking bot segment, n=500).
 > - **Full-Funnel Fraud Catch Rate**: **99.60%** `[99.36%, 99.80%]` (Multi-layer defense: 50 Canary Honeytokens + Sliding-Window Velocity + ML).
-> - **Leave-One-Attack-Type-Out Zero-Day Generalization (Unseen CVV-Cycling, N=500)**:
->   - **Dynamic Disagreement (Persistence-Gated P2)**: **76.80%** `[73.40%, 80.40%]` *(Compound automation & anomaly bypass gate)*
->   - **Isolation Forest Standalone (Unsupervised)**: **75.20%** `[71.60%, 78.81%]` *(True zero-day defense carrier)*
->   - **GNN / Cluster Risk Standalone (Structural)**: **29.80%** `[25.60%, 33.60%]`
->   - **LightGBM Standalone (Supervised)**: **9.00%** `[6.40%, 11.40%]` *(Fails on unseen attack geometry)*
->   - **CatBoost Standalone (Supervised)**: **6.60%** `[4.60%, 8.80%]` *(Fails on unseen attack geometry)*
->   - **Tabular GBDT Blend (0.55 LGB / 0.45 CB)**: **8.20%** `[5.80%, 10.60%]`
->   - **Static 4-Way Stacked Blend (0.45/0.35/0.10/0.10)**: **8.20%** `[5.80%, 10.60%]` *(Supervised weight dilutes IF)*
+> - **Leave-One-Attack-Type-Out Zero-Day Generalization (CVV-Cycling (Unobserved during training, N=500 held-out)):**
+>   - **Dynamic Disagreement (Persistence-Gated P2)**: **76.80%** `[73.40%, 80.40%]` *(Compound Automation & Anomaly Bypass Gate)*
+>   - **Isolation Forest Standalone (Unsupervised)**: **75.20%** `[71.60%, 78.81%]` *(Unsupervised Anomaly Boundary (No labels required))*
+>   - **GNN / Cluster Risk Standalone (Structural)**: **29.80%** `[25.60%, 33.60%]` *(Relational Entity Graph Clustering)*
+>   - **LightGBM Standalone (Supervised)**: **9.00%** `[6.40%, 11.40%]` *(Supervised Trees (Fails on unseen attack geometry))*
+>   - **CatBoost Standalone (Supervised)**: **6.60%** `[4.60%, 8.80%]` *(Supervised Trees (Fails on unseen attack geometry))*
+>   - **Tabular GBDT Blend (0.55 LGB / 0.45 CB)**: **8.20%** `[5.80%, 10.60%]` *(Supervised Tabular Blend)*
+>   - **Static 4-Way Stacked Blend (0.45/0.35/0.10/0.10)**: **8.20%** `[5.80%, 10.60%]` *(Static Blend (0.80 supervised weight dilutes IF))*
 > - **7-Parameter Validation Sweep & Pareto Frontier**: All seven gate parameters ($\tau_{\text{if}}=0.45, \tau_{\text{sup}}=0.40, \theta_{\text{cvv}}=3.0, \theta_{\text{entropy}}=0.60, \theta_{\text{time}}=1.5\text{s}, \theta_{\text{bin}}=4.0, \theta_{\text{fanout}}=(8.0, 8.0)$) were tuned jointly across 2,187 configurations on the 20% validation partition ($D_{\text{val}}$) via a Pareto frontier sweep (maximizing zero-day recall subject to $\text{FPR}_{\text{val}} \le 10\%$). On the untouched test set, this achieves **10.60% Edge-Case Genuine FPR** (down from 80.8%) and **76.80% Zero-Day Recall**.
-> - **Wilcoxon-Mann-Whitney Exact Mathematical Proof**: Verified that global ROC-AUC $0.999864 \approx 0.9999$ is the exact closed-form expectation across stratified positive/negative pairs ($77.38\%$ clean-vs-clean with $\text{AUC}=1.0$, $5.95\%$ clean-vs-hard with $\text{AUC}=0.9998$, $15.48\%$ ambig-vs-clean with $\text{AUC}=0.9999$, and $1.19\%$ ambig-vs-hard with $\text{AUC}=0.9910$).
+> - **Wilcoxon-Mann-Whitney Exact Mathematical Proof**: Verified that global ROC-AUC 0.999864 $\approx 0.9999$ is the exact closed-form expectation across stratified positive/negative pairs (77.38% clean-vs-clean with $\text{AUC}=1.0$, 5.95% clean-vs-hard with $\text{AUC}=0.9998$, 15.48% ambig-vs-clean with $\text{AUC}=0.9999$, and 1.19% ambig-vs-hard with $\text{AUC}=0.9910$).
 > - **Reconciliation with Earlier 91.76% Claim**: The earlier 91.76% figure is confirmed to have shared the exact same root cause as the synthetic feature separability bug (disjoint interval ranges in non-target features in early synthetic iterations). In realistic noisy e-commerce distributions, supervised models drop to 6.60%–9.00% on unobserved attack geometries. The unsupervised Isolation Forest provides the genuine zero-day mechanism (75.20% recall), and persistence-gated dynamic disagreement routing prevents supervised dilution (76.80% recall). The earlier 91.76% figure is formally **superseded**.
 > - **Synchronous Latency Budget**:
 >   - **Sequential Baseline**: **p50 = 9.08ms | p95 = 11.81ms | p99 = 13.86ms** (tested on 100 sequential checkout transactions).
@@ -56,6 +57,7 @@
 >   - Isolation Forest Standalone (Unsupervised): **PR-AUC 0.9387 `[0.9328, 0.9445]` | ROC-AUC 0.9722 `[0.9694, 0.9748]`**
 >   - HeteroGraphSAGE Graph Standalone: **PR-AUC 0.8556 `[0.8449, 0.8654]` | ROC-AUC 0.8764 `[0.8673, 0.8847]`**
 > - **Pitch Metric**: **`Net_Value_Protected` = Fraud Loss Prevented − [False Positive Cost − Recovered GMV]**.
+<!-- METRICS_SUMMARY:END -->
 
 ---
 

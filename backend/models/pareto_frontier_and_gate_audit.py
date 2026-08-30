@@ -1,4 +1,4 @@
-﻿"""
+"""
 Comprehensive 7-Parameter Validation Sweep, Pareto Frontier & ROC-AUC Derivation.
 
 1. Joint 7-Parameter Grid Search strictly on Validation partition (D_val).
@@ -350,6 +350,18 @@ def run_comprehensive_gate_and_pareto_audit():
     print(f"  • Mathematically Derived Global ROC-AUC: {derived_global_auc:.6f} -> ({derived_global_auc:.4f})")
     print(f"  • Empirical Scikit-Learn Global ROC-AUC: {empirical_global_auc:.6f} -> ({empirical_global_auc:.4f})")
     print(f"  • Residual Difference:                  {abs(derived_global_auc - empirical_global_auc):.8f} (Exact Match)")
+
+    # Automatically persist canonical results to docs/metrics.json & sync docs
+    canonical_export_path = REPO_ROOT / "docs" / "metrics.json"
+    if canonical_export_path.exists():
+        import subprocess
+        try:
+            gen_script = REPO_ROOT / "scripts" / "generate_docs.py"
+            if gen_script.exists():
+                subprocess.run([sys.executable, str(gen_script)], check=True)
+                print(f"  • Successfully synced canonical metrics across documentation and React UI.")
+        except Exception as e:
+            print(f"  • Warning: Could not auto-sync docs: {e}")
 
 
 if __name__ == "__main__":
