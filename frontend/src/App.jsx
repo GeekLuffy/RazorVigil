@@ -14,8 +14,7 @@ import MerchantStore from './components/MerchantStore'
 import ArchitectureOverview from './components/ArchitectureOverview'
 import FraudGraphCanvas from './components/FraudGraphCanvas'
 import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
-import ModelGovernance from './components/ModelGovernance'
-import PolicyEngineeringWorkspace from './components/PolicyEngineeringWorkspace'
+import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const WS_URL = 'ws://localhost:8000/ws'
@@ -484,23 +483,13 @@ export default function App() {
           </button>
 
           <button
-            onClick={() => setActiveTab('engineer')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'engineer' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Cpu size={14} />
-            Policy Engineer &amp; Autopsy
-          </button>
-
-          <button
             onClick={() => setActiveTab('governance')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'governance' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white'
             }`}
           >
             <BarChart3 size={14} />
-            Model Governance &amp; Metrics
+            Model Governance &amp; Policy Studio
           </button>
 
           <button
@@ -537,10 +526,8 @@ export default function App() {
         <ArchitectureOverview />
       ) : activeTab === 'disputes' ? (
         <DisputeCaseWorkspace />
-      ) : activeTab === 'engineer' ? (
-        <PolicyEngineeringWorkspace />
       ) : activeTab === 'governance' ? (
-        <ModelGovernance />
+        <ModelGovernanceStudio />
       ) : (
         <>
           {/* Canary alert */}
