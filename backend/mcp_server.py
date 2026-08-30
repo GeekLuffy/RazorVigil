@@ -12,6 +12,8 @@ How to run standalone:
 
 Note: Wraps the live RazorShield backend HTTP API (localhost:8000).
 Set RAZORSHIELD_API_URL env var to point to a deployed backend.
+
+SDK: mcp 2.x (MCPServer from mcp.server.mcpserver, @server.tool decorator).
 """
 
 from __future__ import annotations
@@ -19,20 +21,16 @@ from __future__ import annotations
 import json
 import os
 import sys
-from typing import Any
+from typing import Any, Optional
 
 import httpx
-
-try:
-    from mcp.server import Server
-    from mcp.server.stdio import stdio_server
-    from mcp import types as mcp_types
-    MCP_AVAILABLE = True
-except ImportError:
-    MCP_AVAILABLE = False
+from mcp.server.mcpserver import MCPServer
 
 RAZORSHIELD_API_URL = os.getenv("RAZORSHIELD_API_URL", "http://localhost:8000")
 
+# ---------------------------------------------------------------------------
+# HTTP helpers — fresh AsyncClient per call (safe for stdio + async context)
+# ---------------------------------------------------------------------------
 
 async def _get(path: str, params: dict | None = None) -> dict[str, Any]:
     try:
@@ -53,6 +51,10 @@ async def _post(path: str, body: dict) -> dict[str, Any]:
     except httpx.HTTPError as exc:
         return {"error": str(exc), "path": path}
 
+
+# ---------------------------------------------------------------------------
+# Business logic (shared with demo_agent.py)
+# ---------------------------------------------------------------------------
 
 async def tool_check_canary_status(transaction_id: str) -> dict[str, Any]:
     """Check if a transaction triggered a canary honeytoken hit."""
@@ -152,103 +154,84 @@ async def tool_compile_dispute_evidence(transaction_id: str) -> dict[str, Any]:
     }
 
 
-TOOL_DEFINITIONS = [
-    {
-        "name": "check_canary_status",
-        "description": (
-            "Check whether a transaction triggered a RazorShield canary honeytoken hit. "
-            "Canary cards are synthetic Luhn-valid PANs seeded exclusively within RazorShield's "
-            "own decoy inventory endpoints. Any hit = 1.0-confidence attacker was scanning our system. "
-            "Returns is_canary, confidence, canary_index."
-        ),
-        "inputSchema": {"type": "object",
-                        "properties": {"transaction_id": {"type": "string"}},
-                        "required": ["transaction_id"]},
-    },
-    {
-        "name": "get_cluster_risk_score",
-        "description": (
-            "Get real-time Louvain graph community risk score for any entity (device/IP/card). "
-            "Returns cluster_id, cluster_score (0.0=isolated, 1.0=core ring), ring_size."
-        ),
-        "inputSchema": {"type": "object",
-                        "properties": {
-                            "device_fingerprint": {"type": "string"},
-                            "ip_hash": {"type": "string"},
-                            "card_hash": {"type": "string"},
-                        }},
-    },
-    {
-        "name": "investigate_transaction",
-        "description": (
-            "Run the full 8-layer RazorShield forensic pipeline. "
-            "Returns tier, risk_score (0-1), explanation, and all 16 signal values. "
-            "Use for specialist carding/bot-abuse deep-forensic analysis."
-        ),
-        "inputSchema": {"type": "object",
-                        "properties": {"transaction_id": {"type": "string"}},
-                        "required": ["transaction_id"]},
-    },
-    {
-        "name": "compile_dispute_evidence",
-        "description": (
-            "Compile a 5-domain structured DRAFT evidence dossier: "
-            "(1) Gateway HMAC, (2) ASN/JA3 telemetry, (3) biometrics, "
-            "(4) Louvain graph topology, (5) RBI regulatory context (Authentication Mechanisms Directions 2025). "
-            "DRAFT for merchant review only - not a formally filed document. "
-            "Returns package_id, claims, signal_strength, dossier_draft."
-        ),
-        "inputSchema": {"type": "object",
-                        "properties": {"transaction_id": {"type": "string"}},
-                        "required": ["transaction_id"]},
-    },
-]
+# ---------------------------------------------------------------------------
+# MCP Server setup — mcp 2.x MCPServer API
+# ---------------------------------------------------------------------------
+
+server = MCPServer(
+    name="razorshield-sentinel",
+    version="1.2.0",
+    title="RazorShield Sentinel",
+    description=(
+        "Specialist MCP sub-agent for carding ring detection, Louvain graph clustering, "
+        "canary honeytoken forensics, and chargeback evidence dossier compilation. "
+        "Designed for Razorpay Agent Studio delegation via MCP protocol."
+    ),
+)
 
 
-async def run_mcp_server():
-    if not MCP_AVAILABLE:
-        print(
-            "ERROR: mcp package not installed.\n"
-            "Run: pip install mcp\n"
-            "This installs the Anthropic MCP Python SDK.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+@server.tool(
+    name="check_canary_status",
+    description=(
+        "Check whether a transaction triggered a RazorShield canary honeytoken hit. "
+        "Canary cards are synthetic Luhn-valid PANs seeded exclusively within RazorShield's "
+        "own decoy inventory endpoints. Any hit = 1.0-confidence attacker was scanning our system. "
+        "Returns is_canary, confidence, canary_index."
+    ),
+)
+async def check_canary_status(transaction_id: str) -> str:
+    result = await tool_check_canary_status(transaction_id)
+    return json.dumps(result, indent=2)
 
-    server = Server("razorshield-sentinel")
 
-    @server.list_tools()
-    async def list_tools() -> list[mcp_types.Tool]:
-        return [
-            mcp_types.Tool(
-                name=t["name"],
-                description=t["description"],
-                inputSchema=t["inputSchema"],
-            )
-            for t in TOOL_DEFINITIONS
-        ]
+@server.tool(
+    name="get_cluster_risk_score",
+    description=(
+        "Get real-time Louvain graph community risk score for any entity (device/IP/card). "
+        "Returns cluster_id, cluster_score (0.0=isolated, 1.0=core ring), ring_size."
+    ),
+)
+async def get_cluster_risk_score(
+    device_fingerprint: Optional[str] = None,
+    ip_hash: Optional[str] = None,
+    card_hash: Optional[str] = None,
+) -> str:
+    result = await tool_get_cluster_risk_score(device_fingerprint, ip_hash, card_hash)
+    return json.dumps(result, indent=2)
 
-    @server.call_tool()
-    async def call_tool(name: str, arguments: dict) -> list[mcp_types.TextContent]:
-        try:
-            if name == "check_canary_status":
-                result = await tool_check_canary_status(arguments["transaction_id"])
-            elif name == "get_cluster_risk_score":
-                result = await tool_get_cluster_risk_score(**arguments)
-            elif name == "investigate_transaction":
-                result = await tool_investigate_transaction(arguments["transaction_id"])
-            elif name == "compile_dispute_evidence":
-                result = await tool_compile_dispute_evidence(arguments["transaction_id"])
-            else:
-                result = {"error": f"Unknown tool: {name}"}
-        except Exception as exc:
-            result = {"error": str(exc), "tool": name}
-        return [mcp_types.TextContent(type="text", text=json.dumps(result, indent=2))]
 
-    async with stdio_server() as streams:
-        await server.run(streams[0], streams[1], server.create_initialization_options())
+@server.tool(
+    name="investigate_transaction",
+    description=(
+        "Run the full 8-layer RazorShield forensic pipeline on any transaction. "
+        "Returns tier (safe/soft_risk/elevated_review/high_confidence_bot), "
+        "risk_score (0-1), explanation, and all forensic signal values. "
+        "Use for specialist carding/bot-abuse deep-forensic analysis."
+    ),
+)
+async def investigate_transaction(transaction_id: str) -> str:
+    result = await tool_investigate_transaction(transaction_id)
+    return json.dumps(result, indent=2)
+
+
+@server.tool(
+    name="compile_dispute_evidence",
+    description=(
+        "Compile a 5-domain structured DRAFT evidence dossier: "
+        "(1) Gateway HMAC proof, (2) ASN/JA3 telemetry, (3) biometric kinetics, "
+        "(4) Louvain graph topology, (5) RBI Authentication Directions 2025 regulatory context. "
+        "Fetches real transaction amount and forensic signals automatically. "
+        "DRAFT for merchant review only — not a formally filed document. "
+        "Returns package_id, claims, signal_strength, dossier_draft."
+    ),
+)
+async def compile_dispute_evidence(transaction_id: str) -> str:
+    result = await tool_compile_dispute_evidence(transaction_id)
+    return json.dumps(result, indent=2)
 
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(run_mcp_server())
+    asyncio.run(server.run_stdio_async())
+
+
