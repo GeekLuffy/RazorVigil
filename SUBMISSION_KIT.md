@@ -102,3 +102,12 @@ npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## 📚 Deep Dives & Verification Reports
+
+- 🧭 **[Technical Walkthrough](docs/WALKTHROUGH.md)** — Architectural details, layer descriptions, and system flow.
+- 🎯 **[Live Demo Runbook](docs/DEMO_RUNBOOK.md)** — Minute-by-minute demo sequence with failure recovery playbooks.
+- 🔬 **[External Validation Benchmark](docs/EXTERNAL_VALIDATION.md)** — Cold-transfer validation on real-world datasets (ULB & IEEE-CIS).
+- 🗺️ **[Production Roadmap & Scope](docs/ROADMAP_AND_LIMITATIONS.md)** — Engineering boundaries, multi-tenant scaling, and future federated defenses.

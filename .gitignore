@@ -6,8 +6,13 @@ __pycache__/
 node_modules/
 dist/
 data/*.csv
+data/**/*.csv
 data/*.parquet
+data/**/*.parquet
 data/*.png
+data/**/*.png
+data/**/*.zip
+data/external/
 data/load_test_results.json
 .ipynb_checkpoints/
 threat_intelligence/
