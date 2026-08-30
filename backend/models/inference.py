@@ -92,8 +92,17 @@ class RiskScorer:
 
         return lgbm_prob, cb_prob, normalized_if
 
-    def compute_risk(self, lgbm_prob: float, cb_prob: float, if_score: float, cluster_score: float) -> float:
-        """Computes stacked blended risk score with dynamic zero-day anomaly disagreement gating."""
+    def compute_risk(
+        self,
+        lgbm_prob: float,
+        cb_prob: float,
+        if_score: float,
+        cluster_score: float,
+        is_automation: bool = False,
+    ) -> float:
+        """
+        Computes stacked blended risk score with persistence-consistent zero-day anomaly gating.
+        """
         if self._catboost is not None:
             sup_risk = 0.55 * lgbm_prob + 0.45 * cb_prob
             static_blend = 0.45 * lgbm_prob + 0.35 * cb_prob + 0.10 * if_score + 0.10 * cluster_score
@@ -101,10 +110,10 @@ class RiskScorer:
             sup_risk = lgbm_prob
             static_blend = 0.70 * lgbm_prob + 0.20 * if_score + 0.10 * cluster_score
 
-        # Dynamic Disagreement Gate for Zero-Day Anomaly Protection:
-        # If supervised models predict low risk (<=0.40) but unsupervised IF detects a strong anomaly (>=0.55),
-        # bypass supervised dilution to intercept novel zero-day attack geometries.
-        if if_score >= 0.55 and sup_risk <= 0.40:
+        # Persistence-Consistent Dynamic Disagreement Gate:
+        # Bypasses supervised dilution only when IF detects strong anomaly (>=0.55),
+        # supervised models output low confidence (<=0.40), AND structural automation/proxy signals are present.
+        if if_score >= 0.55 and sup_risk <= 0.40 and is_automation:
             risk = max(static_blend, if_score)
         else:
             risk = static_blend

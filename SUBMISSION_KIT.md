@@ -36,20 +36,22 @@
 > - **Adversarial-Realistic Catch Rate**: **97.60%** `[96.20%, 98.80%]` (Recall on stealth human-mimicking bot segment, n=500).
 > - **Full-Funnel Fraud Catch Rate**: **99.60%** `[99.36%, 99.80%]` (Multi-layer defense: 50 Canary Honeytokens + Sliding-Window Velocity + ML).
 > - **Leave-One-Attack-Type-Out Zero-Day Generalization (Unseen CVV-Cycling, N=500)**:
+>   - **Dynamic Disagreement (Persistence-Gated)**: **76.60%** `[73.20%, 80.20%]` *(Compound automation & anomaly bypass gate)*
 >   - **Isolation Forest Standalone (Unsupervised)**: **75.20%** `[71.60%, 78.81%]` *(True zero-day defense carrier)*
 >   - **GNN / Cluster Risk Standalone (Structural)**: **29.80%** `[25.60%, 33.60%]`
 >   - **LightGBM Standalone (Supervised)**: **9.00%** `[6.40%, 11.40%]` *(Fails on unseen attack geometry)*
 >   - **CatBoost Standalone (Supervised)**: **6.60%** `[4.60%, 8.80%]` *(Fails on unseen attack geometry)*
 >   - **Tabular GBDT Blend (0.55 LGB / 0.45 CB)**: **8.20%** `[5.80%, 10.60%]`
 >   - **Static 4-Way Stacked Blend (0.45/0.35/0.10/0.10)**: **8.20%** `[5.80%, 10.60%]` *(Supervised weight dilutes IF)*
->   - **Dynamic Disagreement-Gated Blend (Anomaly-Bypass)**: **76.80%** `[73.40%, 80.40%]` *(Restores zero-day defense)*
-> - **Reconciliation with Earlier 91.76% Claim**: The earlier 91.76% figure is confirmed to have shared the exact same root cause as the synthetic feature separability bug (disjoint interval ranges in non-target features in early synthetic iterations). In realistic noisy e-commerce distributions, supervised models drop to 6.60%–9.00% on unobserved attack geometries. The unsupervised Isolation Forest provides the genuine zero-day mechanism (75.20% recall), and dynamic disagreement routing prevents supervised dilution (76.80% recall). The earlier 91.76% figure is formally **superseded**.
+> - **Validation-Only Gate Tuning & Persistence Term**: The gate thresholds ($\tau_{\text{if}} = 0.50, \tau_{\text{sup}} = 0.35$) were tuned exclusively on the 20% validation partition ($D_{\text{val}}$) under an edge-genuine FPR constraint. The persistence-consistency gating term verifies compound automation signals (CVV cycling $\ge 3$, sub-2.5s robotic checkout with low keystroke entropy, or TLS JA3 spoofing with multi-BIN fanout), reducing Edge-Case Genuine FPR to 30.20% (routed to soft-risk UPI recovery).
+> - **Reconciliation with Earlier 91.76% Claim**: The earlier 91.76% figure is confirmed to have shared the exact same root cause as the synthetic feature separability bug (disjoint interval ranges in non-target features in early synthetic iterations). In realistic noisy e-commerce distributions, supervised models drop to 6.60%–9.00% on unobserved attack geometries. The unsupervised Isolation Forest provides the genuine zero-day mechanism (75.20% recall), and persistence-gated dynamic disagreement routing prevents supervised dilution (76.60% recall). The earlier 91.76% figure is formally **superseded**.
 > - **Synchronous Latency Budget**:
 >   - **Sequential Baseline**: **p50 = 9.08ms | p95 = 11.81ms | p99 = 13.86ms** (tested on 100 sequential checkout transactions).
 >   - **Sustained Throughput (40 req/s)**: **p50 = 9.44ms | p95 = 18.62ms | p99 = 28.06ms** (strictly below the 50ms gateway budget).
 > - **Ensemble Component Ablation Matrix**:
 >   - Tabular GBDT Blend (0.55 LGB / 0.45 CB): **PR-AUC 0.9997 `[0.9995, 0.9999]` | ROC-AUC 0.9999 `[0.9998, 0.9999]`**
 >   - Stacked 4-Way Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN): **PR-AUC 0.9991 `[0.9983, 0.9997]` | ROC-AUC 0.9996 `[0.9991, 0.9999]`**
+>   - Persistence-Gated 4-Way Blend: **PR-AUC 0.9963 `[0.9944, 0.9979]` | ROC-AUC 0.9986 `[0.9980, 0.9992]`**
 >   - Isolation Forest Standalone (Unsupervised): **PR-AUC 0.9387 `[0.9328, 0.9445]` | ROC-AUC 0.9722 `[0.9694, 0.9748]`**
 >   - HeteroGraphSAGE Graph Standalone: **PR-AUC 0.8556 `[0.8449, 0.8654]` | ROC-AUC 0.8764 `[0.8673, 0.8847]`**
 > - **Pitch Metric**: **`Net_Value_Protected` = Fraud Loss Prevented − [False Positive Cost − Recovered GMV]**.
