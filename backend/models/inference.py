@@ -110,10 +110,10 @@ class RiskScorer:
             sup_risk = lgbm_prob
             static_blend = 0.70 * lgbm_prob + 0.20 * if_score + 0.10 * cluster_score
 
-        # Persistence-Consistent Dynamic Disagreement Gate:
-        # Bypasses supervised dilution only when IF detects strong anomaly (>=0.55),
-        # supervised models output low confidence (<=0.40), AND structural automation/proxy signals are present.
-        if if_score >= 0.55 and sup_risk <= 0.40 and is_automation:
+        # Persistence-Consistent Dynamic Disagreement Gate (Tuned on Validation Partition P2):
+        # Activates anomaly bypass when IF detects strong anomaly (>= 0.45),
+        # supervised models output low confidence (<= 0.40), AND compound automation signals are present.
+        if if_score >= 0.45 and sup_risk <= 0.40 and is_automation:
             risk = max(static_blend, if_score)
         else:
             risk = static_blend

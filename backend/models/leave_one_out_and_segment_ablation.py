@@ -106,7 +106,7 @@ def compute_bootstrap_metrics_ci(y_true, scores, n_boot=1000, seed=42, label="Me
 def compute_automation_signal_mask(X_matrix: np.ndarray) -> np.ndarray:
     """
     Evaluates presence of compound structural automation, multi-credential cycling,
-    or behavioral incoherence (persistence-consistency criteria).
+    or behavioral incoherence using winning Validation Pareto P2 thresholds.
     """
     cvv_idx = FEATURE_COLS.index("cvv_cycle_attempts")
     dev_bin_idx = FEATURE_COLS.index("device_distinct_bin_count")
@@ -117,15 +117,11 @@ def compute_automation_signal_mask(X_matrix: np.ndarray) -> np.ndarray:
     jitter_idx = FEATURE_COLS.index("mouse_jitter_score")
     time_idx = FEATURE_COLS.index("time_on_page_s")
 
-    # Compound Persistence-Consistency Conditions:
-    # 1. Active CVV brute-force cycling (>= 3 retries)
+    # Winning Validation Pareto P2 Thresholds:
     cond_cvv = (X_matrix[:, cvv_idx] >= 3.0)
-    # 2. Robotic automation (sub-2s checkout + near-zero keystroke entropy)
-    cond_bot_timing = (X_matrix[:, entropy_idx] < 0.80) & (X_matrix[:, time_idx] < 2.5)
-    # 3. Spoofed TLS client profile combined with credential retry or multi-BIN testing
-    cond_spoof = (X_matrix[:, ja3_idx] >= 1.0) & ((X_matrix[:, cvv_idx] >= 2.0) | (X_matrix[:, dev_bin_idx] >= 3.0))
-    # 4. Extreme proxy botnet fanout (>= 6 rotating IPs and >= 6 PANs on single device)
-    cond_fanout = (X_matrix[:, dev_ip_idx] >= 6.0) & (X_matrix[:, ip_pan_idx] >= 6.0)
+    cond_bot_timing = (X_matrix[:, entropy_idx] < 0.60) & (X_matrix[:, time_idx] < 1.5)
+    cond_spoof = (X_matrix[:, ja3_idx] >= 1.0) & ((X_matrix[:, cvv_idx] >= 2.0) | (X_matrix[:, dev_bin_idx] >= 4.0))
+    cond_fanout = (X_matrix[:, dev_ip_idx] >= 8.0) & (X_matrix[:, ip_pan_idx] >= 8.0)
 
     is_automation = cond_cvv | cond_bot_timing | cond_spoof | cond_fanout
     return is_automation

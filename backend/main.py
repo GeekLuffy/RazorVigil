@@ -320,13 +320,10 @@ async def checkout(
     feature_vec = build_feature_vector(req, vel_features, cluster_score)
     lgbm_prob, cb_prob, if_score = risk_scorer.score(feature_vec)
     is_auto = (
-        vel_features.device_distinct_ip_count >= 3
-        or vel_features.ip_distinct_pan_count >= 3
-        or vel_features.cvv_cycle_attempts >= 2
-        or req.ja3_ua_mismatch
-        or req.keystroke_entropy < 1.3
-        or req.mouse_jitter_score < 0.22
-        or req.time_on_page_s < 2.5
+        vel_features.cvv_cycle_attempts >= 3.0
+        or (req.keystroke_entropy < 0.60 and req.time_on_page_s < 1.5)
+        or (req.ja3_ua_mismatch and (vel_features.cvv_cycle_attempts >= 2.0 or vel_features.device_distinct_bin_count >= 4.0))
+        or (vel_features.device_distinct_ip_count >= 8.0 and vel_features.ip_distinct_pan_count >= 8.0)
     )
     final_risk = risk_scorer.compute_risk(
         lgbm_prob, cb_prob, if_score, cluster_score, is_automation=is_auto
