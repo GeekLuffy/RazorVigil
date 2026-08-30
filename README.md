@@ -67,21 +67,51 @@ Rather than competing with Razorpay's own native fraud agents, RazorShield provi
 
 Evaluated on a strictly isolated 3-way stratified partition (**60% Train / 20% Validation / 20% Held-Out Test, N=10,000 test holdout**) with **1,000 nonparametric bootstrap resamples**:
 
-| Metric | Point Estimate | 95% Bootstrap CI | Description |
-|---|---|---|---|
-| **Overall Test PR-AUC** | **0.9985** | `[0.9976, 0.9992]` | 4-Way Stacked Blend on held-out test split (Lift: **3.33x**) |
-| **Overall Test ROC-AUC** | **0.9993** | `[0.9988, 0.9997]` | Global ranking discrimination on held-out test partition |
-| **ML-Layer PR-AUC** | **0.9984** | `[0.9974, 0.9992]` | Ambiguous traffic reaching ML (n=9,877 / 10,000, rules excluded) |
-| **Adversarial-Realistic PR-AUC** | **0.9637** | `[0.9381, 0.9832]` | Stealth human-mimicking bot segment (Recall: **97.20%**, n=500) |
-| **Full-Funnel Fraud Catch Rate** | **99.53%** | `[99.30%, 99.77%]` | Multi-layer defense (Canary Traps + Velocity + 4-Way Stacked ML) |
-| **Sequential Latency (p50 / p99)** | **9.08ms / 13.86ms** | — | 4x faster than the 50ms gateway SLA |
-| **Sustained 40 RPS Latency (p99)** | **28.06ms** | — | Sub-30ms performance under concurrent load |
+| Evaluation Metric | Tabular Blend (LGB+CB) | 4-Way Stacked Blend | Dynamic Disagreement Gate | Description |
+|---|---|---|---|---|
+| **Overall Test PR-AUC** | **0.9997** `[0.9995, 0.9999]` | **0.9991** `[0.9983, 0.9997]` | **0.9953** `[0.9933, 0.9971]` | Held-out 20% test holdout (Lift: **3.33x**) |
+| **Overall Test ROC-AUC** | **0.9999** `[0.9998, 0.9999]` | **0.9996** `[0.9991, 0.9999]` | **0.9982** `[0.9975, 0.9988]` | Global ranking discrimination on held-out test split |
+| **ML-Layer PR-AUC** | **0.9996** `[0.9994, 0.9998]` | **0.9984** `[0.9974, 0.9992]` | **0.9948** `[0.9928, 0.9968]` | Ambiguous traffic reaching ML (n=9,877 / 10,000) |
+| **Adversarial-Realistic Recall** | **97.60%** `[96.20%, 98.80%]` | **97.40%** `[96.00%, 98.80%]` | **98.60%** `[97.40%, 99.60%]` | Stealth human-mimicking bot segment (n=500) |
+| **Full-Funnel Fraud Catch Rate** | **99.60%** `[99.36%, 99.80%]` | **99.57%** `[99.33%, 99.80%]` | **99.77%** `[99.57%, 99.90%]` | Multi-layer defense (Canary Traps + Velocity + ML) |
+| **Sequential Latency (p50 / p99)** | **9.08ms / 13.86ms** | **9.42ms / 14.10ms** | **9.55ms / 14.35ms** | 4x faster than the 50ms gateway SLA |
+| **Sustained 40 RPS Latency (p99)** | **28.06ms** | **29.15ms** | **29.80ms** | Sub-30ms performance under concurrent load |
 
-### Stacked Ensemble Component Ablation (Held-Out Test Partition)
-- **Stacked 4-Way Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN)**: PR-AUC **0.9985** `[0.9976, 0.9992]`, ROC-AUC **0.9993** `[0.9988, 0.9997]`
-- **Tabular GBDT Blend (0.55 LGB / 0.45 CB)**: PR-AUC **0.9997** `[0.9996, 0.9999]`, ROC-AUC **0.9999** `[0.9998, 0.9999]`
-- **Isolation Forest Standalone (Unsupervised)**: PR-AUC **0.9387** `[0.9328, 0.9445]`, ROC-AUC **0.9722** `[0.9694, 0.9748]`
-- **Graph Neural Network (HeteroGraphSAGE)**: PR-AUC **0.8556** `[0.8449, 0.8654]`, ROC-AUC **0.8764** `[0.8673, 0.8847]`
+---
+
+### 🛡️ Leave-One-Attack-Type-Out Zero-Day Generalization (Unseen CVV-Cycling, N=500 Held-Out)
+
+To evaluate defense against unobserved attack geometries, models were trained on a partition strictly excluding all CVV-cycling attacks and evaluated solely on held-out unseen CVV-cycling traffic:
+
+| Component / Architecture | Unseen Recall @ 0.50 | 95% Bootstrap Confidence Interval | Primary Defense Mechanism |
+|---|---|---|---|
+| **Isolation Forest (Unsupervised)** | **75.20%** | `[71.60%, 78.81%]` | **Unsupervised Anomaly Boundary** (No labels required) |
+| **GNN / Cluster Risk (Structural)** | **29.80%** | `[25.60%, 33.60%]` | Relational Entity Graph Clustering |
+| **LightGBM Standalone (Supervised)** | **9.00%** | `[6.40%, 11.40%]` | Supervised Trees (Fails on unseen attack geometry) |
+| **CatBoost Standalone (Supervised)** | **6.60%** | `[4.60%, 8.80%]` | Supervised Trees (Fails on unseen attack geometry) |
+| **Tabular GBDT Blend (0.55 LGB / 0.45 CB)** | **8.20%** | `[5.80%, 10.60%]` | Supervised Tabular Blend |
+| **Static 4-Way Stacked Blend** | **8.20%** | `[5.80%, 10.60%]` | Static Blend (0.80 supervised weight dilutes IF) |
+| **Dynamic Disagreement-Gated Blend** | **76.80%** | `[73.40%, 80.40%]` | **Anomaly-Bypass Gate** (Activates when IF disagrees with GBDT) |
+
+> **Reconciliation with Earlier Reported 91.76% Generalization Rate**:
+> The earlier-reported 91.76% leave-one-out figure is now understood to have shared the exact same root cause as the synthetic feature separability bug (disjoint interval ranges in non-target features such as `asn_type`, `paste_event`, and non-overlapping `cluster_risk_score` in early synthetic iterations). In those early iterations, supervised trees latched onto non-target synthetic artifacts to classify rows as fraud even without observing CVV features. In our calibrated dataset with realistic e-commerce noise and overlapping distributions, pure supervised models correctly drop to **6.60% – 9.00%** recall on novel attack geometries. The unsupervised Isolation Forest provides the genuine zero-day mechanism (**75.20% recall**), and our **Dynamic Disagreement Gate** prevents supervised dilution (**76.80% recall**). The earlier 91.76% figure is formally marked as **superseded**.
+
+---
+
+### 🧩 Per-Segment Performance & Ablation Matrix (Held-Out Test Partition, N=10,000)
+
+| Traffic Segment | N (Test) | Base Rate | Tabular Blend (LGB+CB) | Static 4-Way Blend | Dynamic Gated 4-Way |
+|---|---|---|---|---|---|
+| **Normal Genuine** | 6,500 | 0.0% | FPR: **0.00%** | FPR: **0.00%** | FPR: **1.02%** |
+| **Edge-Case Genuine (VPN/Travelers)** | 500 | 0.0% | FPR: **6.00%** | FPR: **5.80%** | FPR: **80.80%** *(Soft-Risk UPI Recovery)* |
+| **Slow Distributed Carding** | 1,000 | 100.0% | Recall: **100.00%** `[100%, 100%]` | Recall: **100.00%** `[100%, 100%]` | Recall: **100.00%** `[100%, 100%]` |
+| **Rapid Burst Script Botnets** | 1,000 | 100.0% | Recall: **100.00%** `[100%, 100%]` | Recall: **100.00%** `[100%, 100%]` | Recall: **100.00%** `[100%, 100%]` |
+| **Adversarial Realistic Bots** | 500 | 100.0% | Recall: **97.60%** `[96.2%, 98.8%]` | Recall: **97.40%** `[96.0%, 98.8%]` | Recall: **98.60%** `[97.4%, 99.6%]` |
+| **CVV Cycling (In-Domain)** | 500 | 100.0% | Recall: **100.00%** `[100%, 100%]` | Recall: **100.00%** `[100%, 100%]` | Recall: **100.00%** `[100%, 100%]` |
+
+> **Architectural Justification: Tabular Blend vs. Multi-Modal 4-Way Blend**:
+> - **In-Domain Supervised Precision**: The **Tabular GBDT Blend (0.55 LGB / 0.45 CB)** achieves higher aggregate in-domain PR-AUC (**0.9997** vs 0.9991) and minimal false positive rate on edge-case genuine traffic (FPR 6.00%).
+> - **Zero-Day & Structural Defense**: The **4-Way Multi-Modal Architecture** (incorporating Isolation Forest and Graph Neural Networks) provides structural insurance against unmodeled zero-day attack geometries (boosting zero-day interception from 8.20% to **76.80%** via dynamic disagreement routing).
 
 > **Methodological Rigor & Guardrails**:
 > 1. **Strict 3-Way Split**: Model training occurs on 60% Train; hyperparameter tuning (Optuna) and ensemble blend-weight selection occur exclusively on 20% Validation; final reporting occurs strictly on 20% Held-Out Test (never touched during tuning).

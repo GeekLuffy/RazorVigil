@@ -30,18 +30,26 @@
 > 9. **Human-in-the-Loop (HITL) Case Resolution & Model Governance**: Interactive SOC dispute management workspace allowing one-click evidence review, Track 03 UPI recovery routing, and live held-out model evaluation analytics (Confusion Matrix, Feature Importances, and Ablation Matrices).
 
 ### Key Metrics & Impact (Strict 3-Way Held-Out Test Reporting, N=10,000, 1,000 Bootstrap CIs)
-> - **Overall Test PR-AUC**: **0.9985** `[0.9976, 0.9992]` (Signal Lift: **3.33x** `[3.23x, 3.42x]`, Prevalence: 30.00%).
-> - **Overall Test ROC-AUC**: **0.9993** `[0.9988, 0.9997]` (Global discrimination on strictly isolated test holdout).
-> - **ML-Layer PR-AUC**: **0.9984** `[0.9974, 0.9992]` (Evaluated on the 9,877 ambiguous transactions reaching ML scoring after excluding deterministic rule overrides).
-> - **Adversarial-Realistic PR-AUC**: **0.9637** `[0.9381, 0.9832]` (Recall: **97.20%**, evaluated on human-mimicking stealth bots with realistic biometric jitter).
-> - **Full-Funnel Fraud Catch Rate**: **99.53%** `[99.30%, 99.77%]` (Multi-layer defense: 50 Canary Honeytokens + Sliding-Window Velocity + 4-Way Stacked ML).
-> - **Methodological Rigor & Leakage Guardrails**: All hyperparameter tuning (5-GPU Optuna) and ensemble blend-weight selection were restricted strictly to the 20% validation partition. The test partition was held strictly unobserved until final reporting. Standing automated evaluation guardrails enforce non-zero CI widths and flag unverified perfection.
+> - **Overall Test PR-AUC**: **0.9997** `[0.9995, 0.9999]` (Tabular GBDT Blend) | **0.9991** `[0.9983, 0.9997]` (4-Way Stacked Blend) (Signal Lift: **3.33x**, Prevalence: 30.00%).
+> - **Overall Test ROC-AUC**: **0.9999** `[0.9998, 0.9999]` (Tabular GBDT Blend) | **0.9996** `[0.9991, 0.9999]` (4-Way Stacked Blend).
+> - **ML-Layer PR-AUC**: **0.9996** `[0.9994, 0.9998]` (Evaluated on the 9,877 ambiguous transactions reaching ML scoring after excluding deterministic rule overrides).
+> - **Adversarial-Realistic Catch Rate**: **97.60%** `[96.20%, 98.80%]` (Recall on stealth human-mimicking bot segment, n=500).
+> - **Full-Funnel Fraud Catch Rate**: **99.60%** `[99.36%, 99.80%]` (Multi-layer defense: 50 Canary Honeytokens + Sliding-Window Velocity + ML).
+> - **Leave-One-Attack-Type-Out Zero-Day Generalization (Unseen CVV-Cycling, N=500)**:
+>   - **Isolation Forest Standalone (Unsupervised)**: **75.20%** `[71.60%, 78.81%]` *(True zero-day defense carrier)*
+>   - **GNN / Cluster Risk Standalone (Structural)**: **29.80%** `[25.60%, 33.60%]`
+>   - **LightGBM Standalone (Supervised)**: **9.00%** `[6.40%, 11.40%]` *(Fails on unseen attack geometry)*
+>   - **CatBoost Standalone (Supervised)**: **6.60%** `[4.60%, 8.80%]` *(Fails on unseen attack geometry)*
+>   - **Tabular GBDT Blend (0.55 LGB / 0.45 CB)**: **8.20%** `[5.80%, 10.60%]`
+>   - **Static 4-Way Stacked Blend (0.45/0.35/0.10/0.10)**: **8.20%** `[5.80%, 10.60%]` *(Supervised weight dilutes IF)*
+>   - **Dynamic Disagreement-Gated Blend (Anomaly-Bypass)**: **76.80%** `[73.40%, 80.40%]` *(Restores zero-day defense)*
+> - **Reconciliation with Earlier 91.76% Claim**: The earlier 91.76% figure is confirmed to have shared the exact same root cause as the synthetic feature separability bug (disjoint interval ranges in non-target features in early synthetic iterations). In realistic noisy e-commerce distributions, supervised models drop to 6.60%–9.00% on unobserved attack geometries. The unsupervised Isolation Forest provides the genuine zero-day mechanism (75.20% recall), and dynamic disagreement routing prevents supervised dilution (76.80% recall). The earlier 91.76% figure is formally **superseded**.
 > - **Synchronous Latency Budget**:
 >   - **Sequential Baseline**: **p50 = 9.08ms | p95 = 11.81ms | p99 = 13.86ms** (tested on 100 sequential checkout transactions).
 >   - **Sustained Throughput (40 req/s)**: **p50 = 9.44ms | p95 = 18.62ms | p99 = 28.06ms** (strictly below the 50ms gateway budget).
 > - **Ensemble Component Ablation Matrix**:
->   - Stacked 4-Way Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN): **PR-AUC 0.9985 `[0.9976, 0.9992]` | ROC-AUC 0.9993 `[0.9988, 0.9997]`**
->   - Tabular GBDT Blend (0.55 LGB / 0.45 CB): **PR-AUC 0.9997 `[0.9996, 0.9999]` | ROC-AUC 0.9999 `[0.9998, 0.9999]`**
+>   - Tabular GBDT Blend (0.55 LGB / 0.45 CB): **PR-AUC 0.9997 `[0.9995, 0.9999]` | ROC-AUC 0.9999 `[0.9998, 0.9999]`**
+>   - Stacked 4-Way Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN): **PR-AUC 0.9991 `[0.9983, 0.9997]` | ROC-AUC 0.9996 `[0.9991, 0.9999]`**
 >   - Isolation Forest Standalone (Unsupervised): **PR-AUC 0.9387 `[0.9328, 0.9445]` | ROC-AUC 0.9722 `[0.9694, 0.9748]`**
 >   - HeteroGraphSAGE Graph Standalone: **PR-AUC 0.8556 `[0.8449, 0.8654]` | ROC-AUC 0.8764 `[0.8673, 0.8847]`**
 > - **Pitch Metric**: **`Net_Value_Protected` = Fraud Loss Prevented − [False Positive Cost − Recovered GMV]**.

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Evaluation Integrity Guardrail for Model Benchmarking.
 
 Automatically detects:
@@ -40,13 +40,13 @@ def check_evaluation_integrity(
     ci_width = ci_high - ci_low
     issues = []
 
-    if point_estimate >= 0.9999:
+    if round(point_estimate, 4) >= 0.9999 or point_estimate >= 0.9995:
         issues.append(
-            f"Point estimate for {metric_name} is {point_estimate:.4f} (>= 0.9999). "
+            f"Point estimate for {metric_name} is {point_estimate:.4f} (>= 0.9995 / 4-decimal 0.9999). "
             "Possible synthetic feature separability, target leakage, or unrepresentative data."
         )
 
-    if ci_high >= 1.0000:
+    if round(ci_high, 4) >= 1.0000 or ci_high >= 0.99995:
         issues.append(
             f"Confidence interval upper bound for {metric_name} touches 1.0000 ({ci_high:.4f}). "
             "Requires verification of non-overlapping feature distributions."

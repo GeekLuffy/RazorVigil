@@ -93,11 +93,22 @@ class RiskScorer:
         return lgbm_prob, cb_prob, normalized_if
 
     def compute_risk(self, lgbm_prob: float, cb_prob: float, if_score: float, cluster_score: float) -> float:
-        """Computes stacked blended risk score."""
+        """Computes stacked blended risk score with dynamic zero-day anomaly disagreement gating."""
         if self._catboost is not None:
-            risk = 0.45 * lgbm_prob + 0.35 * cb_prob + 0.10 * if_score + 0.10 * cluster_score
+            sup_risk = 0.55 * lgbm_prob + 0.45 * cb_prob
+            static_blend = 0.45 * lgbm_prob + 0.35 * cb_prob + 0.10 * if_score + 0.10 * cluster_score
         else:
-            risk = 0.70 * lgbm_prob + 0.20 * if_score + 0.10 * cluster_score
+            sup_risk = lgbm_prob
+            static_blend = 0.70 * lgbm_prob + 0.20 * if_score + 0.10 * cluster_score
+
+        # Dynamic Disagreement Gate for Zero-Day Anomaly Protection:
+        # If supervised models predict low risk (<=0.40) but unsupervised IF detects a strong anomaly (>=0.55),
+        # bypass supervised dilution to intercept novel zero-day attack geometries.
+        if if_score >= 0.55 and sup_risk <= 0.40:
+            risk = max(static_blend, if_score)
+        else:
+            risk = static_blend
+
         return float(np.clip(risk, 0.0, 1.0))
 
     def reload(self) -> None:
