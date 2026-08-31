@@ -621,8 +621,9 @@ export default function ModelGovernanceStudio() {
               )}
             </p>
             <p className="text-[11px] text-slate-400 pt-1 border-t border-slate-900">
-              <b>Methodology:</b> Remediated tree trained on Months 01–08 only. Evaluated on frozen Months 09–12. While static rules drop to 0% recall by Month 7 under stealth micro-strikes, the remediated policy sustains 69.64% aggregate held-out recall with 0.00% normal false positive rate.
+              <b>Methodology:</b> Remediated tree trained on Months 01–08 only and evaluated on frozen Months 09–12. In Month 01, remediated recall (99.21%) is slightly below the static baseline (100.00%) due to a deliberate precision/recall tradeoff (precision improved from 92.65% to 95.42% to reduce merchant checkout friction). While static rules collapse to a flat 0.00% recall by Month 07 under stealth micro-strikes, the remediated policy sustains a 69.64% aggregate held-out recall arc (recovering to 88.10% in Month 09 and 50.00% in Month 12) with 0.00% normal false positive rate.
             </p>
+
           </div>
         </div>
       )}

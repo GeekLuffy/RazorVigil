@@ -1015,8 +1015,11 @@ async def get_temporal_drift_monitor():
     """Run 12-month temporal cohort drift monitor on active baseline policy."""
     from sklearn.tree import DecisionTreeClassifier
     import numpy as np
-    dummy_tree = DecisionTreeClassifier(max_depth=5).fit(np.random.randn(300, 10), np.random.randint(0, 2, 300))
-    monitor_res = run_drift_monitor(dummy_tree)
+    from backend.governance.drift_monitor import generate_temporal_cohort, run_drift_monitor, FEATURE_COLS
+    m1_cohort = generate_temporal_cohort(1, np.random.default_rng(42))
+    static_tree = DecisionTreeClassifier(max_depth=5, min_samples_leaf=10, random_state=42, class_weight="balanced")
+    static_tree.fit(m1_cohort[FEATURE_COLS].values.astype(np.float32), m1_cohort["label"].values.astype(int))
+    monitor_res = run_drift_monitor(static_tree)
     return monitor_res
 
 
@@ -1026,10 +1029,14 @@ async def trigger_drift_remediation():
     from sklearn.tree import DecisionTreeClassifier
     import numpy as np
     import json
-    dummy_tree = DecisionTreeClassifier(max_depth=5).fit(np.random.randn(300, 10), np.random.randint(0, 2, 300))
-    remed_res = remediate_drift(dummy_tree)
+    from backend.governance.drift_monitor import generate_temporal_cohort, remediate_drift, FEATURE_COLS
+    m1_cohort = generate_temporal_cohort(1, np.random.default_rng(42))
+    static_tree = DecisionTreeClassifier(max_depth=5, min_samples_leaf=10, random_state=42, class_weight="balanced")
+    static_tree.fit(m1_cohort[FEATURE_COLS].values.astype(np.float32), m1_cohort["label"].values.astype(int))
+    remed_res = remediate_drift(static_tree)
     clean = json.loads(json.dumps(remed_res, default=lambda o: str(o)))
     return clean
+
 
 
 
