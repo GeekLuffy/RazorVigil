@@ -516,6 +516,29 @@ def test_cryptographic_legitimate_cavv_approval():
     assert res.risk_score < 0.05
 
 
+def test_sub_2000_micro_auth_non_3ds_rejection():
+    """
+    Sub-₹2000 Micro-Auth Carding Bypass Audit:
+    Verifies that ₹1.00 and ₹15.00 card testing attempts trying to use non-3DS ECI 07 are strictly rejected.
+    """
+    from backend.decision.three_ds_verifier import ThreeDSAntiBypassEngine, ThreeDSAuthPayload
+
+    engine = ThreeDSAntiBypassEngine()
+    for micro_amount in [1.00, 15.00, 499.00, 1499.00]:
+        req = ThreeDSAuthPayload(
+            transaction_id=f"tx_micro_{micro_amount}",
+            card_number="4111111111111111",
+            amount=micro_amount,
+            eci="07",  # Non-3DS direct approval attempt
+        )
+        res = engine.verify_auth_payload(req)
+        assert res.is_authorized is False
+        assert res.is_bypassed_or_forged is True
+        assert res.verdict == "NON_3DS_EXPLOIT_REJECTED"
+        assert res.risk_score >= 0.98
+
+
+
 
 
 

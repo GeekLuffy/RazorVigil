@@ -59,19 +59,21 @@ class ThreeDSAntiBypassEngine:
     def verify_auth_payload(self, req: ThreeDSAuthPayload) -> ThreeDSVerificationResult:
         # ----------------------------------------------------------------------
         # Check 1: Non-3DS / Direct Approval Exploitation (ECI 07 / No 3DS)
-        # Carders look for non-enrolled BINs to skip 3DS entirely.
+        # Carders hunt for non-enrolled or non-VBV BINs to skip 3DS entirely,
+        # especially on micro-auths (₹1, ₹15, ₹50, ₹499, ₹1,499).
+        # We enforce a Zero-Trust 3DS Mandate: Non-3DS ECI 07 is REJECTED
+        # across ALL amounts. Step-up 3DS challenge is mandatory.
         # ----------------------------------------------------------------------
         if req.eci in ("07", "00", ""):
-            # If transaction is > ₹2,000 or from international/untrusted BIN, reject non-3DS bypass
-            if req.amount >= 2000.0 or req.is_tls_mismatch:
-                return ThreeDSVerificationResult(
-                    is_authorized=False,
-                    is_bypassed_or_forged=True,
-                    risk_score=0.98,
-                    verdict="NON_3DS_EXPLOIT_REJECTED",
-                    failure_reason="Non-3DS / ECI 07 bypass attempt on high-value transaction. Step-up mandate enforced.",
-                    cryptographic_validity=False,
-                )
+            return ThreeDSVerificationResult(
+                is_authorized=False,
+                is_bypassed_or_forged=True,
+                risk_score=0.99,
+                verdict="NON_3DS_EXPLOIT_REJECTED",
+                failure_reason=f"Zero-Trust 3DS Mandate: Non-3DS / ECI 07 direct approval blocked for ₹{req.amount:,.2f}. Step-up challenge enforced.",
+                cryptographic_validity=False,
+            )
+
 
         # ----------------------------------------------------------------------
         # Check 2: Forged or Zero-Filled CAVV Detection
