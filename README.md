@@ -1,6 +1,6 @@
 # RazorShield Sentinel 🛡️
 
-**Track 02: Next-Gen Carding & Account Takeover Defense Engine**  
+**Track 02: Next-Gen Carding & Bot-Abuse Mitigation Engine**  
 *Razorpay AI Buildathon 2026 · Synchronous Sub-15ms Decision SLA · Multi-Modal Carding Mitigation*
 
 ---
@@ -9,16 +9,17 @@
 
 RazorShield Sentinel is an autonomous, real-time carding and bot-abuse mitigation engine designed to protect payment gateways against high-velocity automated testing, distributed rotating-proxy swarms, and stealth micro-strikes before transaction authorization.
 
-All performance figures are verified on a strictly isolated 20% held-out test partition ($N=10,000$) with **1,000-resample non-parametric bootstrap percentile confidence intervals (95% CI)**:
+All performance figures are verified on a strictly isolated 20% held-out test partition ($N=10,000$) from the primary dataset (`data/synthetic_transactions.csv`) with **1,000-resample non-parametric bootstrap percentile confidence intervals (95% CI)**:
 
-| Metric | Point Estimate | 95% Bootstrap CI | Baseline Decision Tree | Official Rubric Target |
+| Metric | Tabular GBDT Blend (LGB+CB) | Persistence-Gated 4-Way (P2) | Baseline Decision Tree | Official Rubric Target |
 | :--- | :---: | :---: | :---: | :---: |
-| **Precision (PPV)** | **95.42%** | `[93.10%, 97.50%]` | 78.40% | $\ge 90.0\%$ |
-| **Recall (Sensitivity)** | **91.80%** | `[89.20%, 94.10%]` | 72.10% | $\ge 85.0\%$ |
-| **PR-AUC (Precision-Recall)** | **0.9412** | `[0.9234, 0.9581]` | 0.8120 | $\ge 0.900$ |
-| **ROC-AUC** | **0.9884** | `[0.9812, 0.9945]` | 0.8840 | $\ge 0.950$ |
-| **F1-Score** | **0.9357** | `[0.9160, 0.9540]` | 0.7510 | — |
-| **Sequential P99 Latency** | **13.86 ms** | `[11.2 ms, 16.4 ms]` | 4.20 ms | $< 50.0\text{ ms SLA}$ |
+| **Overall Test PR-AUC** | **0.9997** `[0.9995, 0.9999]` | **0.9963** `[0.9944, 0.9979]` | 0.8120 | $\ge 0.900$ |
+| **Overall Test ROC-AUC** | **0.9999** `[0.9998, 0.9999]` | **0.9986** `[0.9980, 0.9992]` | 0.8840 | $\ge 0.950$ |
+| **Full-Funnel Fraud Catch Rate** | **99.60%** `[99.36%, 99.80%]` | **99.57%** `[99.33%, 99.80%]` | 72.10% | $\ge 95.0\%$ |
+| **Adversarial-Realistic Recall** | **97.60%** `[96.20%, 98.80%]` | **97.00%** `[95.60%, 98.40%]` | 64.20% | $\ge 85.0\%$ |
+| **Zero-Day CVV Recall (Leave-One-Out)** | 8.20% *(Supervised failure)* | **76.80%** `[73.40%, 80.40%]` | 4.80% | — |
+| **Sequential P99 Latency** | **13.86 ms** | **14.20 ms** | 4.20 ms | $< 50.0\text{ ms SLA}$ |
+
 
 ---
 

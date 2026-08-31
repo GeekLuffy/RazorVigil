@@ -1,4 +1,4 @@
-﻿{
+{
   "_meta": {
     "version": "1.0.0",
     "last_updated": "2026-08-31T03:00:00Z",
@@ -6,9 +6,9 @@
     "dataset": {
       "total_transactions": 50000,
       "split_ratio": {
-        "train": 0.60,
-        "validation": 0.20,
-        "held_out_test": 0.20
+        "train": 0.6,
+        "validation": 0.2,
+        "held_out_test": 0.2
       },
       "held_out_test_count": 10000,
       "bootstrap_resamples": 1000,
@@ -18,49 +18,163 @@
   "global_test_metrics": {
     "tabular_gbdt_blend": {
       "name": "Tabular GBDT Blend (0.55 LGB / 0.45 CB)",
-      "pr_auc": { "point": 0.9997, "ci": [0.9995, 0.9999] },
-      "roc_auc": { "point": 0.9999, "ci": [0.9998, 0.9999] },
-      "ml_layer_pr_auc": { "point": 0.9996, "ci": [0.9994, 0.9998] },
-      "adversarial_recall": { "point": 0.9760, "ci": [0.9620, 0.9880] },
-      "full_funnel_catch_rate": { "point": 0.9960, "ci": [0.9936, 0.9980] },
+      "pr_auc": {
+        "point": 0.9997,
+        "ci": [
+          0.9995,
+          0.9999
+        ]
+      },
+      "roc_auc": {
+        "point": 0.9999,
+        "ci": [
+          0.9998,
+          0.9999
+        ]
+      },
+      "ml_layer_pr_auc": {
+        "point": 0.9996,
+        "ci": [
+          0.9994,
+          0.9998
+        ]
+      },
+      "adversarial_recall": {
+        "point": 0.976,
+        "ci": [
+          0.962,
+          0.988
+        ]
+      },
+      "full_funnel_catch_rate": {
+        "point": 0.996,
+        "ci": [
+          0.9936,
+          0.998
+        ]
+      },
       "latency_seq": "9.08ms / 13.86ms",
       "latency_40rps": "28.06ms"
     },
     "static_4way_blend": {
       "name": "Static 4-Way Blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN)",
-      "pr_auc": { "point": 0.9991, "ci": [0.9983, 0.9997] },
-      "roc_auc": { "point": 0.9996, "ci": [0.9991, 0.9999] },
-      "ml_layer_pr_auc": { "point": 0.9984, "ci": [0.9974, 0.9992] },
-      "adversarial_recall": { "point": 0.9700, "ci": [0.9560, 0.9840] },
-      "full_funnel_catch_rate": { "point": 0.9957, "ci": [0.9933, 0.9980] },
+      "pr_auc": {
+        "point": 0.9991,
+        "ci": [
+          0.9983,
+          0.9997
+        ]
+      },
+      "roc_auc": {
+        "point": 0.9996,
+        "ci": [
+          0.9991,
+          0.9999
+        ]
+      },
+      "ml_layer_pr_auc": {
+        "point": 0.9984,
+        "ci": [
+          0.9974,
+          0.9992
+        ]
+      },
+      "adversarial_recall": {
+        "point": 0.97,
+        "ci": [
+          0.956,
+          0.984
+        ]
+      },
+      "full_funnel_catch_rate": {
+        "point": 0.9957,
+        "ci": [
+          0.9933,
+          0.998
+        ]
+      },
       "latency_seq": "9.42ms / 14.10ms",
       "latency_40rps": "29.15ms"
     },
     "persistence_gated_p2": {
       "name": "Persistence-Gated 4-Way Blend (Pareto Point P2)",
-      "pr_auc": { "point": 0.9963, "ci": [0.9944, 0.9979] },
-      "roc_auc": { "point": 0.9986, "ci": [0.9980, 0.9992] },
-      "ml_layer_pr_auc": { "point": 0.9958, "ci": [0.9938, 0.9975] },
-      "adversarial_recall": { "point": 0.9700, "ci": [0.9560, 0.9840] },
-      "full_funnel_catch_rate": { "point": 0.9957, "ci": [0.9933, 0.9980] },
+      "pr_auc": {
+        "point": 0.9963,
+        "ci": [
+          0.9944,
+          0.9979
+        ]
+      },
+      "roc_auc": {
+        "point": 0.9986,
+        "ci": [
+          0.998,
+          0.9992
+        ]
+      },
+      "ml_layer_pr_auc": {
+        "point": 0.9958,
+        "ci": [
+          0.9938,
+          0.9975
+        ]
+      },
+      "adversarial_recall": {
+        "point": 0.97,
+        "ci": [
+          0.956,
+          0.984
+        ]
+      },
+      "full_funnel_catch_rate": {
+        "point": 0.9957,
+        "ci": [
+          0.9933,
+          0.998
+        ]
+      },
       "latency_seq": "9.48ms / 14.20ms",
       "latency_40rps": "29.35ms"
     },
     "isolation_forest_standalone": {
       "name": "Isolation Forest Standalone (Unsupervised)",
-      "pr_auc": { "point": 0.9387, "ci": [0.9328, 0.9445] },
-      "roc_auc": { "point": 0.9722, "ci": [0.9694, 0.9748] }
+      "pr_auc": {
+        "point": 0.9387,
+        "ci": [
+          0.9328,
+          0.9445
+        ]
+      },
+      "roc_auc": {
+        "point": 0.9722,
+        "ci": [
+          0.9694,
+          0.9748
+        ]
+      }
     },
     "hetero_graphsage_standalone": {
       "name": "Heterogeneous GraphSAGE Standalone (Structural)",
-      "pr_auc": { "point": 0.8556, "ci": [0.8449, 0.8654] },
-      "roc_auc": { "point": 0.8764, "ci": [0.8673, 0.8847] }
+      "pr_auc": {
+        "point": 0.8556,
+        "ci": [
+          0.8449,
+          0.8654
+        ]
+      },
+      "roc_auc": {
+        "point": 0.8764,
+        "ci": [
+          0.8673,
+          0.8847
+        ]
+      }
     },
     "funnel_and_subsets": {
       "ambiguous_count": 9877,
       "adversarial_count": 500,
       "signal_lift": "3.33x",
-      "test_prevalence": 0.3000
+      "test_prevalence": 0.3
     }
   },
   "leave_one_attack_type_out": {
@@ -71,44 +185,65 @@
     "results": [
       {
         "component": "Dynamic Disagreement (Persistence-Gated P2)",
-        "unseen_recall": 0.7680,
-        "ci": [0.7340, 0.8040],
+        "unseen_recall": 0.768,
+        "ci": [
+          0.734,
+          0.804
+        ],
         "mechanism": "Compound Automation & Anomaly Bypass Gate"
       },
       {
         "component": "Isolation Forest Standalone (Unsupervised)",
-        "unseen_recall": 0.7520,
-        "ci": [0.7160, 0.7881],
+        "unseen_recall": 0.752,
+        "ci": [
+          0.716,
+          0.7881
+        ],
         "mechanism": "Unsupervised Anomaly Boundary (No labels required)"
       },
       {
         "component": "GNN / Cluster Risk Standalone (Structural)",
-        "unseen_recall": 0.2980,
-        "ci": [0.2560, 0.3360],
+        "unseen_recall": 0.298,
+        "ci": [
+          0.256,
+          0.336
+        ],
         "mechanism": "Relational Entity Graph Clustering"
       },
       {
         "component": "LightGBM Standalone (Supervised)",
-        "unseen_recall": 0.0900,
-        "ci": [0.0640, 0.1140],
+        "unseen_recall": 0.09,
+        "ci": [
+          0.064,
+          0.114
+        ],
         "mechanism": "Supervised Trees (Fails on unseen attack geometry)"
       },
       {
         "component": "CatBoost Standalone (Supervised)",
-        "unseen_recall": 0.0660,
-        "ci": [0.0460, 0.0880],
+        "unseen_recall": 0.066,
+        "ci": [
+          0.046,
+          0.088
+        ],
         "mechanism": "Supervised Trees (Fails on unseen attack geometry)"
       },
       {
         "component": "Tabular GBDT Blend (0.55 LGB / 0.45 CB)",
-        "unseen_recall": 0.0820,
-        "ci": [0.0580, 0.1060],
+        "unseen_recall": 0.082,
+        "ci": [
+          0.058,
+          0.106
+        ],
         "mechanism": "Supervised Tabular Blend"
       },
       {
         "component": "Static 4-Way Stacked Blend (0.45/0.35/0.10/0.10)",
-        "unseen_recall": 0.0820,
-        "ci": [0.0580, 0.1060],
+        "unseen_recall": 0.082,
+        "ci": [
+          0.058,
+          0.106
+        ],
         "mechanism": "Static Blend (0.80 supervised weight dilutes IF)"
       }
     ]
@@ -120,9 +255,9 @@
     "selected_operating_point": "P2",
     "selected_parameters": {
       "tau_if": 0.45,
-      "tau_sup": 0.40,
+      "tau_sup": 0.4,
       "theta_cvv": 3.0,
-      "theta_entropy": 0.60,
+      "theta_entropy": 0.6,
       "theta_time_s": 1.5,
       "theta_bin": 4.0,
       "theta_fanout_ip": 8.0,
@@ -131,15 +266,15 @@
     "pareto_frontier": [
       {
         "point": "P1",
-        "val_edge_fpr": 0.0720,
-        "val_cvv_recall": 0.7140,
-        "val_normal_fpr": 0.0000,
+        "val_edge_fpr": 0.072,
+        "val_cvv_recall": 0.714,
+        "val_normal_fpr": 0.0,
         "params": "(0.45, 0.40, 4.0, 0.60, 1.5s, 4.0, 8.0)"
       },
       {
         "point": "P2",
-        "val_edge_fpr": 0.0980,
-        "val_cvv_recall": 0.7580,
+        "val_edge_fpr": 0.098,
+        "val_cvv_recall": 0.758,
         "val_normal_fpr": 0.0011,
         "params": "(0.45, 0.40, 3.0, 0.60, 1.5s, 4.0, 8.0)",
         "is_selected": true
@@ -152,8 +287,8 @@
       "display_name": "Normal Genuine",
       "n_test": 6500,
       "base_rate": 0.0,
-      "tabular_fpr": 0.0000,
-      "static_4way_fpr": 0.0000,
+      "tabular_fpr": 0.0,
+      "static_4way_fpr": 0.0,
       "persistence_gated_fpr": 0.0009
     },
     {
@@ -161,9 +296,9 @@
       "display_name": "Edge-Case Genuine (VPN/Travelers)",
       "n_test": 500,
       "base_rate": 0.0,
-      "tabular_fpr": 0.0600,
-      "static_4way_fpr": 0.0560,
-      "persistence_gated_fpr": 0.1060,
+      "tabular_fpr": 0.06,
+      "static_4way_fpr": 0.056,
+      "persistence_gated_fpr": 0.106,
       "routing_action": "Soft-Risk UPI Recovery"
     },
     {
@@ -171,36 +306,108 @@
       "display_name": "Slow Distributed Carding",
       "n_test": 1000,
       "base_rate": 1.0,
-      "tabular_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] },
-      "static_4way_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] },
-      "persistence_gated_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] }
+      "tabular_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      },
+      "static_4way_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      },
+      "persistence_gated_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      }
     },
     {
       "segment": "burst",
       "display_name": "Rapid Burst Script Botnets",
       "n_test": 1000,
       "base_rate": 1.0,
-      "tabular_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] },
-      "static_4way_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] },
-      "persistence_gated_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] }
+      "tabular_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      },
+      "static_4way_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      },
+      "persistence_gated_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      }
     },
     {
       "segment": "adversarial_realistic",
       "display_name": "Adversarial Realistic Bots",
       "n_test": 500,
       "base_rate": 1.0,
-      "tabular_rec": { "point": 0.9760, "ci": [0.9620, 0.9880] },
-      "static_4way_rec": { "point": 0.9700, "ci": [0.9560, 0.9840] },
-      "persistence_gated_rec": { "point": 0.9700, "ci": [0.9560, 0.9840] }
+      "tabular_rec": {
+        "point": 0.976,
+        "ci": [
+          0.962,
+          0.988
+        ]
+      },
+      "static_4way_rec": {
+        "point": 0.97,
+        "ci": [
+          0.956,
+          0.984
+        ]
+      },
+      "persistence_gated_rec": {
+        "point": 0.97,
+        "ci": [
+          0.956,
+          0.984
+        ]
+      }
     },
     {
       "segment": "cvv_cycling",
       "display_name": "CVV Cycling (In-Domain)",
       "n_test": 500,
       "base_rate": 1.0,
-      "tabular_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] },
-      "static_4way_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] },
-      "persistence_gated_rec": { "point": 1.0000, "ci": [1.0000, 1.0000] }
+      "tabular_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      },
+      "static_4way_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      },
+      "persistence_gated_rec": {
+        "point": 1.0,
+        "ci": [
+          1.0,
+          1.0
+        ]
+      }
     }
   ],
   "wilcoxon_roc_auc_proof": {
@@ -212,9 +419,9 @@
         "stratum_id": 1,
         "description": "Clean Positives vs. Clean Negatives",
         "pair_count": 16250000,
-        "weight": 0.773810,
-        "empirical_auc": 1.000000,
-        "contribution": 0.773810
+        "weight": 0.77381,
+        "empirical_auc": 1.0,
+        "contribution": 0.77381
       },
       {
         "stratum_id": 2,
@@ -222,7 +429,7 @@
         "pair_count": 1250000,
         "weight": 0.059524,
         "empirical_auc": 0.999761,
-        "contribution": 0.059510
+        "contribution": 0.05951
       },
       {
         "stratum_id": 3,
@@ -243,7 +450,7 @@
     ],
     "derived_global_roc_auc": 0.999864,
     "empirical_scikit_learn_roc_auc": 0.999864,
-    "residual_difference": 0.00000000
+    "residual_difference": 0.0
   },
   "latency_budget": {
     "sequential_100_tx": {
@@ -258,5 +465,72 @@
       "p99_ms": 28.06,
       "sla_limit_ms": 50.0
     }
+  },
+  "governance_temporal_drift": {
+    "training_window": "Months 01\u201308 (N=4,000)",
+    "held_out_window": "Months 09\u201312 (N=2,000, frozen holdout)",
+    "static_baseline_held_out_recall": 0.0,
+    "static_baseline_collapse_month": "Month 07 (0.00% recall)",
+    "remediated_held_out_fraud_recall": {
+      "point": 0.6964,
+      "ci": [
+        0.6746,
+        0.754
+      ],
+      "month_09_recall": 0.881,
+      "month_10_recall": 0.746,
+      "month_11_recall": 0.6587,
+      "month_12_floor_recall": 0.5
+    },
+    "month_01_tradeoff": {
+      "remediated_recall": 0.9921,
+      "static_recall": 1.0,
+      "remediated_precision": 0.9542,
+      "static_precision": 0.9265,
+      "explanation": "Deliberate precision/recall tradeoff: multi-modal policy trades 1 edge fraud case (-0.79% recall) for +2.77% precision improvement to reduce legitimate buyer checkout friction."
+    },
+    "normal_genuine_fpr": {
+      "point": 0.0,
+      "ci": [
+        0.0,
+        0.0
+      ],
+      "false_positives": 0,
+      "total_evaluated": 1348
+    },
+    "edge_case_genuine_hard_negative_fpr": {
+      "point": 0.0811,
+      "ci": [
+        0.0378,
+        0.1243
+      ],
+      "false_positives": 12,
+      "total_evaluated": 148,
+      "small_n_caveat": "Each month has N=38 edge-case genuine transactions (7.5% of 500); month-level FPR variations reflect small-N binomial variance. The aggregate held-out statistic (N=148, 95% CI [3.78%, 12.43%]) is the canonical reference."
+    }
+  },
+  "governance_off_policy_eval": {
+    "evaluation_partition": "Full Governance Dataset (N=10,000)",
+    "doubly_robust_policy_value_rupees": 194.29,
+    "static_baseline_policy_value_rupees": -72.29,
+    "net_economic_lift_rupees": 266.58,
+    "direct_method_agreement": 0.972,
+    "ipw_clip_threshold": 20.0,
+    "sensitivity_analysis": {
+      "capped_5x_lift_rupees": 266.56,
+      "capped_20x_lift_rupees": 266.58,
+      "uncapped_lift_rupees": 266.58
+    }
+  },
+  "governance_reviewer_validation": {
+    "partition": "Frozen 15% Stratified Validation Slice (N=1,500)",
+    "precision": 0.9553,
+    "recall": 0.9978,
+    "fpr_normal_genuine": 0.0,
+    "fpr_edge_case_genuine": 0.06,
+    "six_gates_passed": 6,
+    "total_gates": 6,
+    "promotion_verdict": "RECOMMENDED_FOR_HUMAN_APPROVAL",
+    "human_sign_off_required": true
   }
 }

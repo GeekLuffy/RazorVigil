@@ -221,6 +221,62 @@ export const GENERATED_METRICS = Object.freeze({
     "mechanism": "Static Blend (0.80 supervised weight dilutes IF)"
   }
 ]),
+  governanceDrift: Object.freeze({
+  "training_window": "Months 01\u201308 (N=4,000)",
+  "held_out_window": "Months 09\u201312 (N=2,000, frozen holdout)",
+  "static_baseline_held_out_recall": 0.0,
+  "static_baseline_collapse_month": "Month 07 (0.00% recall)",
+  "remediated_held_out_fraud_recall": {
+    "point": 0.6964,
+    "ci": [
+      0.6746,
+      0.754
+    ],
+    "month_09_recall": 0.881,
+    "month_10_recall": 0.746,
+    "month_11_recall": 0.6587,
+    "month_12_floor_recall": 0.5
+  },
+  "month_01_tradeoff": {
+    "remediated_recall": 0.9921,
+    "static_recall": 1.0,
+    "remediated_precision": 0.9542,
+    "static_precision": 0.9265,
+    "explanation": "Deliberate precision/recall tradeoff: multi-modal policy trades 1 edge fraud case (-0.79% recall) for +2.77% precision improvement to reduce legitimate buyer checkout friction."
+  },
+  "normal_genuine_fpr": {
+    "point": 0.0,
+    "ci": [
+      0.0,
+      0.0
+    ],
+    "false_positives": 0,
+    "total_evaluated": 1348
+  },
+  "edge_case_genuine_hard_negative_fpr": {
+    "point": 0.0811,
+    "ci": [
+      0.0378,
+      0.1243
+    ],
+    "false_positives": 12,
+    "total_evaluated": 148,
+    "small_n_caveat": "Each month has N=38 edge-case genuine transactions (7.5% of 500); month-level FPR variations reflect small-N binomial variance. The aggregate held-out statistic (N=148, 95% CI [3.78%, 12.43%]) is the canonical reference."
+  }
+}),
+  governanceOpe: Object.freeze({
+  "evaluation_partition": "Full Governance Dataset (N=10,000)",
+  "doubly_robust_policy_value_rupees": 194.29,
+  "static_baseline_policy_value_rupees": -72.29,
+  "net_economic_lift_rupees": 266.58,
+  "direct_method_agreement": 0.972,
+  "ipw_clip_threshold": 20.0,
+  "sensitivity_analysis": {
+    "capped_5x_lift_rupees": 266.56,
+    "capped_20x_lift_rupees": 266.58,
+    "uncapped_lift_rupees": 266.58
+  }
+}),
 });
 
 export default GENERATED_METRICS;
