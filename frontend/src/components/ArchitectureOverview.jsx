@@ -263,13 +263,13 @@ export default function ArchitectureOverview() {
               </div>
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-slate-300 leading-relaxed">
                 <div className="text-indigo-300 font-bold mb-1">Theorem (Finite-Sample Validity):</div>
-                Let (X_i, Y_i)_{i=1}^n be exchangeable calibration pairs. With nonconformity score s_i = 1 - P(Y = y_i | X_i), the empirical quantile:
+                Let (X_i, Y_i) for i=1..n be exchangeable calibration pairs. With nonconformity score s_i = 1 - P(Y = y_i | X_i), the empirical quantile:
                 <div className="my-2 p-2 bg-slate-900 rounded text-emerald-400 text-center font-bold">
-                  q̂ = Quantile_{(n+1)(1-α)/n} (s_1, ..., s_n)
+                  q̂ = Quantile_((n+1)(1-α)/n) (s_1, ..., s_n)
                 </div>
-                Guarantees exact marginal coverage for test point (X_{'{'}n+1{'}'}, Y_{'{'}n+1{'}'}):
+                Guarantees exact marginal coverage for test point (X_(n+1), Y_(n+1)):
                 <div className="text-indigo-400 font-bold text-center mt-1">
-                  P( Y_{'{'}n+1{'}'} ∈ C(X_{'{'}n+1{'}'}) ) ≥ 1 - α
+                  P( Y_(n+1) ∈ C(X_(n+1)) ) ≥ 1 - α
                 </div>
               </div>
             </div>
@@ -298,9 +298,9 @@ export default function ArchitectureOverview() {
               </div>
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-slate-300 leading-relaxed">
                 <div className="text-emerald-300 font-bold mb-1">Bot Relay Interception Proof:</div>
-                Over quantized inter-keystroke intervals Δt_i = t_i - t_{'{'}i-1{'}'} in bins k=1..10:
+                Over quantized inter-keystroke intervals Δt_i = t_i - t_(i-1) in bins k=1..10:
                 <div className="my-2 p-2 bg-slate-900 rounded text-emerald-400 text-center font-bold">
-                  H(Δt) = -∑_{'{'}k=1{'}'}^K p_k · log_2(p_k)
+                  H(Δt) = -∑ (p_k · log_2(p_k))
                 </div>
                 Scripted bot relays execute with static delays (Δt ≈ 10ms) yielding H = 0.00 bits. Natural human typing exhibits high kinetic entropy (H &gt; 1.20 bits).
               </div>
@@ -320,7 +320,7 @@ export default function ArchitectureOverview() {
                   <div>• E[Loss | HardBlock] = P(Genuine) · (Margin · Amount + LTV)</div>
                 </div>
                 <div className="my-2 p-2 bg-slate-900 rounded text-amber-300 text-center font-bold">
-                  a* = argmin_{'{'}a ∈ {'{'}Pass, Recovery, Block{'}'}{'}'} E[Loss | a]
+                  a* = argmin [ a ∈ {'{Pass, Recovery, Block}'} ] E[Loss | a]
                 </div>
               </div>
             </div>
@@ -329,6 +329,7 @@ export default function ArchitectureOverview() {
       )}
 
       {/* Sub-Section 3: RBI Regulatory Compliance Matrix */}
+
       {activeSubSection === 'rbi' && (
         <div className="panel bg-slate-900/90 border border-slate-800 space-y-3 font-sans">
           <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-wider">
