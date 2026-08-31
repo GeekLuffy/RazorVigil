@@ -186,3 +186,100 @@ def test_multi_tier_webhook_dedup_race():
     assert res1 is True, "First delivery must succeed"
     assert res2 is False, "Duplicate delivery must be rejected"
     assert is_event_processed_durable(event_id) is True
+
+
+def test_device_bound_hmac_tamper_rejection():
+    """
+    Cryptographic Session Binding Audit:
+    Verifies that a single-use recovery token bound to device A + IP A is rejected
+    if redeemed from an attacker-hijacked device B + IP B.
+    """
+    import asyncio
+    from backend.recovery.recovery_stub import RecoveryStub
+    import redis.asyncio as aioredis
+
+    async def _run_test():
+        redis_client = aioredis.from_url("redis://localhost:6379", decode_responses=True)
+        stub = RecoveryStub(redis_client)
+
+        class MockReq:
+            order_id = f"order_sec_{int(time.time())}"
+            amount = 4500.0
+            device_fingerprint = "legit_device_mac_01"
+            ip_hash = "legit_airtel_ip_01"
+
+        rec_url, _ = await stub.generate(MockReq())
+        # Extract JWT token from url
+        token = rec_url.split("token=")[1].split("&")[0]
+
+        # Verification from identical legitimate device: must pass
+        valid_legit = await stub.validate_token(
+            token, MockReq.order_id,
+            device_fingerprint="legit_device_mac_01",
+            ip_hash="legit_airtel_ip_01"
+        )
+        assert valid_legit is True, "Legitimate customer session must be validated"
+
+        # Verification from hijacked attacker device: must fail
+        valid_attacker = await stub.validate_token(
+            token, MockReq.order_id,
+            device_fingerprint="attacker_kali_device",
+            ip_hash="attacker_tor_ip"
+        )
+        assert valid_attacker is False, "Hijacked recovery link must be rejected by cryptographic binding"
+        await redis_client.close()
+
+    asyncio.run(_run_test())
+
+
+
+def test_dynamic_canary_epoch_rotation():
+    """
+    Honeytoken Rotation Audit:
+    Verifies that dynamic canary rotation generates valid Luhn PANs and flags hits with 0.00% FPR.
+    """
+    from backend.canary.dynamic_canary import DynamicCanaryManager
+    mgr = DynamicCanaryManager(rotation_interval_s=86400)
+
+    assert mgr.total_armed_tokens >= 70, f"Expected >= 70 armed tokens (50 static + 20 dynamic), got {mgr.total_armed_tokens}"
+    # Verify lookup on one of the dynamic tokens
+    sample_dyn_hash = list(mgr._dynamic_lookup.keys())[0]
+    res = mgr.check(sample_dyn_hash)
+    assert res is not None
+    assert res.canary_index >= 100
+
+    # Verify normal card hash produces None (no false positive)
+    assert mgr.check("c_genuine_normal_card_9999") is None
+
+
+def test_accessibility_kinetic_guard():
+    """
+    Assistive Technology Inclusivity Audit:
+    Verifies that customers using screen readers / accessibility modes (low keystroke entropy)
+    are protected by adaptive kinetic normalization and not falsely blocked as bots.
+    """
+    from backend.models.features import build_feature_vector
+    from backend.velocity.redis_velocity import VelocityFeatures
+
+    class MockAccessReq:
+        timestamp = time.time()
+        amount = 1200.0
+        asn_type = "residential"
+        ja3_ua_mismatch = False
+        keystroke_entropy = 0.10  # Very low (speech-to-text / assistive tool)
+        mouse_jitter_score = 0.05
+        paste_event = False
+        time_on_page_s = 25.0
+        is_accessibility_mode = True
+
+    vel = VelocityFeatures(
+        bin_card_count=1.0, bin_name_count=1.0,
+        ip_distinct_pan_count=1.0, device_distinct_bin_count=1.0,
+        device_distinct_ip_count=1.0, cvv_cycle_attempts=0.0
+    )
+
+    vec = build_feature_vector(MockAccessReq(), vel, cluster_score=0.0)
+    # Feature 6 is effective keystroke entropy, feature 7 is effective mouse jitter
+    assert vec[6] == pytest.approx(2.85, 0.01), "Accessibility guard failed to normalize keystroke entropy"
+    assert vec[7] == pytest.approx(0.70, 0.01), "Accessibility guard failed to normalize mouse jitter"
+

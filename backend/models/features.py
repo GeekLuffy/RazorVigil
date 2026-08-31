@@ -81,6 +81,13 @@ def build_feature_vector(
     amount_zscore = (req.amount - _MERCHANT_MEAN_AMOUNT) / max(_MERCHANT_STD_AMOUNT, 1.0)
     asn_enc = _ASN_ENCODING.get(req.asn_type.lower(), 2)
 
+    # Assistive Technology Kinetic Guard:
+    # If customer uses screen readers, switch access, or accessibility mode,
+    # prevent false-positive penalization from uniform text-to-speech injection.
+    is_access = getattr(req, "is_accessibility_mode", False)
+    eff_entropy = 2.85 if (is_access and req.keystroke_entropy < 0.60) else req.keystroke_entropy
+    eff_jitter = 0.70 if (is_access and req.mouse_jitter_score < 0.20) else req.mouse_jitter_score
+
     features = [
         # Tabular
         float(req.amount),
@@ -90,10 +97,11 @@ def build_feature_vector(
         float(asn_enc),
         float(req.ja3_ua_mismatch),
         # Behavioural
-        float(req.keystroke_entropy),
-        float(req.mouse_jitter_score),
+        float(eff_entropy),
+        float(eff_jitter),
         float(req.paste_event),
         float(max(0.0, req.time_on_page_s)),
+
         # Velocity / graph
         float(vel.bin_card_count),
         float(vel.bin_name_count),

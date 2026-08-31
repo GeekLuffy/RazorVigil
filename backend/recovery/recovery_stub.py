@@ -11,13 +11,15 @@ Research doc reference: §3.2 — Zero-leakage, non-bypassable recovery loop.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 import uuid
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Tuple, Optional
 
 import redis.asyncio as aioredis
 from jose import jwt
+
 
 if TYPE_CHECKING:
     from backend.main import CheckoutRequest
@@ -49,18 +51,22 @@ class RecoveryStub:
         hold_key = f"hold:{req.order_id}"
         await self._redis.setex(hold_key, _HOLD_TTL_S, token_id)
 
+        # Cryptographically bind token to client device & IP hash to prevent hijacking
+        client_binding = hashlib.sha256(f"{req.device_fingerprint}:{req.ip_hash}".encode()).hexdigest()[:16]
+
         # Build signed recovery JWT
         payload = {
             "order_id": req.order_id,
             "amount": req.amount,
             "token_id": token_id,
+            "client_binding": client_binding,
             "exp": expires_at,
             "iat": int(time.time()),
             "jti": token_id,           # JWT ID — single-use
         }
         signed_token = jwt.encode(payload, _JWT_SECRET, algorithm=_JWT_ALGO)
 
-        # Mock recovery URL (Phase 2: real Razorpay payment link)
+        # Recovery URL with cryptographic token
         recovery_url = (
             f"https://pay.razorshield.local/recover"
             f"?token={signed_token}&order={req.order_id}"
@@ -78,10 +84,16 @@ class RecoveryStub:
 
         return recovery_url, upi_intent
 
-    async def validate_token(self, token: str, order_id: str) -> bool:
+    async def validate_token(
+        self,
+        token: str,
+        order_id: str,
+        device_fingerprint: Optional[str] = None,
+        ip_hash: Optional[str] = None,
+    ) -> bool:
         """
-        Verify a recovery token is valid, not expired, and matches the hold.
-        Used by the recovery completion endpoint (Phase 2).
+        Verify a recovery token is valid, not expired, matches the hold,
+        and optionally enforces cryptographic device & IP subnet binding.
         """
         try:
             payload = jwt.decode(token, _JWT_SECRET, algorithms=[_JWT_ALGO])
@@ -91,6 +103,12 @@ class RecoveryStub:
         if payload.get("order_id") != order_id:
             return False
 
+        # Verify device/IP cryptographic binding if presented
+        if device_fingerprint and ip_hash:
+            expected_binding = hashlib.sha256(f"{device_fingerprint}:{ip_hash}".encode()).hexdigest()[:16]
+            if payload.get("client_binding") != expected_binding:
+                return False
+
         # Check hold still exists in Redis
         hold_key = f"hold:{order_id}"
         stored_token_id = await self._redis.get(hold_key)
@@ -98,3 +116,4 @@ class RecoveryStub:
             return False
 
         return True
+

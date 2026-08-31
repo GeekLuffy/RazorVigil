@@ -226,6 +226,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         mouse_jitter_score: Math.max(liveJitter, 0.68),
         paste_event: false,
         time_on_page_s: timeOnPage,
+        is_accessibility_mode: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
       }
     } else if (activePreset === 'vpn') {
       payload = {

@@ -131,8 +131,10 @@ class CheckoutRequest(BaseModel):
     mouse_jitter_score: float = 0.0
     paste_event: bool = False
     time_on_page_s: float = 0.0
+    is_accessibility_mode: bool = False
 
     session_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
     pan_hash: str = ""
 
 
