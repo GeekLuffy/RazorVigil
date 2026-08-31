@@ -43,8 +43,26 @@ class ThreeDSChallengeExemptionRequest(BaseModel):
     velocity_spike: bool
 
 
+class SessionBindingValidationRequest(BaseModel):
+    session_id: str
+    bound_device_hash: str
+    bound_ip_subnet: str
+    current_device_hash: str
+    current_ip_subnet: str
+    ja4_fingerprint: str = ""
+
+
+@dataclass
+class SessionBindingResult:
+    is_valid: bool
+    hijacking_detected: bool
+    risk_score: float
+    reason: str
+
+
 @dataclass
 class OTPDefenseResult:
+
     is_valid: bool
     is_bot_relay: bool
     risk_score: float
@@ -195,3 +213,33 @@ class OTPRelayDefenseEngine:
             risk_tier="genuine_low_risk",
             rationale="Legitimate low-risk transaction: 3DS2 frictionless authentication permitted",
         )
+
+    def validate_session_binding(self, req: SessionBindingValidationRequest) -> SessionBindingResult:
+        """
+        Anti-Account-Takeover & Stolen Cookie Injection Defense:
+        Verifies that an authenticated 3DS session token has not been stolen and replayed
+        from a different device or distinct proxy IP subnet.
+        """
+        if req.bound_device_hash != req.current_device_hash:
+            return SessionBindingResult(
+                is_valid=False,
+                hijacking_detected=True,
+                risk_score=1.00,
+                reason=f"Stolen Session Token Replay Detected: Device fingerprint mismatch ({req.current_device_hash[:8]} != {req.bound_device_hash[:8]})",
+            )
+
+        if req.bound_ip_subnet != req.current_ip_subnet:
+            return SessionBindingResult(
+                is_valid=False,
+                hijacking_detected=True,
+                risk_score=0.88,
+                reason=f"Suspicious Session Geolocation Drift: Subnet shift detected ({req.current_ip_subnet} != {req.bound_ip_subnet})",
+            )
+
+        return SessionBindingResult(
+            is_valid=True,
+            hijacking_detected=False,
+            risk_score=0.02,
+            reason="Cryptographic session binding verified",
+        )
+

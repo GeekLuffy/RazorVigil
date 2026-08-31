@@ -391,5 +391,27 @@ def test_3ds2_frictionless_downgrade_rejection():
     assert res.risk_tier == "high_risk_downgrade_attempt"
 
 
+def test_session_cookie_hijacking_rejection():
+    """
+    Session Cookie Hijacking Audit:
+    Verifies that stolen authenticated session tokens replayed on a different device fingerprint are rejected.
+    """
+    from backend.decision.otp_defense import OTPRelayDefenseEngine, SessionBindingValidationRequest
+
+    engine = OTPRelayDefenseEngine()
+    req = SessionBindingValidationRequest(
+        session_id="sess_auth_3ds_99",
+        bound_device_hash="fp_macbook_user_real",
+        bound_ip_subnet="122.161.44.0/24",
+        current_device_hash="fp_hacker_kali_linux",
+        current_ip_subnet="185.220.101.0/24",
+    )
+    res = engine.validate_session_binding(req)
+    assert res.is_valid is False
+    assert res.hijacking_detected is True
+    assert res.risk_score == 1.00
+
+
+
 
 

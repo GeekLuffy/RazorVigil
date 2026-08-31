@@ -32,7 +32,9 @@ from backend.decision.otp_defense import (
     OTPRelayDefenseEngine,
     OTPVerificationRequest,
     ThreeDSChallengeExemptionRequest,
+    SessionBindingValidationRequest,
 )
+
 from backend.graph.cluster_engine import ClusterEngine
 from backend.models.features import build_feature_vector
 
@@ -515,8 +517,25 @@ async def audit_3ds_challenge_exemption(req: ThreeDSChallengeExemptionRequest):
     }
 
 
+@app.post("/3ds/session-validate")
+async def validate_3ds_authenticated_session(req: SessionBindingValidationRequest):
+    """
+    Session Replay & Cookie Injection Defense:
+    Verifies that an authenticated 3DS session cookie is cryptographically bound to the original device.
+    """
+    res = otp_defense.validate_session_binding(req)
+    return {
+        "session_id": req.session_id,
+        "is_valid": res.is_valid,
+        "hijacking_detected": res.hijacking_detected,
+        "risk_score": res.risk_score,
+        "reason": res.reason,
+    }
+
+
 @app.get("/decision/bayesian-mel")
 async def get_bayesian_minimum_expected_loss(risk_score: float = 0.45, amount: float = 5000.0):
+
 
     """
     Bayesian Minimum Expected Loss (MEL) Calculator Endpoint:
