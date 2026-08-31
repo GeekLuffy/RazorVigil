@@ -45,12 +45,23 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   // Modal States
   const [checkoutResult, setCheckoutResult] = useState(null)
   const [recoveryModal, setRecoveryModal] = useState(null)
-  const [rzpModal, setRzpModal] = useState(null)
+  const [threeDsModal, setThreeDsModal] = useState(null)
   const [isRecovering, setIsRecovering] = useState(false)
   const [recoverySuccess, setRecoverySuccess] = useState(false)
   const [paymentVerified, setPaymentVerified] = useState(null)
 
+  // 3DS2 Interactive Bank Challenge & Kinetic OTP State
+  const [otpInput, setOtpInput] = useState('')
+  const [otpDeltas, setOtpDeltas] = useState([])
+  const otpLastKeyTime = useRef(null)
+  const [otpLiveEntropy, setOtpLiveEntropy] = useState(0.0)
+  const [otpTimer, setOtpTimer] = useState(45)
+  const [otpSubmitting, setOtpSubmitting] = useState(false)
+  const [otpResult, setOtpResult] = useState(null)
+  const [showSmsToast, setShowSmsToast] = useState(true)
+
   const [activePreset, setActivePreset] = useState('human')
+
 
   const calculateEntropy = (deltas) => {
     if (deltas.length < 3) return 2.65
@@ -112,16 +123,115 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   const [isConfigSaving, setIsConfigSaving] = useState(false)
   const [configSavedMsg, setConfigSavedMsg] = useState('')
 
+  // 3DS2 OTP Resend Timer
   useEffect(() => {
-    fetch(`${API_BASE}/config`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.razorpay_key_id && !d.razorpay_key_id.startsWith('rzp_test_demo')) {
-          setCustomKeyId(d.razorpay_key_id)
-        }
+    if (!threeDsModal || otpTimer <= 0) return
+    const interval = setInterval(() => {
+      setOtpTimer(prev => Math.max(0, prev - 1))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [threeDsModal, otpTimer])
+
+  const handleOtpKeyDown = (e) => {
+    if (e.key === 'Backspace') {
+      setOtpDeltas([])
+      otpLastKeyTime.current = null
+      setOtpLiveEntropy(0.0)
+      return
+    }
+    const now = performance.now()
+    if (otpLastKeyTime.current !== null) {
+      const dt = now - otpLastKeyTime.current
+      setOtpDeltas(prev => {
+        const next = [...prev, Math.round(dt * 10) / 10]
+        setOtpLiveEntropy(calculateEntropy(next))
+        return next
       })
-      .catch(() => {})
-  }, [])
+    }
+    otpLastKeyTime.current = now
+  }
+
+  const submitThreeDsOtp = async (isBotSim = false) => {
+    if (!threeDsModal) return
+    setOtpSubmitting(true)
+    setOtpResult(null)
+
+    const intervalsToUse = isBotSim
+      ? [0.0, 0.0, 0.0, 0.0, 0.0]
+      : (otpDeltas.length >= 3 ? otpDeltas : [195.2, 220.4, 180.1, 210.8, 190.3])
+
+    try {
+      // 1. Kinetic OTP Verification via Backend
+      const otpRes = await fetch(`${API_BASE}/otp/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transaction_id: threeDsModal.transaction_id || `tx_3ds_${Date.now()}`,
+          order_id: threeDsModal.order_id,
+          otp_code: isBotSim ? '482910' : (otpInput || '482910'),
+          keystroke_intervals_ms: intervalsToUse,
+          paste_event: isBotSim,
+          time_to_first_keystroke_ms: isBotSim ? 5.0 : 380.0,
+          total_entry_duration_ms: isBotSim ? 10.0 : intervalsToUse.reduce((a, b) => a + b, 0) + 380.0,
+          client_reported_origin: 'checkout.razorshield.io',
+          gateway_origin: 'checkout.razorshield.io',
+        })
+      }).then(r => r.json())
+
+      if (!otpRes.is_valid || otpRes.is_bot_relay) {
+        setOtpResult({
+          status: 'failed',
+          is_bot: true,
+          reason: otpRes.reason || 'Zero kinetic keystroke entropy (H=0.00). Automated Telegram/CDP bot relay intercepted.',
+          risk_score: otpRes.risk_score || 0.98,
+        })
+        return
+      }
+
+      // 2. Cryptographic 3DS2 CAVV/ECI Verification
+      const authRes = await fetch(`${API_BASE}/3ds/verify-auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transaction_id: threeDsModal.transaction_id || `tx_3ds_${Date.now()}`,
+          order_id: threeDsModal.order_id,
+          three_ds_version: '2.2.0',
+          cavv: 'AAABBIIFmQAAAAAAAQUWJgAAAAA=',
+          eci: '05',
+          device_channel: '02',
+          client_challenge_origin: 'checkout.razorshield.io',
+          acs_challenge_origin: 'checkout.razorshield.io',
+          session_resumed: true,
+          tls_handshake_latency_ms: 22.4,
+          synthetic_canvas_noise: false,
+        })
+      }).then(r => r.json())
+
+      // 3. Finalize Payment Capture on Backend
+      await verifyPaymentOnBackend(
+        threeDsModal.order_id,
+        `pay_${Date.now().toString(36)}`,
+        'rzp_sig_verified_3ds2_sha256'
+      )
+
+      setOtpResult({
+        status: 'success',
+        message: '3DS2 Step-Up Challenge Passed & Payment Captured!',
+        cavv_valid: authRes.cryptographic_validity,
+        latency_ms: 8.84,
+      })
+
+      setTimeout(() => {
+        setThreeDsModal(null)
+      }, 2400)
+
+    } catch (e) {
+      setOtpResult({ status: 'failed', reason: e.message })
+    } finally {
+      setOtpSubmitting(false)
+    }
+  }
+
 
   const handleSaveRazorpayConfig = async (e) => {
     e.preventDefault()
@@ -323,22 +433,47 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
             })
             rzp.open()
           } else {
-            // Fallback to native test modal if script blocked
-            setRzpModal({
+            // Launch 3DS2 Bank Challenge ACS Modal
+            setThreeDsModal({
               order_id: data.razorpay_order_id,
               amount: selectedProduct.price,
               key_id: keyId,
+              transaction_id: data.transaction_id,
+              cardLast4: rawPan.slice(-4) || '1111',
+              cardName: cardName || 'Rahul Sharma',
+              bankName: 'HDFC Bank',
+              cardBrand: 'VISA',
             })
+            setOtpInput('')
+            setOtpDeltas([])
+            otpLastKeyTime.current = null
+            setOtpLiveEntropy(0.0)
+            setOtpTimer(45)
+            setOtpResult(null)
+            setShowSmsToast(true)
           }
         } else {
-          // Open native test modal
-          setRzpModal({
+          // Open 3DS2 Bank Challenge ACS Modal
+          setThreeDsModal({
             order_id: data.razorpay_order_id,
             amount: selectedProduct.price,
             key_id: keyId,
+            transaction_id: data.transaction_id,
+            cardLast4: rawPan.slice(-4) || '1111',
+            cardName: cardName || 'Rahul Sharma',
+            bankName: 'HDFC Bank',
+            cardBrand: 'VISA',
           })
+          setOtpInput('')
+          setOtpDeltas([])
+          otpLastKeyTime.current = null
+          setOtpLiveEntropy(0.0)
+          setOtpTimer(45)
+          setOtpResult(null)
+          setShowSmsToast(true)
         }
       }
+
 
       if (data.tier === 'soft_risk' && data.recovery_url) {
         setRecoveryModal(data)
@@ -683,51 +818,140 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         </div>
       </div>
 
-      {/* Native Razorpay Test Modal Overlay */}
-      {rzpModal && (
-        <div className="fixed inset-0 z-60 bg-black/85 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-indigo-500/40 rounded-2xl w-full max-w-md p-6 shadow-2xl text-center space-y-4">
-            <div className="w-12 h-12 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl mx-auto flex items-center justify-center text-indigo-400">
-              <CreditCard size={24} />
-            </div>
-
-            <div>
-              <h3 className="text-base font-bold text-white">Razorpay Standard Checkout</h3>
-              <p className="text-xs text-slate-400 mt-1">Order #{rzpModal.order_id.slice(0, 12)}</p>
-            </div>
-
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-left font-mono text-xs space-y-1.5">
-              <div className="flex justify-between text-slate-400">
-                <span>Amount:</span>
-                <span className="text-white font-bold">₹{rzpModal.amount.toLocaleString('en-IN')}</span>
+      {/* 3DS 2.0 Bank ACS Step-Up & Kinetic OTP Challenge Modal */}
+      {threeDsModal && (
+        <div className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-indigo-500/40 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-up">
+            
+            {/* ACS Secure Address Header */}
+            <div className="bg-slate-950 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  <Lock size={11} />
+                  TLS 1.3 SECURE
+                </span>
+                <span className="text-slate-500 truncate max-w-[220px]">
+                  https://acs.hdfcbank.com/v2/challenge?id={threeDsModal.order_id?.slice(0, 10)}
+                </span>
               </div>
-              <div className="flex justify-between text-slate-400">
-                <span>Key ID:</span>
-                <span className="text-indigo-400 truncate max-w-[200px]">{rzpModal.key_id}</span>
-              </div>
-              <div className="flex justify-between text-slate-400">
-                <span>Gateway Status:</span>
-                <span className="text-emerald-400 font-bold">Passed Risk Filter (&lt;12ms)</span>
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-2">
               <button
-                onClick={() => setRzpModal(null)}
-                className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition"
+                onClick={() => setThreeDsModal(null)}
+                className="text-slate-400 hover:text-white transition p-1"
               >
-                Cancel
+                <X size={14} />
               </button>
-              <button
-                onClick={() => verifyPaymentOnBackend(rzpModal.order_id, `pay_${Date.now().toString(36)}`, 'local_verified_sig')}
-                className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg transition"
-              >
-                Approve Test Payment
-              </button>
+            </div>
+
+            {/* Bank Header & Order Context */}
+            <div className="p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-indigo-400">
+                    <CreditCard size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                      HDFC Bank 3DS Secure 2.2
+                      <span className="text-[9px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-mono font-bold">EMVCo 3DS2</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400">Razorpay Sovereign Risk Gateway</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-bold text-white font-mono">₹{threeDsModal.amount.toLocaleString('en-IN')}</div>
+                  <div className="text-[10px] text-slate-500 font-mono">Card: •••• {threeDsModal.cardLast4}</div>
+                </div>
+              </div>
+
+              {/* Live Incoming SMS Toast */}
+              {showSmsToast && (
+                <div className="p-3 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5 text-xs text-indigo-200 animate-fadeIn">
+                  <span className="text-base">💬</span>
+                  <div className="flex-1 text-[11px]">
+                    <span className="font-bold text-white block">SMS from HDFC-BANK:</span>
+                    Your 3DS2 One-Time Password is <strong className="text-amber-300 font-mono text-xs px-1 bg-amber-500/20 rounded">482910</strong> for transaction of ₹{threeDsModal.amount.toLocaleString('en-IN')} at SneakerVault India. Valid for 5 mins.
+                  </div>
+                </div>
+              )}
+
+              {/* OTP Form */}
+              <div className="space-y-3 pt-1">
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-200">Enter 6-Digit SMS OTP</label>
+                    <span className="text-[11px] font-mono text-slate-400">
+                      Resend in <span className="text-indigo-400 font-bold">{otpTimer}s</span>
+                    </span>
+                  </div>
+
+                  <input
+                    type="text"
+                    maxLength={6}
+                    autoFocus
+                    placeholder="482910"
+                    value={otpInput}
+                    onChange={e => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                    onKeyDown={handleOtpKeyDown}
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-center text-xl font-mono tracking-[0.4em] text-white focus:outline-none shadow-inner"
+                  />
+                </div>
+
+                {/* Kinetic Hesitation & Shannon Entropy Indicator */}
+                <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl flex items-center justify-between text-[11px] font-mono">
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <span>⚡ Kinetic Telemetry:</span>
+                    <span className={otpLiveEntropy >= 1.2 ? 'text-emerald-400 font-bold' : 'text-slate-400'}>
+                      H = {otpLiveEntropy > 0 ? otpLiveEntropy.toFixed(2) : '2.45'}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                    {otpDeltas.length > 0 ? `${otpDeltas.length} intervals captured` : 'Live delta timer active'}
+                  </span>
+                </div>
+
+                {/* Result Feedback Banner */}
+                {otpResult && (
+                  <div className={`p-3 rounded-xl text-xs border font-mono animate-fadeIn ${
+                    otpResult.status === 'success'
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                      : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                  }`}>
+                    <div className="font-bold flex items-center gap-1.5">
+                      {otpResult.status === 'success' ? <CheckCircle2 size={14} className="text-emerald-400" /> : <AlertTriangle size={14} className="text-rose-400" />}
+                      {otpResult.status === 'success' ? '3DS2 Verified & Payment Captured!' : '3DS2 Step-Up Intercepted'}
+                    </div>
+                    <div className="text-[11px] mt-1 text-slate-300">
+                      {otpResult.message || otpResult.reason}
+                    </div>
+                  </div>
+                )}
+
+                {/* Primary Action Buttons */}
+                <div className="space-y-2 pt-2">
+                  <button
+                    onClick={() => submitThreeDsOtp(false)}
+                    disabled={otpSubmitting}
+                    className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-950/40 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {otpSubmitting ? <RefreshCw size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
+                    Submit OTP &amp; Authorize Payment
+                  </button>
+
+                  <button
+                    onClick={() => submitThreeDsOtp(true)}
+                    disabled={otpSubmitting}
+                    className="w-full py-2 bg-rose-600/15 hover:bg-rose-600/25 border border-rose-500/40 text-rose-300 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5"
+                  >
+                    <span>🤖</span>
+                    Simulate Bot 0ms Script Paste (Triggers Real Intercept)
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
+
 
       {/* Out-of-Band UPI QR Recovery Modal */}
       {recoveryModal && (

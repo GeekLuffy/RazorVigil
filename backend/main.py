@@ -509,6 +509,21 @@ async def verify_3ds_otp(req: OTPVerificationRequest):
     Intercepts automated Telegram OTP grabbers, SIM swap relays, and Modlishka/Evilginx proxies.
     """
     res = otp_defense.evaluate_otp_entry(req)
+
+    await _broadcast({
+        "type": "3ds_otp_evaluation",
+        "transaction_id": req.transaction_id,
+        "order_id": req.order_id,
+        "is_valid": res.is_valid,
+        "is_bot_relay": res.is_bot_relay,
+        "risk_score": res.risk_score,
+        "reason": res.reason,
+        "entropy": res.entropy,
+        "mean_interval_ms": res.mean_interval_ms,
+        "timestamp": time.time(),
+        "message": f"3DS2 Step-Up {'PASSED (Human Verified)' if res.is_valid else 'INTERCEPTED (Bot Relay Blocked)'}: {res.reason}",
+    })
+
     return {
         "transaction_id": req.transaction_id,
         "is_valid": res.is_valid,
@@ -563,6 +578,19 @@ async def verify_3ds_auth_payload(req: ThreeDSAuthPayload):
     fake CAVV/ECI injections, and Python requests TLS Client Hello impersonation.
     """
     res = three_ds_verifier.verify_auth_payload(req)
+
+    await _broadcast({
+        "type": "3ds_auth_verification",
+        "transaction_id": req.transaction_id,
+        "is_authorized": res.is_authorized,
+        "is_bypassed": res.is_bypassed_or_forged,
+        "risk_score": res.risk_score,
+        "verdict": res.verdict,
+        "failure_reason": res.failure_reason,
+        "timestamp": time.time(),
+        "message": f"3DS2 Cryptographic Auth: {res.verdict} (CAVV Valid: {res.cryptographic_validity})",
+    })
+
     return {
         "transaction_id": req.transaction_id,
         "is_authorized": res.is_authorized,
@@ -572,6 +600,7 @@ async def verify_3ds_auth_payload(req: ThreeDSAuthPayload):
         "failure_reason": res.failure_reason,
         "cryptographic_validity": res.cryptographic_validity,
     }
+
 
 
 @app.get("/decision/bayesian-mel")
