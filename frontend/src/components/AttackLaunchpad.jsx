@@ -121,10 +121,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
           await new Promise(r => setTimeout(r, 100))
         }
         setLastActionStatus('Rotating Residential Proxy Autohitter Blocked via Device Fanout & Louvain Graph Ring')
+      } else if (type === 'otp_relay') {
+        // Test 3DS2 OTP-Relay Interception: Simulated Evilginx / Modlishka reverse-proxy bot injecting OTP in <20ms
+        const otpRes = await fetch(`${API_BASE}/otp/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transaction_id: `tx_otp_relay_${Date.now()}`,
+            order_id: `order_3ds_${Date.now()}`,
+            otp_code: '482910',
+            keystroke_intervals_ms: [8.5, 9.2, 8.8, 9.0, 8.7],
+            paste_event: true,
+            time_to_first_keystroke_ms: 12.0,
+            total_entry_duration_ms: 45.0,
+            device_fingerprint: 'fp_evilginx_mitm_node',
+            ip_hash: 'ip_mitm_relay_01'
+          })
+        }).then(r => r.json())
+        setLastActionStatus(`3DS2 OTP-Relay MITM Neutralized: ${otpRes.reason} (Risk: ${otpRes.risk_score.toFixed(2)})`)
       }
     } catch (e) {
       setLastActionStatus(`Error: ${e.message}`)
     } finally {
+
       setLoadingAction(null)
     }
   }
@@ -192,7 +211,17 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
             🌐 Rotating Proxies (6x Swarm)
           </button>
 
+          <button
+            disabled={loadingAction !== null}
+            onClick={() => sendAttack('otp_relay')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-bold transition disabled:opacity-50 shadow-sm"
+          >
+            {loadingAction === 'otp_relay' ? <Loader2 size={13} className="animate-spin" /> : <span>🔐</span>}
+            3DS2 OTP-Relay Intercept
+          </button>
+
           {onTriggerStoreDemo && (
+
             <button
               onClick={onTriggerStoreDemo}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-bold transition shadow-sm"

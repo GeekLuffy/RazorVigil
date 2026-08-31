@@ -283,3 +283,67 @@ def test_accessibility_kinetic_guard():
     assert vec[6] == pytest.approx(2.85, 0.01), "Accessibility guard failed to normalize keystroke entropy"
     assert vec[7] == pytest.approx(0.70, 0.01), "Accessibility guard failed to normalize mouse jitter"
 
+
+def test_3ds2_otp_relay_botnet_interception():
+    """
+    3DS2 OTP-Relay Interception Audit:
+    Verifies that programmatic Telegram OTP injection bots (<15ms interval) are intercepted.
+    """
+    from backend.decision.otp_defense import OTPRelayDefenseEngine, OTPVerificationRequest
+
+    engine = OTPRelayDefenseEngine()
+
+    # 1. Scripted bot entry: 10ms uniform intervals
+    bot_req = OTPVerificationRequest(
+        transaction_id="tx_bot_otp_01",
+        order_id="order_3ds_01",
+        otp_code="938102",
+        keystroke_intervals_ms=[10.0, 10.2, 9.8, 10.1, 10.0],
+        paste_event=False,
+        time_to_first_keystroke_ms=15.0,
+        total_entry_duration_ms=50.1,
+    )
+    res_bot = engine.evaluate_otp_entry(bot_req)
+    assert res_bot.is_bot_relay is True, "Bot OTP relay failed to be detected"
+    assert res_bot.is_valid is False
+    assert res_bot.risk_score >= 0.90
+
+    # 2. Human genuine entry: natural variable intervals
+    human_req = OTPVerificationRequest(
+        transaction_id="tx_human_otp_01",
+        order_id="order_3ds_02",
+        otp_code="482910",
+        keystroke_intervals_ms=[180.0, 240.0, 150.0, 310.0, 190.0],
+        paste_event=False,
+        time_to_first_keystroke_ms=850.0,
+        total_entry_duration_ms=1070.0,
+    )
+    res_human = engine.evaluate_otp_entry(human_req)
+    assert res_human.is_bot_relay is False, "Genuine human OTP entry falsely flagged"
+    assert res_human.is_valid is True
+    assert res_human.risk_score < 0.20
+
+
+def test_bayesian_minimum_expected_loss_optimization():
+    """
+    Bayesian MEL Audit:
+    Verifies that the Bayesian loss calculator selects optimal financial actions based on risk and amounts.
+    """
+    from backend.decision.tiering import DecisionEngine
+    engine = DecisionEngine()
+
+    # 1. Very Low risk (1% on ₹2000): Optimal action must be 'pass' (loss_pass = ₹32 < friction ₹44.5)
+    low_risk = engine.compute_bayesian_loss(risk_score=0.01, amount=2000.0)
+    assert low_risk["optimal_action"] == "pass"
+
+    # 2. Soft risk (45% on ₹10,000 item): Optimal action must be 'recovery' (UPI QR rescue)
+    soft_risk = engine.compute_bayesian_loss(risk_score=0.45, amount=10000.0)
+    assert soft_risk["optimal_action"] == "recovery"
+    assert soft_risk["net_financial_savings_vs_pass"] > 0
+
+    # 3. Extreme risk (95% on ₹50,000 carding attack): High financial savings vs pass
+    high_risk = engine.compute_bayesian_loss(risk_score=0.95, amount=50000.0)
+    assert high_risk["net_financial_savings_vs_pass"] > 40000.0
+
+
+

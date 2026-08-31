@@ -26,6 +26,7 @@ from backend.agent.attestation import AgentAttestationValidator
 from backend.canary.canary_cards import CanaryCards
 from backend.copilot.fraud_analyst import generate_investigation_note
 from backend.decision.tiering import DecisionEngine
+from backend.decision.otp_defense import OTPRelayDefenseEngine, OTPVerificationRequest
 from backend.graph.cluster_engine import ClusterEngine
 from backend.models.features import build_feature_vector
 from backend.models.inference import RiskScorer
@@ -43,6 +44,8 @@ risk_scorer: RiskScorer
 decision_engine: DecisionEngine
 recovery_stub: RecoveryStub
 canary_cards: CanaryCards
+otp_defense: OTPRelayDefenseEngine = OTPRelayDefenseEngine()
+
 agent_validator: AgentAttestationValidator
 razorpay_client: RazorpayClient
 anti_checker: AntiCheckerGuard
@@ -467,8 +470,39 @@ async def checkout_shadow_mode(req: CheckoutRequest):
 
 
 
+@app.post("/otp/verify")
+async def verify_3ds_otp(req: OTPVerificationRequest):
+    """
+    3DS2 & OTP Relay Bypass Defense:
+    Evaluates kinetic keystroke dynamics and clipboard injection during 3DS step-up authentication.
+    Intercepts automated Telegram OTP grabbers, SIM swap relays, and Modlishka/Evilginx proxies.
+    """
+    res = otp_defense.evaluate_otp_entry(req)
+    return {
+        "transaction_id": req.transaction_id,
+        "is_valid": res.is_valid,
+        "is_bot_relay": res.is_bot_relay,
+        "risk_score": res.risk_score,
+        "reason": res.reason,
+        "kinetic_metrics": {
+            "entropy": res.entropy,
+            "mean_interval_ms": res.mean_interval_ms,
+        },
+    }
+
+
+@app.get("/decision/bayesian-mel")
+async def get_bayesian_minimum_expected_loss(risk_score: float = 0.45, amount: float = 5000.0):
+    """
+    Bayesian Minimum Expected Loss (MEL) Calculator Endpoint:
+    Computes mathematical expected loss across Pass vs. Recovery vs. Hard-Block decisions.
+    """
+    return decision_engine.compute_bayesian_loss(risk_score=risk_score, amount=amount)
+
+
 # In-memory transaction registry for deep forensics & MCP delegation
 transaction_store: dict[str, dict[str, Any]] = {}
+
 
 
 @app.get("/agent/demo-token")

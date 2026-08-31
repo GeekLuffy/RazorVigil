@@ -13,9 +13,10 @@ Research doc tiers:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Tuple, Any
 
 if TYPE_CHECKING:
+
     from backend.main import CheckoutRequest
 
 # Tier thresholds
@@ -183,3 +184,46 @@ class DecisionEngine:
             f"Risk {score:.2%} — high-confidence bot. "
             f"Silent honeypot response issued. Cluster from IP {req.ip_hash[:8]}... blocked."
         )
+
+    def compute_bayesian_loss(
+        self,
+        risk_score: float,
+        amount: float,
+        merchant_margin: float = 0.15,
+        chargeback_fine: float = 1200.0,
+        customer_ltv_loss: float = 1500.0,
+    ) -> dict[str, Any]:
+        """
+        Bayesian Minimum Expected Loss (MEL) Calculator.
+        Computes expected monetary rupee loss for each possible action:
+        - E[Loss | Pass] = P(Fraud) * (Amount + Chargeback Fine)
+        - E[Loss | Recovery] = P(Genuine) * (Amount * 0.01 Friction Penalty)
+        - E[Loss | HardBlock] = P(Genuine) * (Amount * Margin + Customer LTV Loss)
+        """
+        p_fraud = max(0.0, min(1.0, risk_score))
+        p_genuine = 1.0 - p_fraud
+
+        # 1. Pass Loss: P(Fraud) * (Transaction Amount + Chargeback Fine)
+        loss_pass = p_fraud * (amount + chargeback_fine)
+
+        # 2. Recovery Loss: P(Genuine) * (Step-Up Conversion Drop Friction ~15% of Gross Profit)
+        conversion_friction = 0.15 * (amount * merchant_margin)
+        loss_recovery = p_genuine * conversion_friction
+
+        # 3. Hard-Block Loss: P(Genuine) * (Lost Gross Profit + Lifetime Customer Value Loss)
+        loss_block = p_genuine * (amount * merchant_margin + customer_ltv_loss)
+
+        losses = {
+            "pass": round(loss_pass, 2),
+            "recovery": round(loss_recovery, 2),
+            "hard_block": round(loss_block, 2),
+        }
+        optimal_action = min(losses, key=losses.get)
+
+
+        return {
+            "optimal_action": optimal_action,
+            "expected_losses": losses,
+            "net_financial_savings_vs_pass": round(loss_pass - losses[optimal_action], 2),
+        }
+
