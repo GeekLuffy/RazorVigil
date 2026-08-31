@@ -18,8 +18,10 @@ import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
 import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer'
 import KeyboardShortcutsModal from './components/KeyboardShortcutsModal'
+import AttackLaunchpad from './components/AttackLaunchpad'
 
 import { API_BASE, WS_URL } from './config'
+
 
 const MAX_FEED_ITEMS = 100
 const MAX_CHART_POINTS = 60
@@ -668,8 +670,12 @@ export default function App() {
         <ModelGovernanceStudio />
       ) : (
         <>
+          {/* Interactive Threat Attack Launchpad */}
+          <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />
+
           {/* 4 Luminous Sparkline Hero KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-4">
+
             {/* 1. Recovered GMV (Elevated Hero Panel-Primary) */}
             <SparklineKpiCard
               title="Recovered GMV (Rescue)"

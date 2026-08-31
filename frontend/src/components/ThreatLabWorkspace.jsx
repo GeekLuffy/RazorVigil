@@ -67,7 +67,57 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
   const [lastActionStatus, setLastActionStatus] = useState(null)
   const [executionLogs, setExecutionLogs] = useState([])
 
+  // 3DS2 Kinetic OTP Live Workbench State
+  const [otpCode, setOtpCode] = useState('482910')
+  const [otpIntervals, setOtpIntervals] = useState([])
+  const [lastKeyTime, setLastKeyTime] = useState(null)
+  const [otpVerificationResult, setOtpVerificationResult] = useState(null)
+  const [otpTesting, setOtpTesting] = useState(false)
+
+  const handleOtpKeyDown = (e) => {
+    if (e.key === 'Backspace') {
+      setOtpIntervals([])
+      setLastKeyTime(null)
+      return
+    }
+    const now = performance.now()
+    if (lastKeyTime !== null) {
+      const dt = now - lastKeyTime
+      setOtpIntervals((prev) => [...prev, Math.round(dt * 10) / 10])
+    }
+    setLastKeyTime(now)
+  }
+
+  const verifyLiveOtp = async (customIntervals = null, origin = 'checkout.razorshield.io') => {
+    setOtpTesting(true)
+    try {
+      const intervalsToUse = customIntervals || (otpIntervals.length >= 3 ? otpIntervals : [180.2, 215.4, 195.1, 230.8, 205.3])
+      const res = await fetch(`${API_BASE}/otp/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transaction_id: `tx_live_otp_${Date.now()}`,
+          order_id: `order_3ds_${Date.now()}`,
+          otp_code: otpCode || '482910',
+          keystroke_intervals_ms: intervalsToUse,
+          paste_event: false,
+          time_to_first_keystroke_ms: 350.0,
+          total_entry_duration_ms: intervalsToUse.reduce((a, b) => a + b, 0) + 350.0,
+          client_reported_origin: origin,
+          gateway_origin: 'checkout.razorshield.io',
+        })
+      }).then(r => r.json())
+      setOtpVerificationResult(res)
+      addLog('3DS2 Live Audit', 'Kinetic OTP Challenge', res.reason, res.is_valid ? 'HUMAN PASSED' : 'BOT INTERCEPTED')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setOtpTesting(false)
+    }
+  }
+
   const addLog = (type, title, detail, outcome = 'BLOCKED') => {
+
     const log = {
       id: Date.now() + Math.random(),
       time: new Date().toLocaleTimeString(),
@@ -315,9 +365,28 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
         const json = await res.json()
         setLastActionStatus(`Google AP2 AI Agent Verified: Passed under ₹50,000 spend limit (${json.latency_ms}ms).`)
         addLog('AI Agent', 'Google AP2 Shopping Assistant', 'Signed AP2 JWT Attestation verified, spend limit approved', 'VERIFIED AGENT')
+      } else if (type === 'otp_relay') {
+        const otpRes = await fetch(`${API_BASE}/otp/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transaction_id: `tx_otp_relay_${Date.now()}`,
+            order_id: `order_3ds_${Date.now()}`,
+            otp_code: '482910',
+            keystroke_intervals_ms: [8.5, 9.2, 8.8, 9.0, 8.7],
+            paste_event: true,
+            time_to_first_keystroke_ms: 12.0,
+            total_entry_duration_ms: 45.0,
+            device_fingerprint: 'fp_evilginx_mitm_node',
+            ip_hash: 'ip_mitm_relay_01'
+          })
+        }).then(r => r.json())
+        setLastActionStatus(`3DS2 OTP-Relay Intercepted: ${otpRes.reason} (Risk: ${otpRes.risk_score.toFixed(2)})`)
+        addLog('3DS2 Defense', 'Evilginx / OTP Bot Relay', otpRes.reason, 'BOT RELAY NEUTRALIZED')
       }
     } catch (e) {
       console.error(e)
+
       setLastActionStatus('Error dispatching test payload.')
     } finally {
       setLoadingAction(null)
@@ -553,10 +622,143 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               </button>
             </div>
           </div>
+
+          {/* 7. 3DS2 OTP-Relay & Evilginx AiTM Reverse Proxy */}
+          <div className="panel p-3.5 bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-500/50 transition">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">🔐</span>
+                  <strong className="text-xs font-bold text-white font-sans">3DS2 OTP-Relay &amp; AiTM Reverse Proxy</strong>
+                  <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">
+                    Kinetic Entropy Defense
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 font-sans max-w-xl">
+                  Simulates a Telegram OTP grabber bot replaying a 6-digit code in &lt;45ms via Modlishka/Evilginx. Intercepted via Shannon entropy &amp; keystroke cadence.
+                </p>
+              </div>
+              <button
+                disabled={loadingAction !== null}
+                onClick={() => sendAttack('otp_relay')}
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-emerald-400/30 disabled:opacity-50"
+              >
+                {loadingAction === 'otp_relay' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
+                Test 3DS Relay Intercept
+              </button>
+            </div>
+          </div>
+
+          {/* Interactive 3DS2 Kinetic Biometrics & OTP Test Bench */}
+          <div className="panel p-4 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/30 border border-indigo-500/40 rounded-xl space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 bg-indigo-500/20 rounded-lg text-indigo-400">
+                  <Shield size={16} />
+                </span>
+                <div>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider font-sans flex items-center gap-2">
+                    Live 3DS2 Kinetic Cadence &amp; OTP Test Bench
+                    <span className="text-[9px] bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded font-mono">INTERACTIVE</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400">Type in the OTP box to measure your human keystroke entropy or inject bot scripts</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+              {/* Input box and live metrics */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-mono text-slate-300 flex items-center justify-between">
+                  <span>Simulated 3DS Challenge OTP:</span>
+                  <span className="text-slate-500 text-[10px]">Type below to record Δt intervals</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  onKeyDown={handleOtpKeyDown}
+                  placeholder="Enter 6-digit OTP"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-center text-lg font-mono tracking-widest text-emerald-400 focus:outline-none focus:border-indigo-500"
+                />
+
+                <div className="bg-slate-950/80 p-2 rounded-lg border border-slate-800 text-[11px] font-mono space-y-1">
+                  <div className="text-slate-400 flex justify-between">
+                    <span>Recorded Keystroke Intervals (Δt):</span>
+                    <span className="text-indigo-300">{otpIntervals.length} samples</span>
+                  </div>
+                  <div className="text-slate-300 truncate">
+                    {otpIntervals.length > 0 ? `[${otpIntervals.join('ms, ')}ms]` : 'Awaiting keystrokes (type in box)...'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons & Presets */}
+              <div className="flex flex-col justify-between space-y-2">
+                <div className="space-y-1.5">
+                  <button
+                    disabled={otpTesting}
+                    onClick={() => verifyLiveOtp()}
+                    className="w-full flex items-center justify-center gap-1.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition disabled:opacity-50"
+                  >
+                    {otpTesting ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
+                    Verify Current Keystroke Cadence
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      disabled={otpTesting}
+                      onClick={() => verifyLiveOtp([9.2, 8.8, 9.5, 9.0, 8.9])}
+                      className="flex items-center justify-center gap-1 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 rounded-lg text-[11px] font-bold transition"
+                    >
+                      🤖 Inject 10ms Bot Relay
+                    </button>
+                    <button
+                      disabled={otpTesting}
+                      onClick={() => verifyLiveOtp([195.2, 240.1, 180.5, 310.2, 205.8])}
+                      className="flex items-center justify-center gap-1 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 rounded-lg text-[11px] font-bold transition"
+                    >
+                      👤 Test Human Cadence
+                    </button>
+                  </div>
+
+                  <button
+                    disabled={otpTesting}
+                    onClick={() => verifyLiveOtp([180.0, 210.0, 190.0, 200.0], 'evil-phish-origin.com')}
+                    className="w-full flex items-center justify-center gap-1 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 rounded-lg text-[11px] font-bold transition"
+                  >
+                    🎣 Test Evilginx Reverse Proxy Origin Mismatch
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Verdict Display */}
+            {otpVerificationResult && (
+              <div className={`p-3 rounded-lg border text-xs font-mono space-y-1 animate-fadeIn ${
+                otpVerificationResult.is_valid
+                  ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
+                  : 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+              }`}>
+                <div className="flex items-center justify-between font-bold">
+                  <span>Verdict: {otpVerificationResult.is_valid ? '✅ HUMAN AUTHENTICATION GRANTED' : '🚫 BOT RELAY / MITM INTERCEPTED'}</span>
+                  <span>Risk: {otpVerificationResult.risk_score.toFixed(2)}</span>
+                </div>
+                <div className="text-[11px] text-slate-300">{otpVerificationResult.reason}</div>
+                <div className="flex gap-4 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                  <span>Entropy: <strong>{otpVerificationResult.kinetic_metrics?.entropy}</strong></span>
+                  <span>Mean Δt: <strong>{otpVerificationResult.kinetic_metrics?.mean_interval_ms}ms</strong></span>
+                  <span>AiTM Proxy: <strong>{otpVerificationResult.mitm_proxy_detected ? 'DETECTED' : 'CLEAN'}</strong></span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Column: Live Telemetry Console & Store Entry Card */}
         <div className="lg:col-span-5 space-y-3">
+
           {/* Store Demo Entry Card */}
           <div className="panel bg-gradient-to-br from-slate-900 via-emerald-950/20 to-slate-900 border border-emerald-500/30 p-4">
             <div className="flex items-center justify-between mb-2">
