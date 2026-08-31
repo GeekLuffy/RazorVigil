@@ -34,6 +34,8 @@ from backend.decision.otp_defense import (
     ThreeDSChallengeExemptionRequest,
     SessionBindingValidationRequest,
 )
+from backend.decision.three_ds_verifier import ThreeDSAntiBypassEngine, ThreeDSAuthPayload
+
 
 from backend.graph.cluster_engine import ClusterEngine
 from backend.models.features import build_feature_vector
@@ -54,8 +56,10 @@ decision_engine: DecisionEngine
 recovery_stub: RecoveryStub
 canary_cards: CanaryCards
 otp_defense: OTPRelayDefenseEngine = OTPRelayDefenseEngine()
+three_ds_verifier: ThreeDSAntiBypassEngine = ThreeDSAntiBypassEngine()
 
 agent_validator: AgentAttestationValidator
+
 razorpay_client: RazorpayClient
 anti_checker: AntiCheckerGuard
 
@@ -533,8 +537,28 @@ async def validate_3ds_authenticated_session(req: SessionBindingValidationReques
     }
 
 
+@app.post("/3ds/verify-auth")
+async def verify_3ds_auth_payload(req: ThreeDSAuthPayload):
+    """
+    3DS2 Cryptographic & Anti-Bypass Verification Endpoint:
+    Neutralizes automated solver scripts, synthetic devicePrint spoofing (random canvas/webgl),
+    fake CAVV/ECI injections, and Python requests TLS Client Hello impersonation.
+    """
+    res = three_ds_verifier.verify_auth_payload(req)
+    return {
+        "transaction_id": req.transaction_id,
+        "is_authorized": res.is_authorized,
+        "is_bypassed_or_forged": res.is_bypassed_or_forged,
+        "risk_score": res.risk_score,
+        "verdict": res.verdict,
+        "failure_reason": res.failure_reason,
+        "cryptographic_validity": res.cryptographic_validity,
+    }
+
+
 @app.get("/decision/bayesian-mel")
 async def get_bayesian_minimum_expected_loss(risk_score: float = 0.45, amount: float = 5000.0):
+
 
 
     """
