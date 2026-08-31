@@ -13,8 +13,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import math
 import time
 from typing import Optional, Tuple
+
 
 import networkx as nx
 import redis.asyncio as aioredis
@@ -80,15 +82,25 @@ class ClusterEngine:
                 return
             graph_copy = self._graph.copy()
 
-        # Louvain runs outside the lock (CPU-bound but short at hackathon scale)
+        # Louvain runs outside the lock with temporal exponential edge decay weights
+        now = time.time()
+        tau_half_life = 1800.0  # 30-minute decay half-life
+        for u, v, data in graph_copy.edges(data=True):
+            edge_key = (u, v) if (u, v) in self._edge_timestamps else (v, u)
+            ts = self._edge_timestamps.get(edge_key, now)
+            dt = max(0.0, now - ts)
+            temporal_weight = max(0.05, math.exp(-dt / tau_half_life))
+            graph_copy[u][v]["weight"] = temporal_weight
+
         if _LOUVAIN_AVAILABLE and graph_copy.number_of_edges() > 0:
-            partition = community_louvain.best_partition(graph_copy)
+            partition = community_louvain.best_partition(graph_copy, weight="weight")
         else:
             # Fallback: connected components as clusters
             partition = {}
             for i, component in enumerate(nx.connected_components(graph_copy)):
                 for node in component:
                     partition[node] = i
+
 
         # Compute cluster sizes
         cluster_sizes: dict[int, int] = {}
