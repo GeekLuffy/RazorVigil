@@ -1022,17 +1022,15 @@ async def get_temporal_drift_monitor():
 
 @app.post("/api/governance/drift/remediate")
 async def trigger_drift_remediation():
-    """Execute closed-loop drift remediation and return re-hardened monthly trace."""
+    """Execute closed-loop drift remediation and return re-hardened monthly trace with static baseline comparison."""
     from sklearn.tree import DecisionTreeClassifier
     import numpy as np
+    import json
     dummy_tree = DecisionTreeClassifier(max_depth=5).fit(np.random.randn(300, 10), np.random.randint(0, 2, 300))
     remed_res = remediate_drift(dummy_tree)
-    return {
-        "status": remed_res["status"],
-        "remediated_trace": remed_res["remediated_trace"],
-        "min_remediated_recall": remed_res["min_remediated_recall"],
-        "post_remediation_drift_detected": remed_res["post_remediation_drift_detected"]
-    }
+    clean = json.loads(json.dumps(remed_res, default=lambda o: str(o)))
+    return clean
+
 
 
 @app.get("/api/governance/blast-radius")
