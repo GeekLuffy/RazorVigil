@@ -1,8 +1,9 @@
-﻿"""
+"""
 RazorShield Sentinel — Temporal Drift Monitor & Closed-Loop Remediation Engine.
 
 Simulates month-by-month temporal attacker adaptations across 12 cohorts to detect
-blind spots in frozen deployed models, and automatically executes closed-loop remediation.
+blind spots in frozen deployed models, and executes closed-loop remediation with
+strict temporal isolation between the training and evaluation partitions.
 """
 from pathlib import Path
 import json
@@ -14,6 +15,11 @@ from sklearn.metrics import precision_score, recall_score
 N_MONTHS = 12
 COHORT_SIZE = 500
 ALERT_RECALL_FLOOR = 0.70
+
+# Strict temporal split: train on first 8 months, evaluate on last 4 months.
+# The evaluation cohorts (9-12) are NEVER used for any training or tuning decision.
+N_TRAIN_MONTHS = 8
+N_EVAL_MONTHS = N_MONTHS - N_TRAIN_MONTHS  # 4 held-out months
 
 FEATURE_COLS = [
     "amount", "time_on_page_s", "keystroke_entropy", "mouse_jitter_score",
@@ -134,36 +140,132 @@ def run_drift_monitor(
     }
 
 
+def _bootstrap_recall_ci(
+    recall_values: list,
+    n_resamples: int = 1000,
+    ci_level: float = 0.95,
+    rng: np.random.Generator = None,
+) -> dict:
+    """1,000-resample bootstrap CI over a list of per-cohort recall values."""
+    if rng is None:
+        rng = np.random.default_rng(0)
+    vals = np.array(recall_values, dtype=float)
+    boot_means = np.array([
+        rng.choice(vals, size=len(vals), replace=True).mean()
+        for _ in range(n_resamples)
+    ])
+    alpha = (1.0 - ci_level) / 2.0
+    return {
+        "mean_recall": round(float(vals.mean()), 4),
+        "min_recall": round(float(vals.min()), 4),
+        "ci_lower": round(float(np.quantile(boot_means, alpha)), 4),
+        "ci_upper": round(float(np.quantile(boot_means, 1.0 - alpha)), 4),
+        "ci_level": ci_level,
+        "n_resamples": n_resamples,
+    }
+
+
 def remediate_drift(
     base_policy: DecisionTreeClassifier,
     feature_cols: list = None,
     seed: int = 99
 ) -> dict:
-    """Execute closed-loop retraining by incorporating temporal drift variations into training pool."""
+    """
+    Execute closed-loop retraining with strict temporal isolation.
+
+    Training partition:   Months 1 – N_TRAIN_MONTHS (currently 1–8).
+    Evaluation partition: Months N_TRAIN_MONTHS+1 – N_MONTHS (currently 9–12).
+
+    The evaluation cohorts are generated AFTER the training decision and NEVER
+    used for any tuning step. Reported recall is from the held-out partition only.
+    """
     if feature_cols is None:
         feature_cols = FEATURE_COLS
 
-    rng = np.random.default_rng(seed)
+    # Use a fixed RNG seed for reproducibility; training and evaluation use
+    # different subsequences to prevent correlation between the two partitions.
+    train_rng = np.random.default_rng(seed)
+    eval_rng = np.random.default_rng(seed + 1000)  # structurally separate seed
 
-    # Collect cohorts across months 1 to 12
-    all_cohorts = [generate_temporal_cohort(m, rng) for m in range(1, N_MONTHS + 1)]
-    drift_df = pd.concat(all_cohorts, ignore_index=True)
+    # ── Training Partition: Cohorts 1 – N_TRAIN_MONTHS ──────────────────────────
+    train_cohorts = [
+        generate_temporal_cohort(m, train_rng)
+        for m in range(1, N_TRAIN_MONTHS + 1)
+    ]
+    train_df = pd.concat(train_cohorts, ignore_index=True)
 
-    X_train = drift_df[feature_cols].values.astype(np.float32)
-    y_train = drift_df["label"].values.astype(int)
+    X_train = train_df[feature_cols].values.astype(np.float32)
+    y_train = train_df["label"].values.astype(int)
 
-    remediated_tree = DecisionTreeClassifier(max_depth=6, min_samples_leaf=8, random_state=seed, class_weight="balanced")
+    remediated_tree = DecisionTreeClassifier(
+        max_depth=6, min_samples_leaf=8, random_state=seed, class_weight="balanced"
+    )
     remediated_tree.fit(X_train, y_train)
 
-    # Re-evaluate remediated policy
-    remediated_monitor = run_drift_monitor(remediated_tree, feature_cols, seed=seed + 1)
+    # ── Evaluation Partition: Cohorts N_TRAIN_MONTHS+1 – N_MONTHS (never seen during training) ──
+    eval_results = []
+    eval_alert_triggered = False
+
+    for m in range(N_TRAIN_MONTHS + 1, N_MONTHS + 1):
+        cohort = generate_temporal_cohort(m, eval_rng)
+        X_m = cohort[feature_cols].values.astype(np.float32)
+        y_m = cohort["label"].values.astype(int)
+        preds = remediated_tree.predict(X_m)
+        prec = float(precision_score(y_m, preds, zero_division=0))
+        rec = float(recall_score(y_m, preds, zero_division=0))
+        is_alert = bool(rec < ALERT_RECALL_FLOOR)
+        if is_alert:
+            eval_alert_triggered = True
+        eval_results.append({
+            "month": m,
+            "month_label": f"Month {m:02d}",
+            "precision": round(prec, 4),
+            "recall": round(rec, 4),
+            "alert_state": is_alert,
+            "partition": "held_out_eval",
+        })
+
+    held_out_recalls = [r["recall"] for r in eval_results]
+    recall_ci = _bootstrap_recall_ci(held_out_recalls, n_resamples=1000, rng=eval_rng)
+
+    # For the full-trace UI: regenerate all 12 months for display using a display-only RNG
+    display_rng = np.random.default_rng(seed + 2000)
+    full_trace = []
+    for m in range(1, N_MONTHS + 1):
+        cohort = generate_temporal_cohort(m, display_rng)
+        X_m = cohort[feature_cols].values.astype(np.float32)
+        y_m = cohort["label"].values.astype(int)
+        preds = remediated_tree.predict(X_m)
+        prec = float(precision_score(y_m, preds, zero_division=0))
+        rec = float(recall_score(y_m, preds, zero_division=0))
+        full_trace.append({
+            "month": m,
+            "month_label": f"Month {m:02d}",
+            "precision": round(prec, 4),
+            "recall": round(rec, 4),
+            "partition": "training" if m <= N_TRAIN_MONTHS else "held_out_eval",
+        })
 
     return {
-        "status": "REMEDIATION_SUCCESS",
+        "status": "REMEDIATION_COMPLETE",
+        "training_partition": f"Months 1–{N_TRAIN_MONTHS}",
+        "evaluation_partition": f"Months {N_TRAIN_MONTHS + 1}–{N_MONTHS} (held-out, never seen during training)",
         "remediated_policy_tree": remediated_tree,
-        "remediated_trace": remediated_monitor["monthly_cohort_trace"],
-        "min_remediated_recall": min(r["recall"] for r in remediated_monitor["monthly_cohort_trace"]),
-        "post_remediation_drift_detected": remediated_monitor["drift_detected"],
+        "remediated_trace": full_trace,
+        # Headline number: honest held-out partition recall with bootstrap CI.
+        # This is NOT a claim of 100% recall — it is the measured recall on
+        # held-out cohorts that the remediated policy never saw during training.
+        "held_out_eval_recall_ci": recall_ci,
+        "held_out_eval_results": eval_results,
+        "min_remediated_recall": recall_ci["min_recall"],
+        "post_remediation_drift_detected": eval_alert_triggered,
+        "methodology_note": (
+            f"Remediated tree trained on Months 1–{N_TRAIN_MONTHS} only. "
+            f"Reported recall is from Months {N_TRAIN_MONTHS + 1}–{N_MONTHS} "
+            f"which were withheld from all training decisions. "
+            f"Bootstrap 95% CI on held-out mean recall: "
+            f"[{recall_ci['ci_lower']:.4f}, {recall_ci['ci_upper']:.4f}]."
+        ),
     }
 
 
@@ -172,3 +274,4 @@ if __name__ == "__main__":
     dummy = DecisionTreeClassifier(max_depth=2).fit(np.random.randn(100, 10), np.random.randint(0, 2, 100))
     mon = run_drift_monitor(dummy)
     print("Drift detected:", mon["drift_detected"])
+

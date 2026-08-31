@@ -1,4 +1,4 @@
-﻿"""
+"""
 RazorShield Sentinel — Doubly-Robust Off-Policy Evaluation (OPE) Engine.
 
 Evaluates candidate risk policies against historical logged decision datasets using
@@ -26,7 +26,16 @@ AMOUNT_LOGISTIC_SCALE = 2000.0
 
 
 def compute_logging_propensity(amount: np.ndarray, threshold: float = 2500.0) -> np.ndarray:
-    """Smoothed logistic enforcement curve representing historical logging behavior."""
+    """
+    Smoothed logistic enforcement curve representing historical logging behavior.
+
+    METHODOLOGY NOTE: This is a CONSTRUCTED synthetic logging policy, not a propensity
+    model fit to real historical logging decisions. It models the assumption that high-amount
+    transactions (> ₹2500) were historically more likely to be manually reviewed. The logistic
+    shape is a modeling choice. Positivity concern: at very low amounts, propensity approaches
+    0.02, giving IPW weights up to ~50x. These extreme weights are clipped but represent a
+    positivity violation for the low-amount stratum.
+    """
     z = (amount - threshold) / AMOUNT_LOGISTIC_SCALE
     return np.clip(1.0 / (1.0 + np.exp(-z)), 0.02, 0.98)
 
@@ -37,7 +46,13 @@ def evaluate_off_policy(
     data_path: Path = DATA_PATH,
     seed: int = 42
 ) -> dict:
-    """Run Doubly-Robust Off-Policy Evaluation comparing target policy vs baseline logging."""
+    """
+    Run Doubly-Robust Off-Policy Evaluation comparing target policy vs baseline logging.
+
+    Returns estimated value lift under stated assumptions — not a proof of real-world
+    performance. All numbers should be interpreted as estimates under the assumptions
+    documented in the methodology_notes field of the return value.
+    """
     if feature_cols is None:
         feature_cols = FEATURE_COLS
 
@@ -108,7 +123,43 @@ def evaluate_off_policy(
     # Baseline Logging Policy Value
     v_baseline_logged = float(np.mean(logged_rewards))
 
+    # dm_dr_agreement is a relative agreement score (not a statistical test):
+    # 1 - |v_dr - v_dm| / max(|v_dr|, 1). Higher = more consistent between estimators.
     dm_dr_agreement = max(0.0, 1.0 - abs(v_dr - v_dm) / max(abs(v_dr), 1.0))
+
+    # Maximum IPW weight (positivity check — values >> 10 indicate potential violations)
+    max_ipw_weight = float(ipw_weights.max())
+    positivity_concern = bool(max_ipw_weight > 20.0)
+
+    methodology_notes = {
+        "logging_policy": (
+            "SYNTHETIC: The logging propensity is a constructed logistic curve sigmoid((amount - 2500) / 2000). "
+            "It is NOT fit to real historical logging decisions. It models the assumption that high-value "
+            "transactions were historically more likely to be manually reviewed."
+        ),
+        "data": (
+            "The DM outcome models (q1, q0) are fit on logged-action subsets of the same synthetic dataset "
+            "used for candidate model training. Results should be treated as indicative estimates, not "
+            "as independent out-of-sample validation."
+        ),
+        "dm_dr_agreement_definition": (
+            "dm_dr_agreement = 1 - |v_DR - v_DM| / max(|v_DR|, 1). "
+            "This is a relative consistency score between two estimators, NOT a statistical hypothesis test. "
+            "A value >= 0.80 indicates the two estimators are within 20% of each other in relative terms."
+        ),
+        "positivity": (
+            "Propensity is clipped to [0.02, 0.98]. At very low amounts, effective IPW weights approach 50x. "
+            f"Max observed IPW weight: {max_ipw_weight:.1f}x. "
+            + ("POSITIVITY CONCERN: Weights > 20x detected — OPE estimates for low-amount stratum may be unreliable. "
+               if positivity_concern else "No severe positivity violation detected (max weight <= 20x).")
+        ),
+        "interpretation": (
+            "All value estimates (v_DR, v_DM, net lift) are point estimates under the stated synthetic "
+            "logging-policy assumption. They are not proofs of real-world value. Interpret as: "
+            "'Under the modeled logging behavior, the candidate policy is estimated to produce a "
+            "value lift of +Rs.X per transaction.'"
+        ),
+    }
 
     return {
         "value_doubly_robust": round(v_dr, 2),
@@ -118,7 +169,10 @@ def evaluate_off_policy(
         "baseline_logged_value": round(v_baseline_logged, 2),
         "net_value_lift_rs": round(v_dr - v_baseline_logged, 2),
         "dm_dr_agreement_score": round(dm_dr_agreement, 4),
+        "max_ipw_weight": round(max_ipw_weight, 2),
+        "positivity_concern": positivity_concern,
         "passed_ope_gate": bool(dm_dr_agreement >= 0.80 and v_dr > v_baseline_logged),
+        "methodology_notes": methodology_notes,
     }
 
 
@@ -126,4 +180,7 @@ if __name__ == "__main__":
     from sklearn.tree import DecisionTreeClassifier
     dummy_tree = DecisionTreeClassifier(max_depth=4).fit(np.random.randn(200, 10), np.random.randint(0, 2, 200))
     res = evaluate_off_policy(dummy_tree)
-    print("Off-Policy Eval:", res)
+    print("Off-Policy Eval:", {k: v for k, v in res.items() if k != "methodology_notes"})
+    print("Positivity concern:", res["positivity_concern"])
+    print("Max IPW weight:", res["max_ipw_weight"])
+

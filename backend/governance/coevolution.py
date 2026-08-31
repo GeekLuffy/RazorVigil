@@ -1,4 +1,4 @@
-﻿"""
+"""
 RazorShield Sentinel — Adversarial Co-Evolution Arms Race Engine.
 
 Orchestrates an automated arms race between an adversarial Red Team attacker
@@ -49,6 +49,45 @@ def sample_adversarial_candidates(n: int, rng: np.random.Generator) -> pd.DataFr
         "cluster_risk_score": cluster_risk,
         "label": 1
     })
+
+
+def _bootstrap_evasion_rate_ci(
+    evasion_rates: list,
+    n_resamples: int = 1000,
+    ci_level: float = 0.95,
+    rng: np.random.Generator = None,
+) -> dict:
+    """
+    Compute a 1,000-resample bootstrap CI over the per-generation evasion-rate trace.
+
+    NOTE: This CI describes variability in the observed evasion-rate trajectory
+    across bootstrap resamples of the generation log — it does NOT constitute a
+    statistical proof of robustness against all possible evasion mutations.
+    The evasion space tested is bounded by the sampled candidate distribution only.
+    """
+    if rng is None:
+        rng = np.random.default_rng(42)
+    rates = np.array(evasion_rates, dtype=float)
+    if len(rates) == 0:
+        return {"mean": 0.0, "ci_lower": 0.0, "ci_upper": 0.0, "n_resamples": 0}
+
+    boot_means = np.array([
+        rng.choice(rates, size=len(rates), replace=True).mean()
+        for _ in range(n_resamples)
+    ])
+    alpha = (1.0 - ci_level) / 2.0
+    return {
+        "mean_evasion_rate": round(float(rates.mean()), 4),
+        "ci_lower": round(float(np.quantile(boot_means, alpha)), 4),
+        "ci_upper": round(float(np.quantile(boot_means, 1.0 - alpha)), 4),
+        "ci_level": ci_level,
+        "n_resamples": n_resamples,
+        "sampling_space_note": (
+            "Evasion space is bounded by the sampled candidate distribution "
+            "(uniform draws over realistic carding parameter ranges). "
+            "This does not cover all theoretically possible evasion mutations."
+        ),
+    }
 
 
 def run_coevolution(
@@ -125,6 +164,16 @@ def run_coevolution(
         current_tree = DecisionTreeClassifier(max_depth=6, min_samples_leaf=6, random_state=seed + gen, class_weight="balanced")
         current_tree.fit(train_pool_X, train_pool_y)
 
+    # Bootstrap CI over per-generation evasion rate trajectory
+    evasion_rates = [g["evasion_rate"] for g in generation_log]
+    evasion_ci = _bootstrap_evasion_rate_ci(evasion_rates, n_resamples=1000, rng=rng)
+
+    first_evasions = generation_log[0]["evasions_found"] if generation_log else 1
+    last_evasions = generation_log[-1]["evasions_found"] if generation_log else 0
+    evasion_drop_pct = round(
+        (1.0 - (last_evasions / max(first_evasions, 1))) * 100, 2
+    )
+
     return {
         "converged": converged,
         "convergence_generation": convergence_gen,
@@ -133,14 +182,23 @@ def run_coevolution(
         "generation_trace": generation_log,
         "hardened_policy_tree": current_tree,
         "feature_cols": available_cols,
+        # No statistical test was run. The certificate below is a point estimate
+        # with a bootstrap CI over the sampled evasion space — not a certified bound.
         "final_robustness_certificate": {
-            "status": "CERTIFIED_ROBUST" if converged else "PARTIAL_CONVERGENCE",
-            "final_evasions": generation_log[-1]["evasions_found"],
-            "evasion_reduction_pct": round(
-                (1.0 - (generation_log[-1]["evasions_found"] / max(generation_log[0]["evasions_found"], 1))) * 100, 2
+            "status": "EVASION_RESISTANCE_MEASURED" if converged else "PARTIAL_EVASION_RESISTANCE",
+            "final_evasions": last_evasions,
+            "evasion_drop_pct_point_estimate": evasion_drop_pct,
+            "evasion_rate_bootstrap_ci": evasion_ci,
+            "final_heldout_precision": generation_log[-1]["heldout_precision"] if generation_log else 0.0,
+            "final_heldout_recall": generation_log[-1]["heldout_recall"] if generation_log else 0.0,
+            "interpretation": (
+                f"Evasion rate dropped from {evasion_rates[0]:.4f} to {evasion_rates[-1]:.4f} "
+                f"({evasion_drop_pct}% reduction) across the tested candidate distribution. "
+                f"Bootstrap 95% CI on mean evasion rate: "
+                f"[{evasion_ci['ci_lower']:.4f}, {evasion_ci['ci_upper']:.4f}]. "
+                "This is measured evasion resistance against tested attack variants — "
+                "not a certified robustness bound against all possible evasion strategies."
             ),
-            "final_heldout_precision": generation_log[-1]["heldout_precision"],
-            "final_heldout_recall": generation_log[-1]["heldout_recall"],
         }
     }
 

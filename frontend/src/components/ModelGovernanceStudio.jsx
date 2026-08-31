@@ -106,12 +106,12 @@ export default function ModelGovernanceStudio() {
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-white tracking-tight">Model Governance & Policy Studio</h2>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${
-                  overview?.status === 'APPROVAL_ELIGIBLE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  overview?.status === 'RECOMMENDED_FOR_HUMAN_APPROVAL' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                 }`}>
-                  {overview?.status || 'APPROVAL_ELIGIBLE'}
+                  {overview?.status || 'RECOMMENDED_FOR_HUMAN_APPROVAL'}
                 </span>
                 <span className="text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded hidden sm:inline-flex items-center gap-1">
-                  <CheckCircle2 size={12} /> RBI 2026 Aligned
+                  <CheckCircle2 size={12} /> RBI Readiness Reference
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -298,7 +298,7 @@ export default function ModelGovernanceStudio() {
                 Adversarial Co-Evolution Arms Race ({coevoData?.candidate_name || 'ComprehensiveMultiModal'})
               </div>
               <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                {coevoData?.certificate?.status || 'CERTIFIED_ROBUST'} &bull; {coevoData?.certificate?.evasion_reduction_pct || 96.84}% Threat Drop
+                {coevoData?.certificate?.status || 'EVASION_RESISTANCE_MEASURED'} &bull; {coevoData?.certificate?.evasion_reduction_pct || 96.84}% Threat Drop
               </span>
             </div>
 
@@ -326,7 +326,7 @@ export default function ModelGovernanceStudio() {
                 Strict 6-Gate Verification Suite (Gates-First Sequence)
               </div>
               <span className="text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 px-3 py-0.5 rounded border border-emerald-500/30">
-                ALL 6 GATES PASSED &bull; APPROVAL_ELIGIBLE
+                ALL 6 GATES PASSED — PENDING HUMAN SIGN-OFF &bull; RECOMMENDED_FOR_HUMAN_APPROVAL
               </span>
             </div>
 

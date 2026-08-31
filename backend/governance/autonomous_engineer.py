@@ -1,4 +1,4 @@
-﻿"""
+"""
 RazorShield Sentinel — Autonomous Policy Engineer Orchestrator.
 
 Executes the complete post-loss autopsy -> feature discovery -> hypothesis synthesis ->
@@ -15,6 +15,7 @@ from .feature_discovery import discover_features, add_engineered_features
 from .coevolution import run_coevolution
 from .policy_verifier import verify_policy_candidate
 from .drift_monitor import run_drift_monitor, remediate_drift
+from .reviewer import request_policy_review
 
 DATA_PATH = Path(__file__).resolve().parents[2] / "backend" / "dataset" / "synthetic_transactions_50k.csv"
 if not DATA_PATH.exists():
@@ -118,6 +119,7 @@ def run_autonomous_policy_engineer(
     verified_candidates = []
     winning_candidate = None
     best_score = -1.0
+    coevo_res_map: dict = {}  # Maps candidate name -> hardened DecisionTreeClassifier
 
     y_train = df_eng["label"].values.astype(int)
 
@@ -137,8 +139,9 @@ def run_autonomous_policy_engineer(
             seed=seed
         )
         hardened_tree = coevo_res["hardened_policy_tree"]
+        coevo_res_map[cand["name"]] = hardened_tree  # Retain for Independent Review pass
 
-        # Run Strict 6-Gate Verification Suite
+        # Run Strict 6-Gate Verification Suite (on training data — not final approval)
         verification = verify_policy_candidate(
             candidate_tree=hardened_tree,
             feature_cols=available_feats,
@@ -161,8 +164,27 @@ def run_autonomous_policy_engineer(
             best_score = verification["composite_ranking_score"]
             winning_candidate = cand_package
 
-    # If no candidate cleared all 6 gates, find highest scoring eligible or report NO_APPROVAL_ELIGIBLE
-    status = "APPROVAL_ELIGIBLE" if winning_candidate is not None else "NO_APPROVAL_ELIGIBLE_POLICY"
+
+    # If no candidate cleared all 6 gates, report NO_GATES_CLEARED
+    # The Autonomous Engineer does NOT promote any candidate to APPROVAL_ELIGIBLE.
+    # The Independent Review Agent (reviewer.py) must be run separately on the
+    # winning candidate to obtain a formal RECOMMENDATION on a frozen validation slice.
+    has_winner = winning_candidate is not None
+    status = "PENDING_INDEPENDENT_REVIEW" if has_winner else "NO_GATES_CLEARED"
+
+    # Run Independent Review on the winning candidate (if one exists).
+    # This is a separate, isolated evaluation on the frozen validation slice.
+    independent_review = None
+    if has_winner:
+        winning_tree = coevo_res_map.get(winning_candidate["name"])
+        if winning_tree is not None:
+            independent_review = request_policy_review(
+                candidate_tree=winning_tree,
+                candidate_name=winning_candidate["name"],
+                feature_cols=winning_candidate["features_used"],
+                data_path=data_path,
+                seed=seed,
+            )
 
     elapsed_time = round(time.time() - start_time, 2)
 
@@ -171,6 +193,7 @@ def run_autonomous_policy_engineer(
         "status": status,
         "winning_candidate": winning_candidate["name"] if winning_candidate else None,
         "winning_package": winning_candidate,
+        "independent_review": independent_review,
         "all_candidates": verified_candidates,
         "autopsy": autopsy_summary,
         "feature_discovery": discovery_res,
@@ -179,7 +202,6 @@ def run_autonomous_policy_engineer(
     # Persist results
     RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(RESULTS_PATH, "w", encoding="utf-8") as f:
-        # Avoid serializing non-serializable objects
         clean_output = json.loads(json.dumps(output, default=lambda o: str(o)))
         json.dump(clean_output, f, indent=2)
 

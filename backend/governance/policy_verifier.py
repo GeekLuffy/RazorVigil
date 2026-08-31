@@ -1,4 +1,4 @@
-﻿"""
+"""
 RazorShield Sentinel — Strict 6-Gate Policy Verification Suite.
 
 Every candidate risk policy must pass all six independent, deterministic gates before
@@ -175,17 +175,29 @@ def verify_policy_candidate(
     # Aggregate Evaluation
     all_gates = [gate_1_detail, gate_2_detail, gate_3_detail, gate_4_detail, gate_5_detail, gate_6_detail]
     passed_count = sum(1 for g in all_gates if g["passed"])
-    is_approval_eligible = bool(passed_count == 6)
+    all_passed = bool(passed_count == 6)
 
     composite_score = round(
         0.30 * hist_prec + 0.30 * hist_rec + 0.20 * adv_rec + 0.10 * ope_res["dm_dr_agreement_score"] + 0.10 * (1.0 - min(max_multiplier / 4.0, 1.0)),
         4
     )
 
+    # NOTE: Passing all 6 gates here does NOT constitute approval. These gates are
+    # evaluated on the full training dataset. The Independent Review Agent (reviewer.py)
+    # must be run next — it evaluates the same 6 gates on a frozen validation slice
+    # that was never seen during training, and returns RECOMMENDED_FOR_HUMAN_APPROVAL
+    # or REJECTED. Only after that can a human officer sign off.
+    eligibility_status = "GATES_PASSED_PENDING_INDEPENDENT_REVIEW" if all_passed else "BLOCKED_BY_GATES"
+
     return {
         "candidate_name": candidate_name,
-        "is_approval_eligible": is_approval_eligible,
-        "eligibility_status": "APPROVAL_ELIGIBLE" if is_approval_eligible else "BLOCKED_BY_GATES",
+        "is_approval_eligible": all_passed,
+        "eligibility_status": eligibility_status,
+        "next_required_step": (
+            "Run backend.governance.reviewer.request_policy_review() on this candidate "
+            "to obtain an independent recommendation on the frozen validation slice."
+            if all_passed else "Address gate failures before submitting for independent review."
+        ),
         "gates_passed_count": passed_count,
         "total_gates_count": 6,
         "composite_ranking_score": composite_score,
@@ -196,7 +208,8 @@ def verify_policy_candidate(
             "adversarial_catch_rate": round(adv_rec, 4),
             "off_policy_lift_rs": ope_res["net_value_lift_rs"],
             "blast_radius_flips": blast_res["human_attention_count"],
-            "tree_depth": depth
+            "tree_depth": depth,
         }
     }
+
 
