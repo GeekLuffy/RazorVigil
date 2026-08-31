@@ -1,7 +1,7 @@
 """
 3DS2 & OTP Relay Bypass Defense Engine — RazorShield Sentinel.
 Neutralizes modern Telegram OTP interception bots, reverse proxy relays (Modlishka/Evilginx),
-and SIM-swap automated input attacks during 3DS step-up authentication.
+SIM-swap automated input attacks, and 3DS2 frictionless downgrade exploits.
 """
 
 from __future__ import annotations
@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field
 
 
@@ -26,6 +26,21 @@ class OTPVerificationRequest(BaseModel):
     device_fingerprint: str = ""
     ip_hash: str = ""
     session_nonce: str = ""
+    # AiTM Reverse-Proxy & TLS Telemetry
+    client_reported_origin: str = "checkout.razorshield.io"
+    gateway_origin: str = "checkout.razorshield.io"
+    tls_session_resumed: bool = True
+    round_trip_latency_ms: float = 45.0
+
+
+class ThreeDSChallengeExemptionRequest(BaseModel):
+    transaction_id: str
+    amount: float
+    requested_exemption: str  # "frictionless", "low_value", "tra_whitelisted"
+    device_fingerprint: str
+    asn_type: str
+    ja3_ua_mismatch: bool
+    velocity_spike: bool
 
 
 @dataclass
@@ -36,13 +51,22 @@ class OTPDefenseResult:
     reason: str
     entropy: float
     mean_interval_ms: float
+    mitm_proxy_detected: bool = False
+
+
+@dataclass
+class ThreeDSExemptionResult:
+    exemption_granted: bool
+    mandate_step_up: bool
+    risk_tier: str
+    rationale: str
 
 
 class OTPRelayDefenseEngine:
     """
-    Evaluates 3DS OTP entry dynamics in real-time (< 2ms evaluation SLA).
-    Detects instant clipboard pasting, programmatic synthetic keystrokes (<15ms interval),
-    and reverse proxy MITM relays.
+    Evaluates 3DS OTP entry dynamics and AiTM proxy signatures in real-time (< 2ms evaluation SLA).
+    Detects instant clipboard pasting, programmatic synthetic keystrokes (<25ms interval),
+    reverse proxy MITM relays (Evilginx), and unauthorized 3DS2 frictionless downgrades.
     """
 
     def __init__(self, min_human_entropy: float = 0.85, max_bot_speed_ms: float = 25.0):
@@ -50,6 +74,30 @@ class OTPRelayDefenseEngine:
         self.max_bot_speed_ms = max_bot_speed_ms
 
     def evaluate_otp_entry(self, req: OTPVerificationRequest) -> OTPDefenseResult:
+        # 1. Check for Adversary-in-the-Middle (AiTM) Reverse-Proxy Header Spoofing
+        if req.client_reported_origin != req.gateway_origin:
+            return OTPDefenseResult(
+                is_valid=False,
+                is_bot_relay=True,
+                risk_score=1.00,
+                reason=f"AiTM Reverse-Proxy Detected: Origin mismatch ({req.client_reported_origin} != {req.gateway_origin}) — Evilginx/Modlishka relay intercepted",
+                entropy=0.0,
+                mean_interval_ms=0.0,
+                mitm_proxy_detected=True,
+            )
+
+        # 2. Check for RTT Proxy Latency Anomalies (>1200ms unexpected latency relay)
+        if req.round_trip_latency_ms > 2500.0 and req.paste_event:
+            return OTPDefenseResult(
+                is_valid=False,
+                is_bot_relay=True,
+                risk_score=0.94,
+                reason="Adversarial relay lag detected: Multi-hop proxy latency with clipboard injection",
+                entropy=0.0,
+                mean_interval_ms=0.0,
+                mitm_proxy_detected=True,
+            )
+
         intervals = req.keystroke_intervals_ms
         if not intervals or len(intervals) < 3:
             # If pasted instantaneously or 0 interval recorded
@@ -71,14 +119,14 @@ class OTPRelayDefenseEngine:
                 mean_interval_ms=50.0,
             )
 
-        # 1. Compute Mean and Variance of Keystroke Intervals
+        # 3. Compute Mean and Variance of Keystroke Intervals
         mean_dt = sum(intervals) / len(intervals)
         
         # Bots typically exhibit uniform low intervals (e.g. exactly 10ms +/- 1ms)
         variance = sum((dt - mean_dt) ** 2 for dt in intervals) / len(intervals)
         std_dev = math.sqrt(variance)
 
-        # 2. Compute Shannon Entropy over interval quantized bins
+        # 4. Compute Shannon Entropy over interval quantized bins
         bins: Dict[int, int] = {}
         for dt in intervals:
             q_bin = int(dt // 15)  # 15ms quantization bucket
@@ -87,7 +135,7 @@ class OTPRelayDefenseEngine:
         total_k = len(intervals)
         entropy = -sum((cnt / total_k) * math.log2(cnt / total_k) for cnt in bins.values())
 
-        # 3. Detect Superhuman Keystroke Speed (Automated Relay Bot)
+        # 5. Detect Superhuman Keystroke Speed (Automated Relay Bot)
         if mean_dt < self.max_bot_speed_ms and std_dev < 8.0:
             return OTPDefenseResult(
                 is_valid=False,
@@ -98,7 +146,7 @@ class OTPRelayDefenseEngine:
                 mean_interval_ms=round(mean_dt, 1),
             )
 
-        # 4. Detect Zero-Entropy Scripted Keystrokes
+        # 6. Detect Zero-Entropy Scripted Keystrokes
         if entropy < self.min_human_entropy and mean_dt < 60.0:
             return OTPDefenseResult(
                 is_valid=False,
@@ -117,4 +165,33 @@ class OTPRelayDefenseEngine:
             reason="Human kinetic keystroke dynamics verified during 3DS challenge",
             entropy=round(entropy, 3),
             mean_interval_ms=round(mean_dt, 1),
+        )
+
+    def audit_3ds2_frictionless_downgrade(self, req: ThreeDSChallengeExemptionRequest) -> ThreeDSExemptionResult:
+        """
+        Prevents carders from spoofing 3DS Requestor Challenge Indicators to force a frictionless flow.
+        Mandates step-up challenge if high-risk telemetry is present.
+        """
+        # Hard Deny of Exemption for Datacenter / TOR or JA3 Spoofing
+        if req.asn_type in ("datacenter", "tor") or req.ja3_ua_mismatch or req.velocity_spike:
+            return ThreeDSExemptionResult(
+                exemption_granted=False,
+                mandate_step_up=True,
+                risk_tier="high_risk_downgrade_attempt",
+                rationale="Frictionless exemption rejected: High-risk network telemetry detected (Datacenter/JA3 Mismatch/Velocity Spike)",
+            )
+
+        if req.amount >= 2000.0 and req.requested_exemption == "low_value":
+            return ThreeDSExemptionResult(
+                exemption_granted=False,
+                mandate_step_up=True,
+                risk_tier="amount_exemption_breach",
+                rationale=f"Low-value exemption rejected: Amount ₹{req.amount:,.2f} exceeds RBI ₹2,000 threshold",
+            )
+
+        return ThreeDSExemptionResult(
+            exemption_granted=True,
+            mandate_step_up=False,
+            risk_tier="genuine_low_risk",
+            rationale="Legitimate low-risk transaction: 3DS2 frictionless authentication permitted",
         )

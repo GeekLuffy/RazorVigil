@@ -346,4 +346,50 @@ def test_bayesian_minimum_expected_loss_optimization():
     assert high_risk["net_financial_savings_vs_pass"] > 40000.0
 
 
+def test_aitm_reverse_proxy_origin_interception():
+    """
+    AiTM (Adversary-in-the-Middle) Proxy Defense Audit:
+    Verifies that Evilginx/Modlishka reverse-proxies spoofing origin headers are intercepted.
+    """
+    from backend.decision.otp_defense import OTPRelayDefenseEngine, OTPVerificationRequest
+
+    engine = OTPRelayDefenseEngine()
+    req = OTPVerificationRequest(
+        transaction_id="tx_aitm_01",
+        order_id="order_aitm_01",
+        otp_code="582910",
+        keystroke_intervals_ms=[180.0, 220.0, 190.0, 210.0, 200.0],
+        client_reported_origin="evil-phish-checkout.com",
+        gateway_origin="checkout.razorshield.io",
+    )
+    res = engine.evaluate_otp_entry(req)
+    assert res.is_valid is False
+    assert res.mitm_proxy_detected is True
+    assert res.risk_score == 1.00
+
+
+def test_3ds2_frictionless_downgrade_rejection():
+    """
+    3DS2 Frictionless Downgrade Audit:
+    Verifies that attackers attempting to force a frictionless flow on high-risk network traffic are forced into step-up.
+    """
+    from backend.decision.otp_defense import OTPRelayDefenseEngine, ThreeDSChallengeExemptionRequest
+
+    engine = OTPRelayDefenseEngine()
+    req = ThreeDSChallengeExemptionRequest(
+        transaction_id="tx_downgrade_01",
+        amount=14999.0,
+        requested_exemption="frictionless",
+        device_fingerprint="fp_carder_spoof_01",
+        asn_type="datacenter",
+        ja3_ua_mismatch=True,
+        velocity_spike=True,
+    )
+    res = engine.audit_3ds2_frictionless_downgrade(req)
+    assert res.exemption_granted is False
+    assert res.mandate_step_up is True
+    assert res.risk_tier == "high_risk_downgrade_attempt"
+
+
+
 

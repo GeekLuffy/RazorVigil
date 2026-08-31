@@ -26,9 +26,14 @@ from backend.agent.attestation import AgentAttestationValidator
 from backend.canary.canary_cards import CanaryCards
 from backend.copilot.fraud_analyst import generate_investigation_note
 from backend.decision.tiering import DecisionEngine
-from backend.decision.otp_defense import OTPRelayDefenseEngine, OTPVerificationRequest
+from backend.decision.otp_defense import (
+    OTPRelayDefenseEngine,
+    OTPVerificationRequest,
+    ThreeDSChallengeExemptionRequest,
+)
 from backend.graph.cluster_engine import ClusterEngine
 from backend.models.features import build_feature_vector
+
 from backend.models.inference import RiskScorer
 from backend.razorpay_client import RazorpayClient
 from backend.recovery.recovery_stub import RecoveryStub
@@ -484,6 +489,7 @@ async def verify_3ds_otp(req: OTPVerificationRequest):
         "is_bot_relay": res.is_bot_relay,
         "risk_score": res.risk_score,
         "reason": res.reason,
+        "mitm_proxy_detected": res.mitm_proxy_detected,
         "kinetic_metrics": {
             "entropy": res.entropy,
             "mean_interval_ms": res.mean_interval_ms,
@@ -491,8 +497,25 @@ async def verify_3ds_otp(req: OTPVerificationRequest):
     }
 
 
+@app.post("/3ds/exemption-audit")
+async def audit_3ds_challenge_exemption(req: ThreeDSChallengeExemptionRequest):
+    """
+    3DS2 Frictionless Downgrade Defense Endpoint:
+    Audits requested frictionless flow / TRA exemptions. Rejects exemptions if high-risk telemetry is present.
+    """
+    res = otp_defense.audit_3ds2_frictionless_downgrade(req)
+    return {
+        "transaction_id": req.transaction_id,
+        "exemption_granted": res.exemption_granted,
+        "mandate_step_up": res.mandate_step_up,
+        "risk_tier": res.risk_tier,
+        "rationale": res.rationale,
+    }
+
+
 @app.get("/decision/bayesian-mel")
 async def get_bayesian_minimum_expected_loss(risk_score: float = 0.45, amount: float = 5000.0):
+
     """
     Bayesian Minimum Expected Loss (MEL) Calculator Endpoint:
     Computes mathematical expected loss across Pass vs. Recovery vs. Hard-Block decisions.
