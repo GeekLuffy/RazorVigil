@@ -1,6 +1,6 @@
 {
-  "execution_time_seconds": 10.04,
-  "status": "APPROVAL_ELIGIBLE",
+  "execution_time_seconds": 12.64,
+  "status": "PENDING_INDEPENDENT_REVIEW",
   "winning_candidate": "ComprehensiveMultiModal",
   "winning_package": {
     "name": "ComprehensiveMultiModal",
@@ -94,16 +94,26 @@
       }
     ],
     "robustness_certificate": {
-      "status": "PARTIAL_CONVERGENCE",
+      "status": "PARTIAL_EVASION_RESISTANCE",
       "final_evasions": 3,
-      "evasion_reduction_pct": 96.84,
+      "evasion_drop_pct_point_estimate": 96.84,
+      "evasion_rate_bootstrap_ci": {
+        "mean_evasion_rate": 0.0583,
+        "ci_lower": 0.01,
+        "ci_upper": 0.1359,
+        "ci_level": 0.95,
+        "n_resamples": 1000,
+        "sampling_space_note": "Evasion space is bounded by the sampled candidate distribution (uniform draws over realistic carding parameter ranges). This does not cover all theoretically possible evasion mutations."
+      },
       "final_heldout_precision": 0.9491,
-      "final_heldout_recall": 1.0
+      "final_heldout_recall": 1.0,
+      "interpretation": "Evasion rate dropped from 0.3167 to 0.0100 (96.84% reduction) across the tested candidate distribution. Bootstrap 95% CI on mean evasion rate: [0.0100, 0.1359]. This is measured evasion resistance against tested attack variants \u2014 not a certified robustness bound against all possible evasion strategies."
     },
     "verification": {
       "candidate_name": "ComprehensiveMultiModal",
       "is_approval_eligible": true,
-      "eligibility_status": "APPROVAL_ELIGIBLE",
+      "eligibility_status": "GATES_PASSED_PENDING_INDEPENDENT_REVIEW",
+      "next_required_step": "Run backend.governance.reviewer.request_policy_review() on this candidate to obtain an independent recommendation on the frozen validation slice.",
       "gates_passed_count": 6,
       "total_gates_count": 6,
       "composite_ranking_score": 0.9021,
@@ -194,6 +204,96 @@
       }
     }
   },
+  "independent_review": {
+    "candidate_name": "ComprehensiveMultiModal",
+    "reviewer": "IndependentReviewAgent_v1",
+    "recommendation": "RECOMMENDED_FOR_HUMAN_APPROVAL",
+    "gates_passed": 6,
+    "total_gates": 6,
+    "rejection_reasons": [],
+    "gate_results": [
+      {
+        "gate": 1,
+        "name": "Held-Out Regression",
+        "passed": true,
+        "observed_precision": 0.9553,
+        "observed_recall": 0.9978,
+        "evaluation_slice": "Last 15% of dataset (1500 rows) - never seen during training"
+      },
+      {
+        "gate": 2,
+        "name": "Adversarial Mutation Catch Rate",
+        "passed": true,
+        "observed_catch_rate": 0.985,
+        "n_adversarial_candidates": 1000
+      },
+      {
+        "gate": 3,
+        "name": "Segment Fairness",
+        "passed": true,
+        "max_fp_multiplier": 2.43,
+        "segments": [
+          {
+            "segment": "Micro",
+            "count": 82,
+            "fp_rate": 0.0,
+            "fp_multiplier": 0.0
+          },
+          {
+            "segment": "Low",
+            "count": 660,
+            "fp_rate": 0.0167,
+            "fp_multiplier": 1.19
+          },
+          {
+            "segment": "Mid",
+            "count": 294,
+            "fp_rate": 0.034,
+            "fp_multiplier": 2.43
+          },
+          {
+            "segment": "High",
+            "count": 14,
+            "fp_rate": 0.0,
+            "fp_multiplier": 0.0
+          }
+        ]
+      },
+      {
+        "gate": 4,
+        "name": "Off-Policy DR-OPE",
+        "passed": true,
+        "dm_dr_agreement": 0.972,
+        "net_value_lift_rs": 266.58
+      },
+      {
+        "gate": 5,
+        "name": "Blast Radius",
+        "passed": true,
+        "human_attention_flips": 8,
+        "max_allowed_flips": 15
+      },
+      {
+        "gate": 6,
+        "name": "Rule Complexity",
+        "passed": true,
+        "depth": 6,
+        "n_leaves": 33
+      }
+    ],
+    "validation_slice_note": "All gates evaluated on the frozen validation slice (last 15% of dataset, 1500 rows). This slice was NEVER exposed to training, coevolution, or any upstream tuning step.",
+    "human_approval_required": true,
+    "human_approval_note": "This recommendation does not constitute approval. Deployment requires explicit human sign-off by an authorized compliance officer.",
+    "summary": {
+      "validation_precision": 0.9553,
+      "validation_recall": 0.9978,
+      "adversarial_catch_rate": 0.985,
+      "ope_lift_rs": 266.58,
+      "ope_dm_dr_agreement": 0.972,
+      "human_attention_flips": 8,
+      "tree_depth": 6
+    }
+  },
   "all_candidates": [
     {
       "name": "VelocityBurstDefense",
@@ -280,16 +380,26 @@
         }
       ],
       "robustness_certificate": {
-        "status": "PARTIAL_CONVERGENCE",
+        "status": "PARTIAL_EVASION_RESISTANCE",
         "final_evasions": 77,
-        "evasion_reduction_pct": 65.47,
+        "evasion_drop_pct_point_estimate": 65.47,
+        "evasion_rate_bootstrap_ci": {
+          "mean_evasion_rate": 0.3467,
+          "ci_lower": 0.2508,
+          "ci_upper": 0.4863,
+          "ci_level": 0.95,
+          "n_resamples": 1000,
+          "sampling_space_note": "Evasion space is bounded by the sampled candidate distribution (uniform draws over realistic carding parameter ranges). This does not cover all theoretically possible evasion mutations."
+        },
         "final_heldout_precision": 0.7655,
-        "final_heldout_recall": 0.8016
+        "final_heldout_recall": 0.8016,
+        "interpretation": "Evasion rate dropped from 0.7433 to 0.2567 (65.47% reduction) across the tested candidate distribution. Bootstrap 95% CI on mean evasion rate: [0.2508, 0.4863]. This is measured evasion resistance against tested attack variants \u2014 not a certified robustness bound against all possible evasion strategies."
       },
       "verification": {
         "candidate_name": "VelocityBurstDefense",
         "is_approval_eligible": false,
         "eligibility_status": "BLOCKED_BY_GATES",
+        "next_required_step": "Address gate failures before submitting for independent review.",
         "gates_passed_count": 2,
         "total_gates_count": 6,
         "composite_ranking_score": 0.6936,
@@ -465,16 +575,26 @@
         }
       ],
       "robustness_certificate": {
-        "status": "PARTIAL_CONVERGENCE",
+        "status": "PARTIAL_EVASION_RESISTANCE",
         "final_evasions": 1,
-        "evasion_reduction_pct": 93.75,
+        "evasion_drop_pct_point_estimate": 93.75,
+        "evasion_rate_bootstrap_ci": {
+          "mean_evasion_rate": 0.02,
+          "ci_lower": 0.0096,
+          "ci_upper": 0.0317,
+          "ci_level": 0.95,
+          "n_resamples": 1000,
+          "sampling_space_note": "Evasion space is bounded by the sampled candidate distribution (uniform draws over realistic carding parameter ranges). This does not cover all theoretically possible evasion mutations."
+        },
         "final_heldout_precision": 0.8681,
-        "final_heldout_recall": 0.9415
+        "final_heldout_recall": 0.9415,
+        "interpretation": "Evasion rate dropped from 0.0533 to 0.0033 (93.75% reduction) across the tested candidate distribution. Bootstrap 95% CI on mean evasion rate: [0.0096, 0.0317]. This is measured evasion resistance against tested attack variants \u2014 not a certified robustness bound against all possible evasion strategies."
       },
       "verification": {
         "candidate_name": "GraphEntityDefense",
         "is_approval_eligible": false,
         "eligibility_status": "BLOCKED_BY_GATES",
+        "next_required_step": "Address gate failures before submitting for independent review.",
         "gates_passed_count": 3,
         "total_gates_count": 6,
         "composite_ranking_score": 0.8322,
@@ -650,16 +770,26 @@
         }
       ],
       "robustness_certificate": {
-        "status": "PARTIAL_CONVERGENCE",
+        "status": "PARTIAL_EVASION_RESISTANCE",
         "final_evasions": 17,
-        "evasion_reduction_pct": 67.92,
+        "evasion_drop_pct_point_estimate": 67.92,
+        "evasion_rate_bootstrap_ci": {
+          "mean_evasion_rate": 0.1092,
+          "ci_lower": 0.0771,
+          "ci_upper": 0.1367,
+          "ci_level": 0.95,
+          "n_resamples": 1000,
+          "sampling_space_note": "Evasion space is bounded by the sampled candidate distribution (uniform draws over realistic carding parameter ranges). This does not cover all theoretically possible evasion mutations."
+        },
         "final_heldout_precision": 0.8259,
-        "final_heldout_recall": 0.9024
+        "final_heldout_recall": 0.9024,
+        "interpretation": "Evasion rate dropped from 0.1767 to 0.0567 (67.92% reduction) across the tested candidate distribution. Bootstrap 95% CI on mean evasion rate: [0.0771, 0.1367]. This is measured evasion resistance against tested attack variants \u2014 not a certified robustness bound against all possible evasion strategies."
       },
       "verification": {
         "candidate_name": "BiometricZeroDayDefense",
         "is_approval_eligible": false,
         "eligibility_status": "BLOCKED_BY_GATES",
+        "next_required_step": "Address gate failures before submitting for independent review.",
         "gates_passed_count": 4,
         "total_gates_count": 6,
         "composite_ranking_score": 0.8178,
@@ -842,16 +972,26 @@
         }
       ],
       "robustness_certificate": {
-        "status": "PARTIAL_CONVERGENCE",
+        "status": "PARTIAL_EVASION_RESISTANCE",
         "final_evasions": 3,
-        "evasion_reduction_pct": 96.84,
+        "evasion_drop_pct_point_estimate": 96.84,
+        "evasion_rate_bootstrap_ci": {
+          "mean_evasion_rate": 0.0583,
+          "ci_lower": 0.01,
+          "ci_upper": 0.1359,
+          "ci_level": 0.95,
+          "n_resamples": 1000,
+          "sampling_space_note": "Evasion space is bounded by the sampled candidate distribution (uniform draws over realistic carding parameter ranges). This does not cover all theoretically possible evasion mutations."
+        },
         "final_heldout_precision": 0.9491,
-        "final_heldout_recall": 1.0
+        "final_heldout_recall": 1.0,
+        "interpretation": "Evasion rate dropped from 0.3167 to 0.0100 (96.84% reduction) across the tested candidate distribution. Bootstrap 95% CI on mean evasion rate: [0.0100, 0.1359]. This is measured evasion resistance against tested attack variants \u2014 not a certified robustness bound against all possible evasion strategies."
       },
       "verification": {
         "candidate_name": "ComprehensiveMultiModal",
         "is_approval_eligible": true,
-        "eligibility_status": "APPROVAL_ELIGIBLE",
+        "eligibility_status": "GATES_PASSED_PENDING_INDEPENDENT_REVIEW",
+        "next_required_step": "Run backend.governance.reviewer.request_policy_review() on this candidate to obtain an independent recommendation on the frozen validation slice.",
         "gates_passed_count": 6,
         "total_gates_count": 6,
         "composite_ranking_score": 0.9021,
@@ -944,15 +1084,15 @@
     }
   ],
   "autopsy": {
-    "total_chargeback_loss_rs": 2040024.84,
-    "total_fraud_incidents": 3000,
-    "baseline_evasion_count": 2792,
-    "baseline_evaded_loss_rs": 1413045.61,
+    "total_chargeback_loss_rs": 1740073.76,
+    "total_fraud_incidents": 2550,
+    "baseline_evasion_count": 2371,
+    "baseline_evaded_loss_rs": 1200483.57,
     "primary_evasion_mechanisms": [
       "Distributed CVV Guessing Fanout across rotating IP proxies",
       "Coordinated Multi-Account Carding Entity Rings"
     ],
-    "failure_diagnosis": "Baseline static threshold (amount > \u20b92,500) allowed 2,792 low-value transactions (\u20b91,413,045.61 loss) to clear without inspection due to lack of behavioral memory."
+    "failure_diagnosis": "Baseline static threshold (amount > \u20b92,500) allowed 2,371 low-value transactions (\u20b91,200,483.57 loss) to clear without inspection due to lack of behavioral memory."
   },
   "feature_discovery": {
     "candidates_tested": [

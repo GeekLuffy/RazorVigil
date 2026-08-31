@@ -80,8 +80,19 @@ def run_autonomous_policy_engineer(
 
     df_eng = add_engineered_features(df)
 
+    # Strict isolation: carve out 85% training partition for engineer.
+    # The remaining 15% validation slice is withheld and evaluated only by reviewer.py.
+    from sklearn.model_selection import train_test_split
+    y_all = df_eng["label"].values.astype(int)
+    seg_all = df_eng["segment"].values if "segment" in df_eng.columns else (
+        df_eng["attack_type"].values if "attack_type" in df_eng.columns else y_all
+    )
+    strat_key = [f"{y_all[i]}_{seg_all[i]}" for i in range(len(df_eng))]
+    train_df_eng, _ = train_test_split(df_eng, test_size=0.15, stratify=strat_key, random_state=seed)
+    train_df_eng = train_df_eng.reset_index(drop=True)
+
     # 1. Forensic Loss Autopsy
-    autopsy_summary = run_forensic_autopsy(df_eng)
+    autopsy_summary = run_forensic_autopsy(train_df_eng)
 
     # 2. Automated Feature Discovery
     discovery_res = discover_features(data_path)
@@ -121,13 +132,14 @@ def run_autonomous_policy_engineer(
     best_score = -1.0
     coevo_res_map: dict = {}  # Maps candidate name -> hardened DecisionTreeClassifier
 
-    y_train = df_eng["label"].values.astype(int)
+    y_train = train_df_eng["label"].values.astype(int)
 
     for cand in candidates:
-        available_feats = [f for f in cand["features"] if f in df_eng.columns]
-        X_train = df_eng[available_feats].fillna(0).values.astype(np.float32)
+        available_feats = [f for f in cand["features"] if f in train_df_eng.columns]
+        X_train = train_df_eng[available_feats].fillna(0).values.astype(np.float32)
 
         # Train initial policy tree
+
         base_tree = DecisionTreeClassifier(max_depth=5, min_samples_leaf=10, random_state=seed, class_weight="balanced")
         base_tree.fit(X_train, y_train)
 

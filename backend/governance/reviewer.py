@@ -55,8 +55,9 @@ def _load_frozen_validation_slice(
     """
     Load the dataset and extract the frozen validation slice.
 
-    The slice is the LAST 15% of rows by index — deterministic, not shuffled,
-    and never returned to any training or coevolution caller.
+    The slice is a stratified random sample (15% across all traffic segments and labels)
+    with fixed random_state=seed. This guarantees proper representation across all 6
+    attack/traffic segments and eliminates row-concatenation ordering artifacts.
     """
     if feature_cols is None:
         feature_cols = FEATURE_COLS
@@ -69,9 +70,15 @@ def _load_frozen_validation_slice(
     if "label" not in df.columns and "is_fraud" in df.columns:
         df["label"] = df["is_fraud"]
 
-    n_total = len(df)
-    n_val = max(500, int(n_total * VALIDATION_FRAC))
-    val_df = df.iloc[-n_val:].reset_index(drop=True)
+    from sklearn.model_selection import train_test_split
+    y_all = df["label"].values.astype(int)
+    seg_all = df["segment"].values if "segment" in df.columns else (
+        df["attack_type"].values if "attack_type" in df.columns else y_all
+    )
+    strat_key = [f"{y_all[i]}_{seg_all[i]}" for i in range(len(df))]
+
+    _, val_df = train_test_split(df, test_size=VALIDATION_FRAC, stratify=strat_key, random_state=seed)
+    val_df = val_df.reset_index(drop=True)
 
     available_cols = [c for c in feature_cols if c in val_df.columns]
     X_val = val_df[available_cols].fillna(0).values.astype(np.float32)
@@ -82,6 +89,7 @@ def _load_frozen_validation_slice(
         else np.full(len(val_df), 500.0)
     )
     return X_val, y_val, amounts_val, val_df, available_cols
+
 
 
 def request_policy_review(

@@ -44,10 +44,15 @@ def evaluate_off_policy(
     policy_tree: DecisionTreeClassifier,
     feature_cols: list = None,
     data_path: Path = DATA_PATH,
+    ipw_clip_threshold: float = 20.0,
     seed: int = 42
 ) -> dict:
     """
     Run Doubly-Robust Off-Policy Evaluation comparing target policy vs baseline logging.
+
+    Applies IPW weight clipping (capped at ipw_clip_threshold, default 20.0x) to protect
+    against high variance from low-propensity strata, while also computing uncapped
+    raw estimates to measure clipping sensitivity.
 
     Returns estimated value lift under stated assumptions — not a proof of real-world
     performance. All numbers should be interpreted as estimates under the assumptions
@@ -105,17 +110,27 @@ def evaluate_off_policy(
     # 4. Direct Method (DM) Value
     v_dm = float(np.mean(np.where(target_actions == 1, q1_hat, q0_hat)))
 
-    # 5. Inverse Propensity Weighting (IPW) Value
+    # 5. Inverse Propensity Weighting (IPW) Value (raw & clipped)
     match_mask = (logged_actions == target_actions)
     prob_logged_action = np.where(logged_actions == 1, propensity, 1.0 - propensity)
-    ipw_weights = match_mask.astype(float) / np.clip(prob_logged_action, 0.02, 1.0)
-    v_ipw = float(np.mean(ipw_weights * logged_rewards))
+    ipw_weights_raw = match_mask.astype(float) / np.clip(prob_logged_action, 0.02, 1.0)
+    ipw_weights_clipped = np.clip(ipw_weights_raw, 0.0, ipw_clip_threshold)
 
-    # 6. Doubly-Robust (DR) Estimator
+    v_ipw_raw = float(np.mean(ipw_weights_raw * logged_rewards))
+    v_ipw_clipped = float(np.mean(ipw_weights_clipped * logged_rewards))
+
+    # 6. Doubly-Robust (DR) Estimator (raw & clipped)
     q_target = np.where(target_actions == 1, q1_hat, q0_hat)
     q_logged = np.where(logged_actions == 1, q1_hat, q0_hat)
-    dr_residuals = ipw_weights * (logged_rewards - q_logged)
-    v_dr = float(np.mean(q_target + dr_residuals))
+    dr_residuals_raw = ipw_weights_raw * (logged_rewards - q_logged)
+    dr_residuals_clipped = ipw_weights_clipped * (logged_rewards - q_logged)
+
+    v_dr_raw = float(np.mean(q_target + dr_residuals_raw))
+    v_dr_clipped = float(np.mean(q_target + dr_residuals_clipped))
+
+    # Primary value uses the clipped DR estimator for numerical stability
+    v_dr = v_dr_clipped
+    v_ipw = v_ipw_clipped
 
     # 7. Oracle Ground-Truth Value (for verification)
     v_oracle = float(np.mean(np.where(target_actions == 1, reward_if_block, reward_if_pass)))
@@ -126,10 +141,27 @@ def evaluate_off_policy(
     # dm_dr_agreement is a relative agreement score (not a statistical test):
     # 1 - |v_dr - v_dm| / max(|v_dr|, 1). Higher = more consistent between estimators.
     dm_dr_agreement = max(0.0, 1.0 - abs(v_dr - v_dm) / max(abs(v_dr), 1.0))
+    dm_dr_agreement_raw = max(0.0, 1.0 - abs(v_dr_raw - v_dm) / max(abs(v_dr_raw), 1.0))
 
-    # Maximum IPW weight (positivity check — values >> 10 indicate potential violations)
-    max_ipw_weight = float(ipw_weights.max())
+    # Maximum IPW weight (positivity check)
+    max_ipw_weight = float(ipw_weights_raw.max())
+    p99_ipw_weight = float(np.percentile(ipw_weights_raw[match_mask], 99)) if match_mask.sum() > 0 else 0.0
     positivity_concern = bool(max_ipw_weight > 20.0)
+
+    # Sensitivity analysis across multiple clipping thresholds
+    sensitivity_table = []
+    for cap in [5.0, 10.0, 15.0, 20.0, 30.0, None]:
+        w = ipw_weights_raw if cap is None else np.clip(ipw_weights_raw, 0.0, cap)
+        cap_v_dr = float(np.mean(q_target + w * (logged_rewards - q_logged)))
+        cap_lift = float(cap_v_dr - v_baseline_logged)
+        sensitivity_table.append({
+            "threshold": f"{cap:.1f}x" if cap is not None else "Uncapped (raw)",
+            "value_doubly_robust": round(cap_v_dr, 2),
+            "net_value_lift_rs": round(cap_lift, 2),
+        })
+
+    max_sensitivity_spread = max(abs(s["value_doubly_robust"] - v_dr) for s in sensitivity_table)
+    is_clipping_stable = bool(max_sensitivity_spread < 5.0)
 
     methodology_notes = {
         "logging_policy": (
@@ -147,11 +179,11 @@ def evaluate_off_policy(
             "This is a relative consistency score between two estimators, NOT a statistical hypothesis test. "
             "A value >= 0.80 indicates the two estimators are within 20% of each other in relative terms."
         ),
-        "positivity": (
-            "Propensity is clipped to [0.02, 0.98]. At very low amounts, effective IPW weights approach 50x. "
-            f"Max observed IPW weight: {max_ipw_weight:.1f}x. "
-            + ("POSITIVITY CONCERN: Weights > 20x detected — OPE estimates for low-amount stratum may be unreliable. "
-               if positivity_concern else "No severe positivity violation detected (max weight <= 20x).")
+        "positivity_and_clipping": (
+            f"Propensity is clipped to [0.02, 0.98]. Max observed IPW weight: {max_ipw_weight:.1f}x (99th pct: {p99_ipw_weight:.1f}x). "
+            f"IPW weights are capped at {ipw_clip_threshold:.1f}x for primary DR estimate. "
+            + ("Sensitivity analysis confirms the DR lift is STABLE across caps (spread < Rs.5.00). "
+               if is_clipping_stable else "SENSITIVITY WARNING: Lift varies across clipping thresholds. ")
         ),
         "interpretation": (
             "All value estimates (v_DR, v_DM, net lift) are point estimates under the stated synthetic "
@@ -163,14 +195,22 @@ def evaluate_off_policy(
 
     return {
         "value_doubly_robust": round(v_dr, 2),
+        "value_doubly_robust_raw": round(v_dr_raw, 2),
         "value_direct_method": round(v_dm, 2),
         "value_inverse_propensity": round(v_ipw, 2),
+        "value_inverse_propensity_raw": round(v_ipw_raw, 2),
         "value_oracle_true": round(v_oracle, 2),
         "baseline_logged_value": round(v_baseline_logged, 2),
         "net_value_lift_rs": round(v_dr - v_baseline_logged, 2),
+        "net_value_lift_rs_raw": round(v_dr_raw - v_baseline_logged, 2),
         "dm_dr_agreement_score": round(dm_dr_agreement, 4),
+        "dm_dr_agreement_score_raw": round(dm_dr_agreement_raw, 4),
+        "ipw_clip_threshold": ipw_clip_threshold,
         "max_ipw_weight": round(max_ipw_weight, 2),
+        "p99_ipw_weight": round(p99_ipw_weight, 2),
         "positivity_concern": positivity_concern,
+        "is_clipping_stable": is_clipping_stable,
+        "clipping_sensitivity_table": sensitivity_table,
         "passed_ope_gate": bool(dm_dr_agreement >= 0.80 and v_dr > v_baseline_logged),
         "methodology_notes": methodology_notes,
     }
@@ -180,7 +220,9 @@ if __name__ == "__main__":
     from sklearn.tree import DecisionTreeClassifier
     dummy_tree = DecisionTreeClassifier(max_depth=4).fit(np.random.randn(200, 10), np.random.randint(0, 2, 200))
     res = evaluate_off_policy(dummy_tree)
-    print("Off-Policy Eval:", {k: v for k, v in res.items() if k != "methodology_notes"})
-    print("Positivity concern:", res["positivity_concern"])
-    print("Max IPW weight:", res["max_ipw_weight"])
+    print("Off-Policy Eval (clipped at 20x):", res["net_value_lift_rs"])
+    print("Off-Policy Eval (raw uncapped):", res["net_value_lift_rs_raw"])
+    print("Sensitivity table:", res["clipping_sensitivity_table"])
+    print("Is stable:", res["is_clipping_stable"])
+
 
