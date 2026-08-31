@@ -21,7 +21,7 @@ import {
   Bot
 } from 'lucide-react'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../config'
 
 const STATUS_BADGES = {
   PENDING_REVIEW: { label: 'PENDING REVIEW', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' },

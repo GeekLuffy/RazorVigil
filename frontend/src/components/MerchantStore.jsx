@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { ShoppingBag, Lock, ShieldCheck, QrCode, ArrowRight, RefreshCw, Smartphone, Laptop, CheckCircle2, AlertTriangle, X, CreditCard } from 'lucide-react'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../config'
 
 let rzpScriptPromise = null
 function loadRazorpayScript() {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Flame, ShieldAlert, Bot, Globe, CheckCircle2, Play, Loader2 } from 'lucide-react'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../config'
 
 export default function AttackLaunchpad({ onTriggerStoreDemo }) {
   const [loadingAction, setLoadingAction] = useState(null)

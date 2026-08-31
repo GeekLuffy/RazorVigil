@@ -16,7 +16,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../config'
 
 export default function ActiveDefenseWorkspace({ copilotNotes = [] }) {
   const [rulesData, setRulesData] = useState(null)

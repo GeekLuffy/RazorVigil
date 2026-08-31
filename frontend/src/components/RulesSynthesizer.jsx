@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ShieldAlert, Code2, Copy, Check, Terminal, ExternalLink, Sparkles } from 'lucide-react'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../config'
 
 export default function RulesSynthesizer() {
   const [rulesData, setRulesData] = useState(null)

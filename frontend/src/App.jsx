@@ -16,10 +16,10 @@ import FraudGraphCanvas from './components/FraudGraphCanvas'
 import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
 import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 
-// ─── Config ───────────────────────────────────────────────────────────────────
-const WS_URL = 'ws://localhost:8000/ws'
+import { API_BASE, WS_URL } from './config'
 const MAX_FEED_ITEMS = 80
 const MAX_CHART_POINTS = 60
+
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const TIER_META = {

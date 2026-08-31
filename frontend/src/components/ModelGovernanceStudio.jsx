@@ -8,7 +8,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
 
-const API_BASE = 'http://localhost:8000'
+import { API_BASE } from '../config'
 
 export default function ModelGovernanceStudio() {
   const [activeSubTab, setActiveSubTab] = useState('engineer') // 'engineer' | 'benchmarks' | 'drift' | 'blast' | 'features'
