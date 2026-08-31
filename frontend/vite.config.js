@@ -23,8 +23,11 @@ export default defineConfig({
       '/decision': { target: 'http://localhost:8000', changeOrigin: true },
       '/cases': { target: 'http://localhost:8000', changeOrigin: true },
       '/governance': { target: 'http://localhost:8000', changeOrigin: true },
+      '/rules': { target: 'http://localhost:8000', changeOrigin: true },
+      '/antichecker': { target: 'http://localhost:8000', changeOrigin: true },
       '/metrics': { target: 'http://localhost:8000', changeOrigin: true },
       '/ws': { target: 'ws://localhost:8000', ws: true, changeOrigin: true },
     },
+
   },
 })

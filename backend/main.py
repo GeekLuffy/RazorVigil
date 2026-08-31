@@ -1324,3 +1324,12 @@ async def request_independent_policy_review(candidate_name: str = "LatestCandida
         raise HTTPException(status_code=500, detail=f"Independent review failed: {str(e)}")
 
 
+# Mount pre-built React Frontend at root for high-performance zero-proxy single-port serving
+from fastapi.staticfiles import StaticFiles
+
+_frontend_dist = Path(__file__).resolve().parents[1] / "frontend" / "dist"
+if _frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(_frontend_dist), html=True), name="static_frontend")
+
+
+
