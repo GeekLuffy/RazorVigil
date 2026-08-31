@@ -26,37 +26,36 @@ driver.set_window_size(1920, 1080)
 base_url = "http://localhost:5173"
 
 TABS_CONFIG = [
-    ("Live SOC Gateway", "01_soc_command_center.png", "Live SOC Gateway & Real-Time Telemetry Stream"),
-    ("Threat Simulator & Lab", "02_threat_simulator_lab.png", "Threat Simulator & Multi-Vector Attack Launchpad"),
-    ("Active Defense & WAF", "03_active_defense_waf.png", "Active Defense, WAF Rules & Canary Token Traps"),
-    ("Disputes & Evidence", "04_disputes_and_evidence.png", "Autonomous Dispute Dossier & Chargeback Defense"),
-    ("Model Governance & Policy Studio", "05_model_governance_studio.png", "Model Governance Studio & 12-Month Drift Tracker"),
-    ("Architecture & RBI Specs", "06_architecture_and_rbi_specs.png", "Full Architecture Deep Dive & RBI Compliance Specs"),
-    ("Live Merchant Store", "07_live_merchant_store.png", "Merchant Store Sandbox with Multi-Modal Biometrics"),
+    ("Live SOC", "01_soc_command_center.png", "Live SOC Gateway & Real-Time Telemetry Stream"),
+    ("Threat Simulator", "02_threat_simulator_lab.png", "Threat Simulator & Multi-Vector Attack Launchpad"),
+    ("Active Defense", "03_active_defense_waf.png", "Active Defense, WAF Rules & Canary Token Traps"),
+    ("Disputes", "04_disputes_and_evidence.png", "Autonomous Dispute Dossier & Chargeback Defense"),
+    ("Governance", "05_model_governance_studio.png", "Model Governance Studio & 12-Month Drift Tracker"),
+    ("Specs", "06_architecture_and_rbi_specs.png", "Full Architecture Deep Dive & RBI Compliance Specs"),
+    ("Merchant Store", "07_live_merchant_store.png", "Merchant Store Sandbox with Multi-Modal Biometrics"),
 ]
 
 try:
     print(f"Loading {base_url}...")
     driver.get(base_url)
-    time.sleep(3)
+    time.sleep(3.5)
 
-    for tab_label, filename, description in TABS_CONFIG:
-        print(f"\nNavigating to '{tab_label}'...")
+    for search_term, filename, description in TABS_CONFIG:
+        print(f"\nNavigating to '{search_term}'...")
         buttons = driver.find_elements(By.TAG_NAME, "button")
         clicked = False
         for b in buttons:
-            if b.text.strip().lower() == tab_label.lower():
-                driver.execute_script("arguments[0].click();", b)
+            txt = b.text.strip()
+            if search_term.lower() in txt.lower():
+                driver.execute_script("arguments[0].scrollIntoView(); arguments[0].click();", b)
                 clicked = True
+                print(f"  [Clicked button: '{txt}']")
                 break
-        if not clicked:
-            for b in buttons:
-                if tab_label.lower() in b.text.strip().lower():
-                    driver.execute_script("arguments[0].click();", b)
-                    clicked = True
-                    break
 
-        time.sleep(2.5)  # Wait for tab render & charts
+        if not clicked:
+            print(f"  [WARNING: Could not find button for '{search_term}']")
+
+        time.sleep(3.0)  # Wait for tab render & charts to settle
         dest_path = output_dir / filename
         driver.save_screenshot(str(dest_path))
         print(f"  [OK] Saved {filename} ({dest_path.stat().st_size / 1024:.1f} KB)")

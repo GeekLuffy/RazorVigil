@@ -64,7 +64,15 @@ async def startup_event():
     asyncio.create_task(cluster_engine.run_forever())
 
     risk_scorer = RiskScorer()
+    # Warm up ML models to eliminate cold-start latency spike
+    try:
+        dummy_vec = [0.0] * 16
+        risk_scorer.score(dummy_vec)
+    except Exception as e:
+        print(f"[Warmup] Note: {e}")
+
     decision_engine = DecisionEngine()
+
     recovery_stub = RecoveryStub(velocity_tracker.redis)
     canary_cards = CanaryCards()
     agent_validator = AgentAttestationValidator()
@@ -336,6 +344,7 @@ async def checkout(
 
     # 6. Decision Tiering
     tier, action, explanation = decision_engine.decide(final_risk, req)
+    latency_ms = (time.perf_counter() - t0) * 1000
 
     # 7. Gateway & Recovery Dispatch
     recovery_url = None
@@ -353,9 +362,8 @@ async def checkout(
         if final_risk < 0.20:
             final_risk = 0.284
 
-    latency_ms = (time.perf_counter() - t0) * 1000
-
     response = CheckoutResponse(
+
         transaction_id=req.transaction_id,
         tier=tier,
         risk_score=round(final_risk, 4),

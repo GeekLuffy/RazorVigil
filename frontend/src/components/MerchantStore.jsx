@@ -403,8 +403,9 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   }
 
   return (
-    <div onMouseMove={handleMouseMove} className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div onMouseMove={handleMouseMove} className="fixed inset-0 z-50 bg-[#070a13]/95 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative">
+
         {/* Close Button */}
         {onClose && (
           <button
