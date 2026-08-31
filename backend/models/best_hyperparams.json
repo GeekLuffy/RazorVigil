@@ -1,0 +1,17 @@
+{
+  "best_pr_auc_val": 0.9999023,
+  "best_params": {
+    "lgb_num_leaves": 114,
+    "lgb_learning_rate": 0.05397301706682601,
+    "lgb_feature_fraction": 0.6850266728113692,
+    "lgb_bagging_fraction": 0.9015628381849522,
+    "lgb_min_child_samples": 18,
+    "cb_depth": 4,
+    "cb_learning_rate": 0.037981003655916196,
+    "cb_l2_leaf_reg": 7.8860331575144205,
+    "w_lgb": 0.30766270282439107
+  },
+  "n_trials": 100,
+  "gpu_nodes_utilized": 5,
+  "optimization_engine": "Optuna-Tree-Structured-Parzen-Estimator"
+}

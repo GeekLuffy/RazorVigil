@@ -51,12 +51,17 @@ def sync():
     create_remote_dir("backend/decision")
     create_remote_dir("backend/antichecker")
     create_remote_dir("backend/recovery")
+    create_remote_dir("backend/governance")
+    create_remote_dir("backend/benchmarks")
+    create_remote_dir("backend/dataset")
     create_remote_dir("data")
     create_remote_dir("data/external")
     create_remote_dir("docs")
+    create_remote_dir("tests")
 
     # Upload backend files and model pickles
     for p in root.glob("backend/**/*.py"):
+
         rel = p.relative_to(root)
         upload_file(p, str(rel))
 
@@ -64,8 +69,13 @@ def sync():
         rel = p.relative_to(root)
         upload_file(p, str(rel))
 
+    for p in root.glob("tests/**/*.py"):
+        rel = p.relative_to(root)
+        upload_file(p, str(rel))
+
     # Upload requirements
     if (root / "requirements.txt").exists():
+
         upload_file(root / "requirements.txt", "requirements.txt")
 
     print("\nSyncing code complete!")
