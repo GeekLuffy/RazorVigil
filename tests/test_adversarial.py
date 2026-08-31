@@ -245,9 +245,10 @@ def test_device_bound_hmac_tamper_rejection():
             ip_hash="attacker_tor_ip"
         )
         assert valid_attacker is False, "Hijacked recovery link must be rejected by cryptographic binding"
-        await redis_client.close()
+        await redis_client.aclose()
 
     asyncio.run(_run_test())
+
 
 
 

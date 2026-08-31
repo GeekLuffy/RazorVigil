@@ -66,11 +66,8 @@ anti_checker: AntiCheckerGuard
 ws_clients: list[WebSocket] = []
 
 
-app = FastAPI(title="RazorShield Sentinel", version="1.0.0")
-
-
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global velocity_tracker, cluster_engine, risk_scorer
     global decision_engine, recovery_stub, canary_cards, agent_validator, razorpay_client, anti_checker
 
@@ -78,7 +75,7 @@ async def startup_event():
     await velocity_tracker.connect()
 
     cluster_engine = ClusterEngine(velocity_tracker.redis)
-    asyncio.create_task(cluster_engine.run_forever())
+    cluster_task = asyncio.create_task(cluster_engine.run_forever())
 
     risk_scorer = RiskScorer()
     # Warm up ML models to eliminate cold-start latency spike
@@ -90,20 +87,34 @@ async def startup_event():
         print(f"[Warmup] Note: {e}")
 
     decision_engine = DecisionEngine()
-
-
     recovery_stub = RecoveryStub(velocity_tracker.redis)
     canary_cards = CanaryCards()
     agent_validator = AgentAttestationValidator()
     razorpay_client = RazorpayClient()
     anti_checker = AntiCheckerGuard(enable_tarpit_poisoning=True)
 
+    yield
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    global velocity_tracker
+    if cluster_task:
+        cluster_task.cancel()
     if velocity_tracker:
         await velocity_tracker.close()
+
+
+
+async def startup_event():
+    """Backward compatibility hook for direct script invocations."""
+    pass
+
+
+async def shutdown_event():
+    """Backward compatibility hook for direct script invocations."""
+    pass
+
+
+app = FastAPI(title="RazorShield Sentinel", version="1.0.0", lifespan=lifespan)
+
+
 
 app.add_middleware(
     CORSMiddleware,
