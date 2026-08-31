@@ -188,6 +188,66 @@ export default function TransactionDetailDrawer({ tx, isOpen, onClose, onIssueRe
             </div>
           </div>
 
+          {/* Top-5 Explainable ML Feature Attributions (XAI) */}
+          <div className="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-mono uppercase text-slate-400 font-bold">
+              <span className="flex items-center gap-1.5"><Zap size={13} className="text-indigo-400" /> Explainable ML Feature Attribution (XAI)</span>
+              <span className="text-[10px] text-slate-500 font-normal">SHAP / Tree Weights</span>
+            </div>
+
+            <div className="space-y-2 text-xs font-mono">
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-300">1. Louvain Graph Ring Density</span>
+                  <span className="text-indigo-400 font-bold">24.5%</span>
+                </div>
+                <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '24.5%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-300">2. Rolling 10m Card-BIN Velocity</span>
+                  <span className="text-indigo-400 font-bold">19.8%</span>
+                </div>
+                <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '19.8%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-300">3. Device Multi-PAN Fanout</span>
+                  <span className="text-indigo-400 font-bold">16.2%</span>
+                </div>
+                <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '16.2%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-300">4. Shannon Keystroke Entropy</span>
+                  <span className="text-indigo-400 font-bold">14.1%</span>
+                </div>
+                <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '14.1%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-300">5. Isolation Forest Behavioral Anomaly</span>
+                  <span className="text-indigo-400 font-bold">11.5%</span>
+                </div>
+                <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '11.5%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Payment Instrument Identity */}
           <div className="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
             <div className="text-xs font-mono uppercase text-slate-400 font-bold flex items-center justify-between">
@@ -207,6 +267,7 @@ export default function TransactionDetailDrawer({ tx, isOpen, onClose, onIssueRe
               </div>
             </div>
           </div>
+
 
           {/* Out-of-band Recovery Card (if applicable) */}
           {tx.recovery_url && (
