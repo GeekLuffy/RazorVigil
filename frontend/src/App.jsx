@@ -6,8 +6,9 @@ import {
 import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
-  ArrowRight, Search, Play, Pause, Keyboard, Clock, ChevronRight
+  ArrowRight, Search, Play, Pause, Clock, ChevronRight
 } from 'lucide-react'
+
 
 import ThreatLabWorkspace from './components/ThreatLabWorkspace'
 import ActiveDefenseWorkspace from './components/ActiveDefenseWorkspace'
@@ -17,9 +18,9 @@ import FraudGraphCanvas from './components/FraudGraphCanvas'
 import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
 import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer'
-import KeyboardShortcutsModal from './components/KeyboardShortcutsModal'
 import AttackLaunchpad from './components/AttackLaunchpad'
 import ExecutiveGuideModal from './components/ExecutiveGuideModal'
+
 
 
 import { API_BASE, WS_URL } from './config'
@@ -261,14 +262,11 @@ export default function App() {
   const [webhookAlert, setWebhookAlert] = useState(null)
   const [copilotNotes, setCopilotNotes] = useState([])
   const [isStoreOpen, setIsStoreOpen] = useState(false)
-  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
   const [selectedTx, setSelectedTx] = useState(null)
   const [isFeedPaused, setIsFeedPaused] = useState(false)
   const [searchFilter, setSearchFilter] = useState('')
   const [tierFilter, setTierFilter] = useState('ALL')
   const [isGuideOpen, setIsGuideOpen] = useState(false)
-
-
 
   // Sparklines trend state
   const [gmvSpark, setGmvSpark] = useState([{ v: 12 }, { v: 18 }, { v: 24 }, { v: 35 }, { v: 48 }])
@@ -281,41 +279,6 @@ export default function App() {
   const tRef = useRef(0)
   const initialBurstTriggered = useRef(false)
 
-  // ─── Global Keyboard Hotkeys ───────────────────────────────────────────────
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return
-
-      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
-        e.preventDefault()
-        setIsShortcutsOpen(prev => !prev)
-      } else if (e.key === '1') {
-        setActiveTab('soc')
-      } else if (e.key === '2') {
-        setActiveTab('lab')
-      } else if (e.key === '3') {
-        setActiveTab('rules')
-      } else if (e.key === '4') {
-        setActiveTab('disputes')
-      } else if (e.key === '5') {
-        setActiveTab('governance')
-      } else if (e.key === '6') {
-        setActiveTab('pitch')
-      } else if (e.key === 'm' || e.key === 'M') {
-        setIsStoreOpen(prev => !prev)
-      } else if (e.key === ' ') {
-        e.preventDefault()
-        setIsFeedPaused(prev => !prev)
-      } else if (e.key === 'Escape') {
-        setSelectedTx(null)
-        setIsShortcutsOpen(false)
-        setIsStoreOpen(false)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
 
   const handleTx = useCallback((tx) => {
     if (tx.type === 'webhook_payment_captured' || tx.type === 'recovery_completed') {
@@ -647,20 +610,11 @@ export default function App() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsGuideOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-950/50 border border-indigo-400/40 transition-all hover:scale-[1.03] active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-950/50 border border-indigo-400/40 transition-all hover:scale-[1.03] active:scale-95"
             title="Open 1-minute guided interactive tour for evaluators & judges"
           >
             <Sparkles size={13} className="text-amber-300 animate-pulse" />
             <span className="hidden sm:inline">1-Min</span> Guided Tour
-          </button>
-
-          <button
-            onClick={() => setIsShortcutsOpen(true)}
-            title="Keyboard Shortcuts (?)"
-            className="p-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800/80 transition text-xs flex items-center gap-1 font-mono shadow-inner"
-          >
-            <Keyboard size={14} />
-            <span className="hidden sm:inline">?</span>
           </button>
 
           <div className="flex items-center gap-2 text-xs font-mono ml-1 bg-slate-950/70 px-2.5 py-1 rounded-xl border border-slate-800/80">
@@ -670,6 +624,7 @@ export default function App() {
             </span>
           </div>
         </div>
+
       </div>
 
       {/* Main Tab Content */}
@@ -892,12 +847,6 @@ export default function App() {
         onClose={() => setSelectedTx(null)}
       />
 
-      {/* Keyboard Shortcuts Modal */}
-      <KeyboardShortcutsModal
-        isOpen={isShortcutsOpen}
-        onClose={() => setIsShortcutsOpen(false)}
-      />
-
       {/* Embedded Merchant Storefront Modal */}
       {isStoreOpen && (
         <MerchantStore
@@ -922,13 +871,15 @@ export default function App() {
         }}
       />
 
-
-
       {/* Footer */}
-      <div className="mt-8 pt-4 border-t border-slate-900 text-center text-xs text-slate-600 font-sans flex flex-wrap items-center justify-between gap-2">
+      <div className="mt-8 pt-4 border-t border-slate-900/80 text-center text-xs text-slate-500 font-sans flex flex-wrap items-center justify-between gap-2">
         <span>Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Autonomous Payment Defense Engine</span>
-        <span className="text-slate-500 font-mono">Press <kbd className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[10px]">?</kbd> for hotkeys</span>
+        <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+          Synchronous SLA &lt;10ms · RBI 2025/2026 Sovereign Compliance
+        </span>
       </div>
+
 
     </div>
   )
