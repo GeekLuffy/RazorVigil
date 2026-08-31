@@ -19,8 +19,11 @@ import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer'
 import KeyboardShortcutsModal from './components/KeyboardShortcutsModal'
 import AttackLaunchpad from './components/AttackLaunchpad'
+import ExecutiveGuideModal from './components/ExecutiveGuideModal'
+
 
 import { API_BASE, WS_URL } from './config'
+
 
 
 const MAX_FEED_ITEMS = 100
@@ -263,6 +266,9 @@ export default function App() {
   const [isFeedPaused, setIsFeedPaused] = useState(false)
   const [searchFilter, setSearchFilter] = useState('')
   const [tierFilter, setTierFilter] = useState('ALL')
+  const [isGuideOpen, setIsGuideOpen] = useState(false)
+  const [isPlainEnglish, setIsPlainEnglish] = useState(false)
+
 
   // Sparklines trend state
   const [gmvSpark, setGmvSpark] = useState([{ v: 12 }, { v: 18 }, { v: 24 }, { v: 35 }, { v: 48 }])
@@ -638,20 +644,41 @@ export default function App() {
         </div>
 
         {/* Global Controls & Status */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsGuideOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-900/40 border border-indigo-400/40 transition hover:scale-105 active:scale-95"
+            title="Open 1-minute guided interactive tour for evaluators & non-tech visitors"
+          >
+            <Sparkles size={13} className="text-amber-300 animate-pulse" />
+            <span className="hidden sm:inline">1-Min</span> Guided Tour
+          </button>
+
+          <button
+            onClick={() => setIsPlainEnglish(prev => !prev)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border ${
+              isPlainEnglish
+                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-md shadow-amber-950/40'
+                : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+            title="Toggle plain-English explanations for all metrics and attacks"
+          >
+            <span>{isPlainEnglish ? '👔 Plain English (Active)' : '👔 Plain English'}</span>
+          </button>
+
           <button
             onClick={() => setIsShortcutsOpen(true)}
             title="Keyboard Shortcuts (?)"
-            className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition text-xs flex items-center gap-1 font-mono"
+            className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition text-xs flex items-center gap-1 font-mono"
           >
             <Keyboard size={14} />
             <span className="hidden sm:inline">?</span>
           </button>
 
-          <div className="flex items-center gap-2 text-xs font-mono">
+          <div className="flex items-center gap-2 text-xs font-mono ml-1">
             <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            <span className={wsStatus === 'connected' ? 'text-emerald-400' : 'text-amber-400'}>
-              {wsStatus === 'connected' ? 'GATEWAY ONLINE' : 'RECONNECTING'}
+            <span className={wsStatus === 'connected' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+              {wsStatus === 'connected' ? 'ONLINE' : 'RECONNECTING'}
             </span>
           </div>
         </div>
@@ -670,8 +697,33 @@ export default function App() {
         <ModelGovernanceStudio />
       ) : (
         <>
+          {/* Executive Plain-English Overview Banner (if Plain English mode or for new visitors) */}
+          {isPlainEnglish && (
+            <div className="bg-gradient-to-r from-amber-950/30 via-slate-900 to-indigo-950/30 border border-amber-500/30 rounded-2xl p-4 mb-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-sans animate-fadeIn">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/40">
+                    👔 EXECUTIVE PLAIN-ENGLISH MODE
+                  </span>
+                  <span className="text-xs text-slate-400">Simplified view for product &amp; business evaluators</span>
+                </div>
+                <p className="text-xs text-slate-200 leading-relaxed max-w-3xl">
+                  <strong>How to test in 10 seconds:</strong> Click any of the red &amp; green attack buttons below. Watch how real shoppers get approved in <strong>9ms</strong> while stolen-card bots and fake OTP interceptors get blocked before hitting your payment gateway!
+                </p>
+              </div>
+              <button
+                onClick={() => setIsGuideOpen(true)}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shrink-0 shadow-lg shadow-amber-950/50 transition flex items-center gap-1.5 font-sans"
+              >
+                <Sparkles size={13} />
+                Open Guided 1-Min Tour
+              </button>
+            </div>
+          )}
+
           {/* Interactive Threat Attack Launchpad */}
           <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />
+
 
           {/* 4 Luminous Sparkline Hero KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-4">
@@ -890,6 +942,17 @@ export default function App() {
           }}
         />
       )}
+
+      {/* Executive 1-Min Guided Tour Modal */}
+      <ExecutiveGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+        onLaunchStore={() => {
+          setIsGuideOpen(false)
+          setIsStoreOpen(true)
+        }}
+      />
+
 
       {/* Footer */}
       <div className="mt-8 pt-4 border-t border-slate-900 text-center text-xs text-slate-600 font-sans flex flex-wrap items-center justify-between gap-2">
