@@ -59,8 +59,27 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   const [otpSubmitting, setOtpSubmitting] = useState(false)
   const [otpResult, setOtpResult] = useState(null)
   const [showSmsToast, setShowSmsToast] = useState(true)
-
   const [activePreset, setActivePreset] = useState('human')
+
+  // Real-Time WebRTC Local IP Leak Probe
+  const [webrtcLeakIp, setWebrtcLeakIp] = useState(null)
+  useEffect(() => {
+    try {
+      const pc = new (window.RTCPeerConnection || window.webkitRTCPeerConnection)({ iceServers: [] })
+      pc.createDataChannel('')
+      pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => {})
+      pc.onicecandidate = (ice) => {
+        if (!ice || !ice.candidate || !ice.candidate.candidate) return
+        const match = ice.candidate.candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/)
+        if (match) {
+          setWebrtcLeakIp(match[1])
+        }
+      }
+    } catch {
+      // Ignored if browser blocks WebRTC
+    }
+  }, [])
+
 
 
   const calculateEntropy = (deltas) => {
@@ -320,6 +339,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
 
     const rawPan = cardNumber.replace(/\s+/g, '')
     const timeOnPage = Math.max(12.0, (Date.now() - pageLoadTime.current) / 1000)
+    const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Asia/Kolkata'
 
     let payload
     if (activePreset === 'human') {
@@ -330,13 +350,16 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         billing_name: cardName,
         device_fingerprint: `dev_human_${Date.now() % 100000}`,
         ip_hash: `ip_airtel_res_${Date.now() % 100000}`,
-        asn_type: 'residential',
+        asn_type: vpnMode ? 'datacenter' : 'residential',
         ja3_ua_mismatch: false,
         keystroke_entropy: Math.max(liveEntropy, 2.65),
         mouse_jitter_score: Math.max(liveJitter, 0.68),
         paste_event: false,
         time_on_page_s: timeOnPage,
         is_accessibility_mode: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        client_webrtc_ip: webrtcLeakIp || undefined,
+        client_timezone: tz,
+        is_vpn_simulated: vpnMode,
       }
     } else if (activePreset === 'vpn') {
       payload = {
@@ -352,6 +375,9 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         mouse_jitter_score: 0.62,
         paste_event: false,
         time_on_page_s: timeOnPage,
+        client_webrtc_ip: webrtcLeakIp || undefined,
+        client_timezone: tz,
+        is_vpn_simulated: true,
       }
     } else if (activePreset === 'canary') {
       const demoHashRes = await fetch(`${API_BASE}/canary/demo-hash?index=7`).then(r => r.json()).catch(() => ({ card_hash: 'canary_7_hash' }))
@@ -368,6 +394,9 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         mouse_jitter_score: 0.0,
         paste_event: true,
         time_on_page_s: 0.5,
+        client_webrtc_ip: webrtcLeakIp || undefined,
+        client_timezone: tz,
+        is_vpn_simulated: true,
       }
     } else if (activePreset === 'telegram') {
       payload = {
@@ -383,6 +412,9 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         mouse_jitter_score: 0.0,
         paste_event: true,
         time_on_page_s: 0.3,
+        client_webrtc_ip: webrtcLeakIp || undefined,
+        client_timezone: tz,
+        is_vpn_simulated: true,
       }
     } else {
       payload = {
@@ -398,8 +430,12 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         mouse_jitter_score: 0.0,
         paste_event: true,
         time_on_page_s: 0.8,
+        client_webrtc_ip: webrtcLeakIp || undefined,
+        client_timezone: tz,
+        is_vpn_simulated: true,
       }
     }
+
 
     try {
       const res = await fetch(`${API_BASE}/checkout`, {

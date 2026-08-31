@@ -44,9 +44,11 @@ from backend.models.inference import RiskScorer
 from backend.razorpay_client import RazorpayClient
 from backend.recovery.recovery_stub import RecoveryStub
 from backend.velocity.redis_velocity import VelocityTracker
-
 from backend.antichecker.anti_checker_engine import AntiCheckerGuard
+from backend.antichecker.proxy_detector import proxy_detector
 from backend.copilot.chargeback_evidence import evidence_synthesizer
+
+
 
 # Singletons initialized in lifespan
 velocity_tracker: VelocityTracker
@@ -153,6 +155,12 @@ class CheckoutRequest(BaseModel):
     ja3_hash: str = ""
     ja3_ua_mismatch: bool = False
 
+    # Anonymizer, VPN & WebRTC telemetry
+    client_webrtc_ip: Optional[str] = None
+    client_timezone: Optional[str] = None
+    is_vpn_simulated: bool = False
+    raw_client_ip: Optional[str] = None
+
     # Client biometrics
     keystroke_entropy: float = 0.0
     mouse_jitter_score: float = 0.0
@@ -163,6 +171,7 @@ class CheckoutRequest(BaseModel):
     session_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
 
     pan_hash: str = ""
+
 
 
 class CheckoutResponse(BaseModel):
@@ -212,11 +221,32 @@ async def get_antichecker_stats():
 @app.post("/checkout", response_model=CheckoutResponse)
 async def checkout(
     req: CheckoutRequest,
+    request: Request,
     x_agent_attestation: Optional[str] = Header(default=None, alias="X-Agent-Attestation"),
 ) -> CheckoutResponse:
     t0 = time.perf_counter()
 
-    # 0. Anti-Checker Guard (Layer 0 Sentinel against Telegram scrapers & micro-auths)
+    # 0. Real-Time Proxy, Datacenter & Commercial VPN Inspection
+    client_ip = (
+        request.headers.get("cf-connecting-ip")
+        or request.headers.get("x-real-ip")
+        or (request.headers.get("x-forwarded-for", "").split(",")[0].strip() if request.headers.get("x-forwarded-for") else None)
+        or req.raw_client_ip
+        or (request.client.host if getattr(request, "client", None) else None)
+        or req.ip_hash
+    )
+    proxy_res = proxy_detector.inspect_request(
+        client_ip=str(client_ip),
+        headers=dict(request.headers),
+        declared_asn=req.asn_type,
+        client_webrtc_ip=req.client_webrtc_ip,
+        client_timezone=req.client_timezone,
+        is_vpn_simulated=req.is_vpn_simulated,
+    )
+    if proxy_res.is_vpn_or_proxy:
+        req.asn_type = proxy_res.detected_asn_type
+
+    # 0.1 Anti-Checker Guard (Layer 0 Sentinel against Telegram scrapers & micro-auths)
     if anti_checker:
         is_bot, bot_reason, bot_meta = anti_checker.evaluate_request(
             amount=req.amount,
@@ -226,6 +256,7 @@ async def checkout(
             mouse_jitter=req.mouse_jitter_score,
             time_on_page_s=req.time_on_page_s,
         )
+
         if is_bot:
             latency_ms = (time.perf_counter() - t0) * 1000
             response = CheckoutResponse(
