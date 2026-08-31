@@ -23,4 +23,6 @@ backend/dataset/*.csv
 *.db
 *.sqlite
 backend/data/*.db
+*.exe
+
 

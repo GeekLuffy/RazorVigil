@@ -481,11 +481,12 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
                 <button
                   type="button"
                   onClick={() => setShowConfig(!showConfig)}
-                  className="text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition"
+                  className="text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 transition shrink-0 whitespace-nowrap"
                 >
-                  ⚙️ Gateway Keys
+                  ⚙️ API Config
                 </button>
               </div>
+
             </div>
 
             {/* Razorpay Gateway Keys Drawer */}

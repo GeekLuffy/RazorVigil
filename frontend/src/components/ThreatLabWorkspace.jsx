@@ -325,23 +325,23 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
   }
 
   return (
-    <div className="space-y-4 animate-fadeIn">
+    <div className="space-y-4 animate-fadeIn font-sans">
       {/* Top Banner */}
-      <div className="panel bg-gradient-to-r from-slate-900 via-rose-950/30 to-slate-900 border border-rose-500/30">
+      <div className="panel-primary bg-gradient-to-r from-slate-900 via-indigo-950/30 to-slate-900 border-indigo-500/30">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-rose-400 uppercase tracking-widest mb-1 flex-wrap">
+            <div className="flex items-center gap-2 text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1 flex-wrap font-sans">
               <Flame size={16} />
               Interactive Threat Simulation &amp; Attack Testing Lab
-              <span className="text-[9px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded-full font-bold ml-2">
+              <span className="text-[9px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full font-bold ml-2">
                 🛡️ DEFENSE SIMULATOR (LOCAL SANDBOX ONLY)
               </span>
             </div>
 
-            <h2 className="text-xl font-bold text-white tracking-tight">
+            <h2 className="text-xl font-bold text-white tracking-tight font-sans">
               Adversarial Attack Launchpad &amp; Automated Pipeline Runner
             </h2>
-            <p className="text-xs text-slate-400 mt-1 max-w-3xl">
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
               Trigger real-world Telegram carding bots, rotating proxy swarms, canary honeytoken probes,
               and AI agent checkouts to test RazorShield Sentinel's synchronous sub-50ms defenses in real-time.
             </p>
@@ -350,10 +350,10 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
           <button
             onClick={runSimulation}
             disabled={isRunning}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition shadow-lg ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs font-sans transition shadow-lg ${
               isRunning
                 ? 'bg-amber-600/50 text-amber-200 cursor-not-allowed border border-amber-500/40'
-                : 'bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white shadow-rose-900/30 border border-rose-400/30'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/30 border border-indigo-400/30'
             }`}
           >
             {isRunning ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
@@ -373,7 +373,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
             </div>
             <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
               <div
-                className="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full transition-all duration-300"
+                className="bg-indigo-500 h-full rounded-full transition-all duration-300"
                 style={{ width: `${(currentStep / SIMULATION_STAGES.length) * 100}%` }}
               />
             </div>
@@ -393,9 +393,9 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left Column: Manual Attack Vector Launchpad */}
         <div className="lg:col-span-7 space-y-3">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between font-sans">
             <span>Direct Attack Vector Triggers (Layer 0–4)</span>
-            <span className="text-[10px] font-mono text-rose-400">REALTIME DISPATCH</span>
+            <span className="text-[10px] font-mono text-indigo-400">REALTIME DISPATCH</span>
           </div>
 
           {/* 1. Telegram Carding Bot */}
@@ -404,19 +404,19 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">🤖</span>
-                  <strong className="text-xs font-bold text-white">Telegram ₹1 Carding Bot Exploit</strong>
-                  <span className="text-[10px] font-mono bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded">
+                  <strong className="text-xs font-bold text-white font-sans">Telegram ₹1 Carding Bot Exploit</strong>
+                  <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-bold">
                     Layer 0 Sentinel
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 font-sans max-w-xl">
                   Automated headless scraper testing stolen card BIN 411773 via ₹1 micro-auth. Triggers Anti-Checker deceptive tarpit poisoning.
                 </p>
               </div>
               <button
                 disabled={loadingAction !== null}
                 onClick={() => sendAttack('tg_checker')}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-indigo-400/30 disabled:opacity-50"
               >
                 {loadingAction === 'tg_checker' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                 Trigger Exploit
@@ -430,19 +430,19 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">⚡</span>
-                  <strong className="text-xs font-bold text-white">12x Distributed Carding Burst</strong>
-                  <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded">
+                  <strong className="text-xs font-bold text-white font-sans">12x Distributed Carding Burst</strong>
+                  <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-bold">
                     Layer 1 Redis Velocity
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 font-sans max-w-xl">
                   Simulates a high-velocity botnet carding storm cycling through stolen PANs. Tested against sub-second sliding-window counters.
                 </p>
               </div>
               <button
                 disabled={loadingAction !== null}
                 onClick={() => sendAttack('burst')}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-indigo-400/30 disabled:opacity-50"
               >
                 {loadingAction === 'burst' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                 Fire 12x Burst
@@ -456,19 +456,19 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">🔄</span>
-                  <strong className="text-xs font-bold text-white">Rotating Residential Proxy Autohitter</strong>
-                  <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded">
+                  <strong className="text-xs font-bold text-white font-sans">Rotating Residential Proxy Autohitter</strong>
+                  <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-bold">
                     Layer 1.5 Proxy Trap
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 font-sans max-w-xl">
                   Adversary cycling residential IP addresses on a single device fingerprint. Intercepted by multi-IP device fanout quarantine.
                 </p>
               </div>
               <button
                 disabled={loadingAction !== null}
                 onClick={() => sendAttack('proxy_autohit')}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-indigo-400/30 disabled:opacity-50"
               >
                 {loadingAction === 'proxy_autohit' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                 Test Proxy Swarm
@@ -482,19 +482,19 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">🐤</span>
-                  <strong className="text-xs font-bold text-white">Canary Honeytoken Breach</strong>
-                  <span className="text-[10px] font-mono bg-yellow-500/20 text-yellow-300 px-1.5 py-0.5 rounded">
+                  <strong className="text-xs font-bold text-white font-sans">Canary Honeytoken Breach</strong>
+                  <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold">
                     0% False Positive
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 font-sans max-w-xl">
                   Card scan on armed synthetic Canary PAN (Index #7). Instant 1.0 confidence honeypot quarantine without calling ML.
                 </p>
               </div>
               <button
                 disabled={loadingAction !== null}
                 onClick={() => sendAttack('canary')}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-indigo-400/30 disabled:opacity-50"
               >
                 {loadingAction === 'canary' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                 Test Canary Card
@@ -508,19 +508,19 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">🛡️</span>
-                  <strong className="text-xs font-bold text-white">High-Value VPN Shopper (₹18,999)</strong>
-                  <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded">
+                  <strong className="text-xs font-bold text-white font-sans">High-Value VPN Shopper (₹18,999)</strong>
+                  <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">
                     Track 03 Recovery
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 font-sans max-w-xl">
                   Genuine consumer shopping on NordVPN datacenter exit node. Routed to soft risk; issued single-use signed UPI QR link.
                 </p>
               </div>
               <button
                 disabled={loadingAction !== null}
                 onClick={() => sendAttack('recovery')}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-indigo-400/30 disabled:opacity-50"
               >
                 {loadingAction === 'recovery' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                 Test Recovery Flow
@@ -534,19 +534,19 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">🤖</span>
-                  <strong className="text-xs font-bold text-white">Google AP2 AI Shopping Agent</strong>
-                  <span className="text-[10px] font-mono bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded">
+                  <strong className="text-xs font-bold text-white font-sans">Google AP2 AI Shopping Agent</strong>
+                  <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-bold">
                     Agent-Aware Gate
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 font-sans max-w-xl">
                   Headless autonomous shopping agent presenting a signed cryptographic AP2 JWT mandate and ₹50,000 spend limit.
                 </p>
               </div>
               <button
                 disabled={loadingAction !== null}
                 onClick={() => sendAttack('agent')}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-indigo-400/30 disabled:opacity-50"
               >
                 {loadingAction === 'agent' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
                 Test AI Agent
@@ -560,20 +560,20 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
           {/* Store Demo Entry Card */}
           <div className="panel bg-gradient-to-br from-slate-900 via-emerald-950/20 to-slate-900 border border-emerald-500/30 p-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-widest">
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-widest font-sans">
                 <ShoppingBag size={15} />
                 Live Merchant Storefront Simulator
               </div>
-              <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
                 Interactive Checkout
               </span>
             </div>
-            <p className="text-xs text-slate-300 mb-3 leading-relaxed">
+            <p className="text-xs text-slate-300 mb-3 leading-relaxed font-sans max-w-md">
               Test end-to-end user checkout flows directly on our demo storefront (SneakerVault Premium India) with native Razorpay test modal integration.
             </p>
             <button
               onClick={onTriggerStoreDemo}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition shadow-md shadow-emerald-950/30"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs font-sans rounded-lg transition shadow-md shadow-emerald-950/30"
             >
               <ShoppingBag size={14} />
               Open Live Merchant Store Modal
@@ -583,9 +583,9 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
 
           {/* Live Attack Telemetry Console */}
           <div className="panel bg-slate-900/90 border border-slate-800">
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center justify-between">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center justify-between font-sans">
               <span className="flex items-center gap-1.5">
-                <Terminal size={14} className="text-rose-400" />
+                <Terminal size={14} className="text-indigo-400" />
                 Live Attack Execution Log
               </span>
               <span className="text-[10px] font-mono text-slate-500">Realtime Audit</span>
@@ -604,13 +604,13 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
                     className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs font-mono space-y-1 animate-fadeIn"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400 font-bold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                      <span className="text-slate-400 font-bold flex items-center gap-1 font-sans">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
                         {log.title}
                       </span>
                       <span className="text-[10px] text-slate-500">{log.time}</span>
                     </div>
-                    <p className="text-[11px] text-slate-300">{log.detail}</p>
+                    <p className="text-[11px] text-slate-300 font-sans">{log.detail}</p>
                     <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-900">
                       <span className="text-slate-500 uppercase">{log.type}</span>
                       <span className="text-emerald-400 font-bold">{log.outcome}</span>

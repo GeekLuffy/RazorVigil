@@ -2,23 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #0a0a0f;
-  color: #e2e8f0;
-  font-family: 'Inter', 'JetBrains Mono', monospace;
+@layer base {
+  body {
+    background-color: #070a13;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+
+  .font-mono, code, kbd, pre {
+    font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  }
 }
 
-.tier-safe { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
-.tier-soft_risk { @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
-.tier-elevated_review { @apply bg-orange-500/20 text-orange-300 border border-orange-500/30; }
-.tier-high_confidence_bot { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+/* ── Ambient Background Mesh ── */
+.bg-soc-mesh {
+  background-color: #070a13;
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(99, 102, 241, 0.07) 0, transparent 45%),
+    radial-gradient(ellipse at 85% 0%, rgba(16, 185, 129, 0.05) 0, transparent 45%),
+    radial-gradient(ellipse at 50% 100%, rgba(244, 63, 94, 0.04) 0, transparent 50%);
+}
 
-.panel { @apply bg-slate-900/80 border border-slate-700/50 rounded-xl p-4; }
+/* ── Surface Cards ── */
+.panel {
+  @apply bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 transition-all duration-200;
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.panel-primary {
+  @apply bg-slate-900/85 border border-indigo-500/30 rounded-xl p-4 transition-all duration-200;
+  border-top: 1.5px solid rgba(99, 102, 241, 0.5);
+  box-shadow: 0 6px 24px -4px rgba(99, 102, 241, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.soc-card {
+  background: linear-gradient(165deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 29, 0.95) 100%);
+  border: 1px solid rgba(30, 41, 59, 0.8);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.soc-card-indigo { border-top: 1.5px solid rgba(99, 102, 241, 0.45); }
+.soc-card-emerald { border-top: 1.5px solid rgba(16, 185, 129, 0.45); }
+.soc-card-rose { border-top: 1.5px solid rgba(244, 63, 94, 0.45); }
+.soc-card-amber { border-top: 1.5px solid rgba(245, 158, 11, 0.45); }
+
+/* ── Luminous Glow Text ── */
+.glow-text-emerald { text-shadow: 0 0 20px rgba(16, 185, 129, 0.35); }
+.glow-text-rose { text-shadow: 0 0 20px rgba(244, 63, 94, 0.35); }
+.glow-text-indigo { text-shadow: 0 0 20px rgba(99, 102, 241, 0.35); }
+
+/* ── Tier Badges ── */
+.tier-safe { @apply bg-emerald-500/15 text-emerald-400 border border-emerald-500/30; }
+.tier-soft_risk { @apply bg-amber-500/15 text-amber-300 border border-amber-500/30; }
+.tier-elevated_review { @apply bg-amber-500/20 text-amber-400 border border-amber-500/40; }
+.tier-high_confidence_bot { @apply bg-rose-500/15 text-rose-400 border border-rose-500/30; }
+.tier-verified_agent { @apply bg-indigo-500/15 text-indigo-300 border border-indigo-500/30; }
 
 .canary-flash {
   animation: canary-pulse 0.5s ease-in-out 4;
 }
+
 @keyframes canary-pulse {
   0%, 100% { background-color: transparent; }
-  50% { background-color: rgba(234, 179, 8, 0.15); }
+  50% { background-color: rgba(245, 158, 11, 0.18); }
 }
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor {
+  display: inline-block;
+  animation: cursor-blink 1s infinite;
+}
+
+/* ── Slide in and fade transitions ── */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes scale-up {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-up {
+  animation: scale-up 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Scrollbars ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #334155; }
