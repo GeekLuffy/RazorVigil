@@ -17,18 +17,32 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-import lightgbm as lgb
-from catboost import CatBoostClassifier
+try:
+    from catboost import CatBoostClassifier
+except ImportError:
+    CatBoostClassifier = None
+
 from sklearn.metrics import average_precision_score, roc_auc_score
+
+
 
 # Add repo root to path
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+import pandas as pd
 from backend.models.ft_transformer import FTTransformer
-from backend.models.features import build_training_matrix
 from backend.models.conformal_calibrator import ConformalRiskCalibrator
+
+FEATURE_COLS = [
+    "amount", "amount_zscore", "hour_sin", "hour_cos", "asn_type_encoded",
+    "ja3_ua_mismatch", "keystroke_entropy", "mouse_jitter_score", "paste_event",
+    "time_on_page_s", "bin_card_count", "bin_name_count", "ip_distinct_pan_count",
+    "device_distinct_bin_count", "device_distinct_ip_count", "cvv_cycle_attempts",
+    "cluster_risk_score"
+]
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("GPUClusterTrainer")
@@ -128,9 +142,12 @@ def run_full_gpu_cluster_training(n_samples: int = 50000):
     gpus = get_available_gpus()
     logger.info("Starting Multi-GPU Super-Cluster Training Pipeline across %d GPUs...", len(gpus))
 
-    # Generate synthetic training dataset
-    logger.info("Generating %d synthetic transaction training vectors...", n_samples)
-    X, y = build_training_matrix(n_samples=n_samples)
+    # Load training dataset
+    data_path = ROOT_DIR / "data" / "synthetic_transactions.csv"
+    logger.info("Loading transaction training data from %s...", data_path)
+    df = pd.read_csv(data_path)
+    X = df[FEATURE_COLS].values.astype(np.float32)
+    y = df["label"].values.astype(np.float32)
 
     # 60/20/20 train/val/cal split
     n = len(X)
@@ -140,6 +157,7 @@ def run_full_gpu_cluster_training(n_samples: int = 50000):
     X_train, y_train = X[:n_train], y[:n_train]
     X_val, y_val = X[n_train:n_train + n_val], y[n_train:n_train + n_val]
     X_cal, y_cal = X[n_train + n_val:], y[n_train + n_val:]
+
 
     # 1. Train FT-Transformer on GPU 0
     target_gpu = gpus[0] if gpus else -1
@@ -160,6 +178,18 @@ def run_full_gpu_cluster_training(n_samples: int = 50000):
     calibrator.calibrate(cal_probs_np, y_cal)
     logger.info("Conformal Calibrator Armed: q_hat = %.4f (95%% coverage guarantee)", calibrator.q_hat)
 
+    # Save model weights & conformal calibrator for live inference
+    model_save_path = ROOT_DIR / "backend" / "models" / "ft_transformer_model.pt"
+    torch.save(ft_model.state_dict(), model_save_path)
+    logger.info("Saved FT-Transformer weights to %s", model_save_path)
+
+    import pickle
+    calib_save_path = ROOT_DIR / "backend" / "models" / "conformal_calibrator.pkl"
+    with open(calib_save_path, "wb") as f:
+        pickle.dump(calibrator, f)
+    logger.info("Saved Conformal Calibrator to %s", calib_save_path)
+
+
     # Save summary
     results = {
         "status": "success",
@@ -174,6 +204,7 @@ def run_full_gpu_cluster_training(n_samples: int = 50000):
         json.dump(results, f, indent=2)
     logger.info("Cluster Training Results exported to %s", out_path)
     return results
+
 
 
 if __name__ == "__main__":

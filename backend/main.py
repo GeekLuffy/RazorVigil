@@ -361,9 +361,10 @@ async def checkout(
     # 4. Louvain Community Cluster Scoring
     cluster_score, cluster_id = await cluster_engine.get_cluster_score(req.device_fingerprint)
 
-    # 5. Hybrid ML Model Scoring (Stacked 4-Way Blend with Persistence-Consistent Gate)
+    # 5. Heterogeneous ML Model Scoring (Stacked Quad-Blend: LGBM + CatBoost + FT-Transformer + IsoForest)
     feature_vec = build_feature_vector(req, vel_features, cluster_score)
     lgbm_prob, cb_prob, if_score = risk_scorer.score(feature_vec)
+    ft_prob = risk_scorer.score_ft_transformer(feature_vec)
     is_auto = (
         vel_features.cvv_cycle_attempts >= 3.0
         or (req.keystroke_entropy < 0.60 and req.time_on_page_s < 1.5)
@@ -371,12 +372,14 @@ async def checkout(
         or (vel_features.device_distinct_ip_count >= 8.0 and vel_features.ip_distinct_pan_count >= 8.0)
     )
     final_risk = risk_scorer.compute_risk(
-        lgbm_prob, cb_prob, if_score, cluster_score, is_automation=is_auto
+        lgbm_prob, cb_prob, if_score, cluster_score, is_automation=is_auto, ft_prob=ft_prob
     )
+    conformal_data = risk_scorer.get_conformal_prediction(final_risk)
 
     # 6. Decision Tiering
     tier, action, explanation = decision_engine.decide(final_risk, req)
     latency_ms = (time.perf_counter() - t0) * 1000
+
 
     # 7. Gateway & Recovery Dispatch
     recovery_url = None
@@ -441,8 +444,12 @@ async def checkout(
             "keystroke_entropy": req.keystroke_entropy,
             "mouse_jitter_score": req.mouse_jitter_score,
             "cluster_risk_score": cluster_score,
+            "ft_transformer_score": round(ft_prob, 4),
+            "conformal_prediction_set": conformal_data.get("prediction_set", []),
+            "conformal_interval": [conformal_data.get("lower_bound", 0.0), conformal_data.get("upper_bound", 1.0)],
         },
     }
+
 
     if ws_clients:
         asyncio.create_task(_broadcast(response.model_dump()))
