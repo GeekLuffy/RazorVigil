@@ -149,18 +149,18 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
   }
 
   return (
-    <div className="bg-slate-900/90 border border-indigo-500/30 rounded-xl p-3 mb-4 shadow-lg shadow-indigo-950/20 backdrop-blur-md">
+    <div className="glass-panel rounded-2xl p-3.5 mb-4 shadow-xl shadow-black/40 border border-slate-800 hover:border-indigo-500/30 transition-all duration-300">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-indigo-500/20 rounded-lg text-indigo-400">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-blue-500/10 border border-indigo-500/30 rounded-xl text-indigo-400 shadow-md shadow-indigo-950/40">
             <Play size={16} />
           </div>
           <div>
             <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
               Interactive Attack Launchpad
-              <span className="text-[10px] bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded font-mono">1-CLICK DEMO</span>
+              <span className="text-[9px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-mono font-bold">1-CLICK DEMO</span>
             </div>
-            <div className="text-[11px] text-slate-400">Trigger live threat patterns directly into the pipeline</div>
+            <div className="text-[11px] text-slate-400 font-sans">Trigger live threat vectors directly into the 9.2ms synchronous gateway</div>
           </div>
         </div>
 
@@ -169,76 +169,76 @@ export default function AttackLaunchpad({ onTriggerStoreDemo }) {
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('tg_checker')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600/25 hover:bg-rose-600/35 border border-rose-500/50 text-rose-200 rounded-lg text-xs font-bold transition disabled:opacity-50 shadow-sm animate-pulse"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 hover:border-rose-400 text-rose-200 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-rose-950/30"
           >
             {loadingAction === 'tg_checker' ? <Loader2 size={13} className="animate-spin" /> : <span>⚡</span>}
-            Telegram ₹1 Checker (CDP Bot)
+            Telegram ₹1 Checker
           </button>
 
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('burst')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 rounded-lg text-xs font-medium transition disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 hover:border-red-400 text-red-300 rounded-xl text-xs font-medium transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-red-950/20"
           >
             {loadingAction === 'burst' ? <Loader2 size={13} className="animate-spin" /> : <Flame size={13} />}
-            15x Distributed Burst
+            15x Bot Burst
           </button>
 
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('canary')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-medium transition disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 hover:border-amber-400 text-amber-300 rounded-xl text-xs font-medium transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-amber-950/20"
           >
             {loadingAction === 'canary' ? <Loader2 size={13} className="animate-spin" /> : <span>🐤</span>}
-            Fire Canary Honeytoken
+            Canary Honeytoken
           </button>
 
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('agent')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/40 text-purple-300 rounded-lg text-xs font-medium transition disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 hover:border-purple-400 text-purple-300 rounded-xl text-xs font-medium transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-purple-950/20"
           >
             {loadingAction === 'agent' ? <Loader2 size={13} className="animate-spin" /> : <Bot size={13} />}
-            AI Shopping Agent (AP2)
+            AI Agent (AP2)
           </button>
 
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('proxy')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 rounded-lg text-xs font-bold transition disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 hover:border-sky-400 text-sky-300 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-sky-950/20"
           >
             {loadingAction === 'proxy' ? <Loader2 size={13} className="animate-spin" /> : <Globe size={13} />}
-            🌐 Rotating Proxies (6x Swarm)
+            6x Proxy Swarm
           </button>
 
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('otp_relay')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-bold transition disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 hover:border-emerald-400 text-emerald-300 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-emerald-950/20"
           >
             {loadingAction === 'otp_relay' ? <Loader2 size={13} className="animate-spin" /> : <span>🔐</span>}
-            3DS2 OTP-Relay Intercept
+            3DS2 OTP Intercept
           </button>
 
           {onTriggerStoreDemo && (
-
             <button
               onClick={onTriggerStoreDemo}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-bold transition shadow-sm"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-400/50 text-emerald-200 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 shadow-md shadow-emerald-950/30"
             >
               <CheckCircle2 size={13} />
-              Open Live Store Checkout
+              Live Store
             </button>
           )}
         </div>
       </div>
 
       {lastActionStatus && (
-        <div className="mt-2 pt-2 border-t border-slate-800 text-[11px] font-mono text-emerald-400 flex items-center gap-1.5 animate-fadeIn">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <div className="mt-2.5 pt-2.5 border-t border-slate-800/80 text-[11px] font-mono text-emerald-400 flex items-center gap-2 animate-fadeIn">
+          <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           {lastActionStatus}
         </div>
       )}
     </div>
   )
+
 }
