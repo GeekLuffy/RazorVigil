@@ -71,9 +71,12 @@ def train_ft_transformer_gpu(
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size * 2, shuffle=False)
 
-    criterion = nn.BCELoss()
+    # IEEE Transactions on Neural Networks (TNNLS) Focal Loss for severe class imbalance
+    from backend.models.ft_transformer import BinaryFocalLoss
+    criterion = BinaryFocalLoss(alpha=0.75, gamma=2.0)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+
     scaler = torch.cuda.amp.GradScaler(enabled=device.type == "cuda")
 
     best_val_pr_auc = 0.0

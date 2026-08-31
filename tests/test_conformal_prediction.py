@@ -105,3 +105,30 @@ def test_temporal_graph_edge_decay():
     assert weight_stale < 0.15
     assert weight_fresh > weight_stale
 
+
+def test_binary_focal_loss_optimization():
+    """
+    IEEE TNNLS Focal Loss Test:
+    Verifies that BinaryFocalLoss computes valid gradients and penalizes hard misclassifications
+    more severely than easy predictions.
+    """
+    from backend.models.ft_transformer import BinaryFocalLoss
+
+    focal = BinaryFocalLoss(alpha=0.75, gamma=2.0)
+
+    # Hard false negative: true fraud (y=1) predicted as low risk (p=0.05)
+    hard_p = torch.tensor([0.05], requires_grad=True)
+    hard_y = torch.tensor([1.0])
+    loss_hard = focal(hard_p, hard_y)
+    loss_hard.backward()
+
+    # Easy true positive: true fraud (y=1) predicted as high risk (p=0.95)
+    easy_p = torch.tensor([0.95])
+    easy_y = torch.tensor([1.0])
+    loss_easy = focal(easy_p, easy_y)
+
+    assert loss_hard.item() > loss_easy.item() * 50.0  # Hard error penalized >50x higher
+    assert hard_p.grad is not None
+    assert torch.isfinite(loss_hard) and torch.isfinite(loss_easy)
+
+

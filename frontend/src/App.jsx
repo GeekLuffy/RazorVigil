@@ -893,9 +893,10 @@ export default function App() {
 
       {/* Footer */}
       <div className="mt-8 pt-4 border-t border-slate-900 text-center text-xs text-slate-600 font-sans flex flex-wrap items-center justify-between gap-2">
-        <span>Razorpay AI Buildathon 2026 · Track 02 (AI Risk Manager) + Track 03 (Revenue Recovery)</span>
+        <span>Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Autonomous Payment Defense Engine</span>
         <span className="text-slate-500 font-mono">Press <kbd className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[10px]">?</kbd> for hotkeys</span>
       </div>
+
     </div>
   )
 }

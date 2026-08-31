@@ -137,3 +137,34 @@ class FTTransformer(nn.Module):
         prob = torch.sigmoid(logits)
 
         return prob, cls_output
+
+
+class BinaryFocalLoss(nn.Module):
+    """
+    IEEE Transactions on Neural Networks (TNNLS) & Lin et al. Focal Loss.
+    Addresses severe class imbalance in transaction fraud streams by dynamically
+    down-weighting easy genuine transactions and focusing gradients on hard boundary attacks:
+        FL(p_t) = -alpha_t * (1 - p_t)^gamma * log(p_t)
+    """
+
+    def __init__(self, alpha: float = 0.75, gamma: float = 2.0, reduction: str = "mean", eps: float = 1e-7):
+        super().__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.reduction = reduction
+        self.eps = eps
+
+    def forward(self, pred_probs: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        # pred_probs in [0, 1], targets in {0, 1}
+        pred_probs = torch.clamp(pred_probs, self.eps, 1.0 - self.eps)
+        p_t = targets * pred_probs + (1.0 - targets) * (1.0 - pred_probs)
+        alpha_t = targets * self.alpha + (1.0 - targets) * (1.0 - self.alpha)
+
+        loss = -alpha_t * torch.pow(1.0 - p_t, self.gamma) * torch.log(p_t)
+
+        if self.reduction == "mean":
+            return loss.mean()
+        elif self.reduction == "sum":
+            return loss.sum()
+        return loss
+
