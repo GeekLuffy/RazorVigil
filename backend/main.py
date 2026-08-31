@@ -10,12 +10,13 @@ import json
 import os
 import time
 import uuid
-from pathlib import Path
 from contextlib import asynccontextmanager
-from typing import Any, Optional
-
+from typing import Any, Optional, Dict, List
+import numpy as np
 from dotenv import load_dotenv
 load_dotenv()
+
+
 
 from fastapi import FastAPI, Header, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -66,12 +67,14 @@ async def startup_event():
     risk_scorer = RiskScorer()
     # Warm up ML models to eliminate cold-start latency spike
     try:
-        dummy_vec = [0.0] * 16
+        dummy_vec = np.zeros(17, dtype=np.float32)
         risk_scorer.score(dummy_vec)
+        print("[Warmup] ML inference pipelines pre-warmed in memory.")
     except Exception as e:
         print(f"[Warmup] Note: {e}")
 
     decision_engine = DecisionEngine()
+
 
     recovery_stub = RecoveryStub(velocity_tracker.redis)
     canary_cards = CanaryCards()
@@ -416,6 +419,50 @@ async def checkout(
         asyncio.create_task(_broadcast(response.model_dump()))
 
     return response
+
+
+@app.post("/checkout/shadow")
+async def checkout_shadow_mode(req: CheckoutRequest):
+    """
+    Shadow Mode Evaluation Endpoint:
+    Scores live production checkouts asynchronously/in parallel without blocking transactions
+    or modifying merchant payment flow. Used during Phase 1 deployment to baseline latency and drift.
+    """
+    t0 = time.perf_counter()
+    vel_features = await velocity_tracker.record_and_get_features(req)
+    cluster_score, cluster_id = await cluster_engine.get_cluster_score(req.device_fingerprint)
+    feature_vec = build_feature_vector(req, vel_features, cluster_score)
+    lgbm_prob, cb_prob, if_score = risk_scorer.score(feature_vec)
+
+    is_auto = (
+        vel_features.cvv_cycle_attempts >= 3.0
+        or (req.keystroke_entropy < 0.60 and req.time_on_page_s < 1.5)
+        or (req.ja3_ua_mismatch and (vel_features.cvv_cycle_attempts >= 2.0 or vel_features.device_distinct_bin_count >= 4.0))
+        or (vel_features.device_distinct_ip_count >= 8.0 and vel_features.ip_distinct_pan_count >= 8.0)
+    )
+    final_risk = risk_scorer.compute_risk(
+        lgbm_prob, cb_prob, if_score, cluster_score, is_automation=is_auto
+    )
+    tier, action, explanation = decision_engine.decide(final_risk, req)
+    latency_ms = (time.perf_counter() - t0) * 1000
+
+    return {
+        "shadow_evaluation": True,
+        "enforce_action": False,
+        "transaction_id": req.transaction_id,
+        "predicted_tier": tier,
+        "predicted_action": action,
+        "risk_score": round(final_risk, 4),
+        "latency_ms": round(latency_ms, 2),
+        "explanation": explanation,
+        "feature_attribution": {
+            "lgbm_probability": round(float(lgbm_prob), 4),
+            "catboost_probability": round(float(cb_prob), 4),
+            "isolation_forest_anomaly": round(float(if_score), 4),
+            "louvain_cluster_risk": round(float(cluster_score), 4),
+        },
+    }
+
 
 
 # In-memory transaction registry for deep forensics & MCP delegation

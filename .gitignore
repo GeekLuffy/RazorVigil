@@ -18,8 +18,8 @@ data/load_test_results.json
 threat_intelligence/
 evidence/
 notes/
-scripts/
 backend/dataset/*.csv
+
 *.db
 *.sqlite
 backend/data/*.db
