@@ -1,6 +1,11 @@
+version: '3.8'
+
 services:
+  # In-Memory Sliding-Window Velocity Cache
   redis:
     image: redis:7-alpine
+    container_name: razorshield-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     healthcheck:
@@ -8,3 +13,25 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  # RazorShield Sentinel Autonomous Gateway & SOC
+  razorshield:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: razorshield-sentinel
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - PORT=8000
+      - ENVIRONMENT=production
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

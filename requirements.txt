@@ -3,6 +3,8 @@ uvicorn[standard]==0.32.1
 redis[hiredis]==5.2.0
 razorpay>=2.0.1
 lightgbm==4.5.0
+catboost>=1.2.20
+torch>=2.1.0
 scikit-learn==1.5.2
 imbalanced-learn==0.12.4
 numpy==1.26.4
@@ -17,5 +19,10 @@ networkx==3.4.2
 python-louvain==0.16
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.12
+python-dotenv>=1.0.0
+reportlab>=4.0.0
+matplotlib>=3.8.0
+pytest>=8.0.0
 mcp>=1.0.0              # Anthropic MCP Python SDK — Agent Studio MCP server
 anthropic>=0.30.0       # Claude Agent SDK (for demo_agent.py orchestration)
+
