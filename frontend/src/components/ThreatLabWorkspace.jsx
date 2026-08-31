@@ -330,10 +330,14 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
       <div className="panel bg-gradient-to-r from-slate-900 via-rose-950/30 to-slate-900 border border-rose-500/30">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-rose-400 uppercase tracking-widest mb-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-rose-400 uppercase tracking-widest mb-1 flex-wrap">
               <Flame size={16} />
               Interactive Threat Simulation &amp; Attack Testing Lab
+              <span className="text-[9px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded-full font-bold ml-2">
+                🛡️ DEFENSE SIMULATOR (LOCAL SANDBOX ONLY)
+              </span>
             </div>
+
             <h2 className="text-xl font-bold text-white tracking-tight">
               Adversarial Attack Launchpad &amp; Automated Pipeline Runner
             </h2>

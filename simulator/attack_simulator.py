@@ -41,11 +41,25 @@ if sys.stdout.encoding != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # ---------------------------------------------------------------------------
-# Config
+# DEFENSE-ONLY SAFETY DECLARATION & LOCAL ENDPOINT GUARDRAILS
+# ---------------------------------------------------------------------------
+# RazorShield Sentinel attack simulators are designed and hardcoded STRICTLY
+# for local defensive evaluation, live pitching, and automated test pipelines.
+# In compliance with the Razorpay AI Buildathon safety rules, this tool CANNOT
+# target external endpoints or live payment gateways.
 # ---------------------------------------------------------------------------
 
 API_BASE = "http://localhost:8000"
 CHECKOUT_URL = f"{API_BASE}/checkout"
+
+# Strict safety assertion: prohibit external egress
+import urllib.parse
+_parsed = urllib.parse.urlparse(CHECKOUT_URL)
+if _parsed.hostname not in {"localhost", "127.0.0.1", "0.0.0.0", "::1"}:
+    raise RuntimeError(
+        f"SAFETY GUARDRAIL TRIGGERED: Attack simulator is restricted to local defensive endpoints only. "
+        f"Attempted host '{_parsed.hostname}' is prohibited."
+    )
 
 # ANSI colors (work in Windows Terminal / PowerShell 7)
 _GREEN  = "\033[92m"
@@ -58,6 +72,7 @@ _DIM    = "\033[2m"
 
 ATTACK_BINS = ["522222", "533333"]
 NORMAL_BINS = ["411111", "424242", "512345"]
+
 
 
 def _h(s: str) -> str:

@@ -1,10 +1,16 @@
 """
 RazorShield Sentinel — Adversarial Co-Evolution Arms Race Engine.
 
+DEFENSE-ONLY COMPLIANCE DECLARATION:
+This module operates exclusively in-memory on synthetic numpy/pandas data structures.
+It contains zero offensive tooling, exploits, or network egress capabilities against external
+payment infrastructure. Used solely for offline defensive stress-testing and policy hardening.
+
 Orchestrates an automated arms race between an adversarial Red Team attacker
 and a Blue Team policy defender, iteratively generating evasions and folding them
 into retraining until measured robustness convergence is achieved.
 """
+
 from pathlib import Path
 import json
 import numpy as np

@@ -19,5 +19,8 @@ threat_intelligence/
 evidence/
 notes/
 scripts/
-*.log
 backend/dataset/*.csv
+*.db
+*.sqlite
+backend/data/*.db
+

@@ -527,16 +527,35 @@ async def razorpay_webhook(
     # Razorpay's webhook payload carries the event identifier in the JSON body as the top-level
     # "id" field (e.g., "id": "evt_XXXXXXXXXXXXXXX"). The X-Razorpay-Event-Id header is used
     # as a fallback for environments that may set it, but the JSON body "id" is the canonical source.
+    #
+    # Dual-Layer Idempotency Architecture:
+    #   Layer 1: Redis SET ... NX EX=86400 (fast in-memory cache)
+    #   Layer 2: SQLite webhook_events table with PRIMARY KEY (event_id) unique constraint
+    #            as a durable backstop that survives Redis restarts or cache flushes.
+    from backend.webhook_idempotency import record_webhook_event_durable
+
     event_id_from_body = event_data.get("id")
     dedup_event_id = event_id_from_body or x_razorpay_event_id
     if dedup_event_id:
         idempotency_key = f"webhook:event:{dedup_event_id}"
-        already_processed = await velocity_tracker.redis.set(
+        already_in_redis = await velocity_tracker.redis.set(
             idempotency_key, "1", ex=86400, nx=True  # 24-hour TTL, set only if not exists
         )
-        if already_processed is None:
-            # Key already existed — this is a duplicate delivery, return 200 immediately
-            return {"status": "duplicate", "event_id": dedup_event_id}
+        if already_in_redis is None:
+            # Duplicate detected in fast-path Redis cache — return 200 immediately
+            return {"status": "duplicate", "event_id": dedup_event_id, "layer": "redis_cache"}
+
+        # Check durable database backstop
+        event_type_name = event_data.get("event", "payment.captured")
+        durable_success = record_webhook_event_durable(
+            event_id=dedup_event_id,
+            event_type=event_type_name,
+            raw_payload=raw_body
+        )
+        if not durable_success:
+            # Duplicate detected in persistent SQLite storage (e.g., after Redis restart)
+            return {"status": "duplicate", "event_id": dedup_event_id, "layer": "durable_sqlite_backstop"}
+
 
     event_type = event_data.get("event", "payment.captured")
     payload = event_data.get("payload", {})

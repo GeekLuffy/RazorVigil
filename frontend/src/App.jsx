@@ -430,15 +430,19 @@ export default function App() {
             <Shield size={26} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
               RazorShield Sentinel
-              <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full font-bold">
                 Enterprise Edition v1.2
+              </span>
+              <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full flex items-center gap-1 font-bold">
+                🧪 SYNTHETIC DATA / DEMO ENVIRONMENT
               </span>
             </h1>
             <p className="text-xs text-slate-400">Autonomous Real-Time Fraud &amp; Bot Abuse Mitigation Engine</p>
           </div>
         </div>
+
 
         {/* Tab Navigator */}
         <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
@@ -559,6 +563,9 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <Activity size={14} className="text-rose-400" />
                     <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Live Risk Score Stream (p99 &lt;15ms)</span>
+                    <span className="text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold">
+                      SIMULATED TRAFFIC
+                    </span>
                   </div>
                   <span className="text-[11px] font-mono text-slate-500">— — 0.75 bot threshold</span>
                 </div>
@@ -570,9 +577,13 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <Wifi size={14} className="text-sky-400" />
                     <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Live Transaction Telemetry Feed</span>
+                    <span className="text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold">
+                      DEMO TRANSACTIONS
+                    </span>
                   </div>
                   <span className="text-[11px] font-mono text-slate-500">latency · tier · score · tx-id</span>
                 </div>
+
                 <div className="flex flex-col gap-1 max-h-72 overflow-y-auto pr-1">
                   {feed.length === 0 ? (
                     <div className="text-slate-600 text-xs text-center py-10 font-mono">

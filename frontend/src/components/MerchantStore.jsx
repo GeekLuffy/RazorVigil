@@ -418,10 +418,16 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
         {/* Product Column */}
         <div className="w-full md:w-5/12 bg-slate-950 p-6 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-indigo-400 uppercase tracking-widest mb-3">
-              <ShoppingBag size={14} />
-              Merchant Checkout Demo
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+              <div className="flex items-center gap-2 text-xs font-mono text-indigo-400 uppercase tracking-widest">
+                <ShoppingBag size={14} />
+                Merchant Checkout Demo
+              </div>
+              <span className="text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold">
+                🧪 SYNTHETIC TEST CARDS
+              </span>
             </div>
+
 
             <div className="aspect-square bg-slate-900/60 rounded-xl border border-slate-800 flex items-center justify-center text-7xl shadow-inner mb-4">
               {selectedProduct.image}
