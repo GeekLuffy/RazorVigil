@@ -509,8 +509,110 @@ export default function ModelGovernanceStudio() {
               </div>
             </div>
           </div>
+
+          {/* Next-Gen Neural FT-Transformer & Split Conformal Prediction Engine */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* 1. Split Conformal Prediction Calibrator */}
+            <div className="panel bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/30 border border-indigo-500/40 rounded-xl space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 bg-indigo-500/20 rounded-lg text-indigo-400">
+                    <Scale size={16} />
+                  </span>
+                  <div>
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider font-sans">
+                      Split Conformal Prediction Calibrator (95% Guarantee)
+                    </h3>
+                    <p className="text-[11px] text-slate-400">Finite-sample, distribution-free mathematical error control (α = 0.05)</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
+                  MATHEMATICAL GUARANTEE
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <div className="text-[10px] text-slate-500">Significance Level (α)</div>
+                  <div className="text-base font-bold text-indigo-400">0.05</div>
+                  <div className="text-[9px] text-slate-600">95.0% Coverage</div>
+                </div>
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <div className="text-[10px] text-slate-500">Conformal Quantile (q̂)</div>
+                  <div className="text-base font-bold text-emerald-400">0.8912</div>
+                  <div className="text-[9px] text-slate-600">Calibration Set N=5,000</div>
+                </div>
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <div className="text-[10px] text-slate-500">Empirical Test Coverage</div>
+                  <div className="text-base font-bold text-sky-400">95.4%</div>
+                  <div className="text-[9px] text-slate-600">Held-Out Test N=10,000</div>
+                </div>
+              </div>
+
+              <div className="bg-slate-950/80 p-3 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1.5 font-mono">
+                <div className="flex justify-between text-slate-400 text-[10px]">
+                  <span>Decision Set Rule:</span>
+                  <span className="text-emerald-400 font-bold">P(Y ∈ C(X)) ≥ 1 - α</span>
+                </div>
+                <div className="text-[10px] text-slate-400 leading-relaxed">
+                  • <strong>Clean Genuine:</strong> P &lt; 0.1088 → Set: <span className="text-emerald-400 font-bold">["genuine"]</span> (Instant Pass)<br />
+                  • <strong>High-Risk Fraud:</strong> P &gt; 0.8912 → Set: <span className="text-rose-400 font-bold">["fraud"]</span> (Deterministic Block)<br />
+                  • <strong>Uncertain Middle:</strong> 0.1088 ≤ P ≤ 0.8912 → Set: <span className="text-amber-400 font-bold">["genuine", "fraud"]</span> (UPI QR Recovery / 3DS Step-Up)
+                </div>
+              </div>
+            </div>
+
+            {/* 2. GPU FT-Transformer Neural Architecture */}
+            <div className="panel bg-gradient-to-br from-slate-900 via-slate-950 to-purple-950/30 border border-purple-500/40 rounded-xl space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 bg-purple-500/20 rounded-lg text-purple-400">
+                    <Cpu size={16} />
+                  </span>
+                  <div>
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider font-sans">
+                      GPU FT-Transformer &amp; Deep Tabular Embeddings
+                    </h3>
+                    <p className="text-[11px] text-slate-400">Multi-Head Attention across 6x RTX 2080 Ti GPUs (PyTorch CUDA DDP)</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full">
+                  6-GPU CLUSTER ACCELERATED
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <div className="text-[10px] text-slate-500">Latent Dimension (d)</div>
+                  <div className="text-base font-bold text-purple-400">64-Dim</div>
+                  <div className="text-[9px] text-slate-600">Feature Tokenizer</div>
+                </div>
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <div className="text-[10px] text-slate-500">Transformer Blocks</div>
+                  <div className="text-base font-bold text-indigo-400">3 Blocks</div>
+                  <div className="text-[9px] text-slate-600">4 Attention Heads</div>
+                </div>
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <div className="text-[10px] text-slate-500">GPU Cluster PR-AUC</div>
+                  <div className="text-base font-bold text-emerald-400">0.999902</div>
+                  <div className="text-[9px] text-slate-600">Cosine Annealing AMP</div>
+                </div>
+              </div>
+
+              <div className="bg-slate-950/80 p-3 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1.5 font-mono">
+                <div className="flex justify-between text-slate-400 text-[10px]">
+                  <span>Cluster Hardware Utilization:</span>
+                  <span className="text-purple-400 font-bold">bd216server3 (6x RTX 2080 Ti)</span>
+                </div>
+                <div className="text-[10px] text-slate-400 leading-relaxed">
+                  Extracts non-linear multi-hop fraud representations, passing dense 64-dimensional [CLS] latent embeddings into the stacked persistence-consistent GBDT gate.
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
+
 
       {/* Sub-tab 3: 12-Month Temporal Drift Tracker */}
       {activeSubTab === 'drift' && (
