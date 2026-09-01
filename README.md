@@ -48,30 +48,54 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 
 ## 🏗️ Defense Architecture
 
-### Synchronous Hot Path vs. Asynchronous Intelligence Plane
+```
+                                  INCOMING CHECKOUT REQUEST (Hot Path)
+                                                   │
+                                                   ▼
+ ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+ │  [Layer 0] Anti-Checker Tarpit: Deterministic Luhn & Micro-Auth Attack Traps (< 1.2ms)           │
+ │  [Layer 1] Armed Canary Honeytokens: 50 Cryptographic Synthetic BIN Traps (< 2.5ms)              │
+ │  [Layer 2] Sliding-Window Atomic Velocity: Redis 10s / 1m / 10m / 1h Windows (< 3.0ms)           │
+ │  [Layer 3] ASN & WebRTC Classifier: TLS JA3 Mismatch & Proxy Subnet Interception (< 3.5ms)       │
+ │  [Layer 4] Kinetic Biometric Entropy Gate: Keystroke Shannon Entropy Filter (< 4.0ms)            │
+ │  [Layer 5] Quad-Ensemble ML Scoring: LightGBM + CatBoost + Isolation Forest + GraphSAGE (< 8.5ms)│
+ │  [Layer 6] Zero-Trust 3DS2 Defense: Ed25519 Nonces & Cryptographic CAVV Validation (< 2.1ms)     │
+ │  [Layer 7] Louvain Graph Engine: Temporal Graph Partitioning Q=0.8994 (< 4.2ms)                  │
+ │  [Conformal] Split Conformal Calibrator: Distribution-Free 95% Error Bounds                      │
+ │  [Bayesian] Minimum Expected Loss: Optimal Financial Action Routing                              │
+ └─────────────────────────────────────────────────┬────────────────────────────────────────────────┘
+                                                   │
+                 ┌─────────────────────────────────┼─────────────────────────────────┐
+                 ▼                                 ▼                                 ▼
+       [TIER 1: PASS]                    [TIER 2: SOFT-RISK]                [TIER 3: BLOCKED]
+     • Clean Genuine Order             • Dynamic UPI QR Step-Up           • Deterministic Tarpit
+     • Instant Gating (<12ms)          • 5-Minute Inventory Hold          • 8s Poison Latency Delay
+```
+
+### Defense Pipeline Flowchart
 
 ```mermaid
-graph TD
-    REQ["Incoming Checkout Request"] --> L0["Layer 0: Anti-Checker Tarpit"]
-    L0 --> L1["Layer 1: 50 Armed Canary Honeytokens"]
-    L1 --> L2["Layer 2: Sliding-Window Velocity"]
-    L2 --> L3["Layer 3: ASN and WebRTC Classifier"]
-    L3 --> L4["Layer 4: Kinetic Biometric Gate"]
-    L4 --> L5["Layer 5: Quad-Ensemble ML Scoring"]
-    L5 --> L6["Layer 6: Zero-Trust 3DS2 Verification"]
-    L6 --> L7["Layer 7: Louvain Graph Engine"]
-    L7 --> CF["Split Conformal Calibration"]
-    CF --> MEL["Bayesian Action Tiering"]
+flowchart TD
+    REQ[Incoming Checkout Request] --> L0[Layer 0 - Anti-Checker Tarpit]
+    L0 --> L1[Layer 1 - 50 Canary Honeytokens]
+    L1 --> L2[Layer 2 - Sliding Window Velocity]
+    L2 --> L3[Layer 3 - ASN and WebRTC Defense]
+    L3 --> L4[Layer 4 - Kinetic Biometric Gate]
+    L4 --> L5[Layer 5 - Quad-Ensemble ML Scoring]
+    L5 --> L6[Layer 6 - Zero-Trust 3DS2 Verification]
+    L6 --> L7[Layer 7 - Louvain Graph Engine]
+    L7 --> CF[Split Conformal Calibration]
+    CF --> MEL[Bayesian Action Tiering]
 
-    MEL --> T1["Tier 1: Instant Approval (Under 12ms)"]
-    MEL --> T2["Tier 2: Soft-Risk Hold (Dynamic UPI QR)"]
-    MEL --> T3["Tier 3: Tarpit and Block (8s Poison Delay)"]
+    MEL --> T1[Tier 1 - Instant Approval Under 12ms]
+    MEL --> T2[Tier 2 - Soft-Risk Dynamic UPI QR]
+    MEL --> T3[Tier 3 - Tarpit Poison Delay 8s]
 
-    T1 -.-> A1["Louvain Mule Ring Explorer"]
-    T2 -.-> A2["Threat Memory Copilot RAG"]
-    T3 -.-> A3["Red-Team Arms Race Simulator"]
-    A1 --> A4["Dispute Evidence Dossier PDF"]
-    A2 --> A5["PSI Drift and Doubly Robust Monitor"]
+    T1 --> A1[Louvain Mule Ring Explorer]
+    T2 --> A2[Threat Memory Copilot RAG]
+    T3 --> A3[Red-Team Arms Race Simulator]
+    A1 --> A4[Dispute Evidence Dossier PDF]
+    A2 --> A5[PSI Drift Monitor]
 ```
 
 ---
@@ -79,12 +103,12 @@ graph TD
 ### Split Conformal Decision Routing
 
 ```mermaid
-graph LR
-    SCORE["ML Risk Score"]
-    SCORE -->|Low Risk| GENUINE["Decision: Genuine (Instant Approval)"]
-    SCORE -->|Uncertain| UNCERTAIN["Decision: Uncertain (Step-Up to UPI QR)"]
-    SCORE -->|High Risk| FRAUD["Decision: Fraud (Honeypot Block)"]
+flowchart LR
+    SCORE[ML Risk Score] -->|Low Risk| GENUINE[Decision - Instant Approval]
+    SCORE -->|Uncertain| UNCERTAIN[Decision - Step-Up to UPI QR]
+    SCORE -->|High Risk| FRAUD[Decision - Honeypot Block]
 ```
+
 
 
 
