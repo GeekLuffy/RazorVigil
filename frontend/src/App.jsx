@@ -6,8 +6,9 @@ import {
 import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
-  ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot
+  ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords
 } from 'lucide-react'
+
 
 
 
@@ -25,6 +26,9 @@ import AttackLaunchpad from './components/AttackLaunchpad'
 import ExecutiveGuideModal from './components/ExecutiveGuideModal'
 import StressBenchmarkModal from './components/StressBenchmarkModal'
 import CopilotIncidentRoom from './components/CopilotIncidentRoom'
+import IntegrationExportModal from './components/IntegrationExportModal'
+import RedTeamArmsRaceWorkspace from './components/RedTeamArmsRaceWorkspace'
+
 
 
 
@@ -276,6 +280,8 @@ export default function App() {
   const [isGuideOpen, setIsGuideOpen] = useState(false)
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false)
   const [isCopilotOpen, setIsCopilotOpen] = useState(false)
+  const [isExportOpen, setIsExportOpen] = useState(false)
+
 
 
 
@@ -607,7 +613,17 @@ export default function App() {
             }`}
           >
             <BarChart3 size={13} />
-            Model Governance &amp; Policy Studio
+            Model Governance
+          </button>
+
+          <button
+            onClick={() => setActiveTab('arms_race')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold font-sans transition-all ${
+              activeTab === 'arms_race' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <Swords size={13} className="text-rose-400" />
+            Arms Race Lab
           </button>
 
           <button
@@ -617,7 +633,7 @@ export default function App() {
             }`}
           >
             <FileText size={13} />
-            Architecture &amp; RBI Specs
+            Architecture &amp; RBI
           </button>
 
           <div className="h-4 w-px bg-slate-800 mx-1 hidden sm:block" />
@@ -634,6 +650,15 @@ export default function App() {
         {/* Global Controls & Status */}
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setIsExportOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 transition shadow-sm"
+            title="Open 1-Click Merchant Export & Multi-Language SDK Snippets"
+          >
+            <Package size={13} className="text-cyan-400" />
+            <span className="hidden sm:inline">📦 SDK &amp;</span> Export
+          </button>
+
+          <button
             onClick={() => setIsCopilotOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600/20 to-purple-600/20 hover:from-pink-600/30 hover:to-purple-600/30 text-pink-300 border border-pink-500/40 transition shadow-sm"
             title="Open interactive Threat Memory Copilot AI Incident Room"
@@ -641,6 +666,7 @@ export default function App() {
             <Bot size={13} className="text-pink-400 animate-pulse" />
             <span className="hidden sm:inline">AI</span> Copilot Room
           </button>
+
 
           <button
             onClick={() => setIsBenchmarkOpen(true)}
@@ -685,7 +711,10 @@ export default function App() {
         <DisputeCaseWorkspace />
       ) : activeTab === 'governance' ? (
         <ModelGovernanceStudio />
+      ) : activeTab === 'arms_race' ? (
+        <RedTeamArmsRaceWorkspace />
       ) : (
+
 
         <>
           {/* Interactive Threat Attack Launchpad */}
@@ -924,6 +953,13 @@ export default function App() {
         isOpen={isBenchmarkOpen}
         onClose={() => setIsBenchmarkOpen(false)}
       />
+
+      {/* 1-Click Merchant Export & Multi-Language SDK Modal */}
+      <IntegrationExportModal
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+      />
+
 
       {/* Interactive Threat Memory Copilot Incident Room Drawer */}
       <CopilotIncidentRoom
