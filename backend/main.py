@@ -47,6 +47,8 @@ from backend.velocity.redis_velocity import VelocityTracker
 from backend.antichecker.anti_checker_engine import AntiCheckerGuard
 from backend.antichecker.proxy_detector import proxy_detector
 from backend.copilot.chargeback_evidence import evidence_synthesizer
+from backend.copilot.copilot_chat import ChatRequest, ChatResponse, copilot_engine
+
 
 
 
@@ -1267,7 +1269,24 @@ async def run_live_stress_benchmark(
     }
 
 
+@app.post("/copilot/chat", response_model=ChatResponse)
+async def chat_with_copilot(req: ChatRequest):
+    """
+    Interactive Threat Memory Copilot Incident Room endpoint.
+    Performs real-time knowledge retrieval and forensic reasoning across live transactions,
+    NetworkX Louvain graph topology, and RBI Sovereign Regulatory Directives.
+    """
+    return copilot_engine.process_message(
+        message=req.message,
+        transaction_store=transaction_store,
+        cluster_engine=cluster_engine,
+        transaction_id=req.transaction_id,
+        cluster_id=req.cluster_id,
+    )
+
+
 class CaseActionRequest(BaseModel):
+
 
 
     action: str  # SUBMIT_REPRESENTATION, ACCEPT_DISPUTE, ROUTE_TO_UPI_RECOVERY

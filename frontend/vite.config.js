@@ -28,9 +28,11 @@ export default defineConfig({
       '/cluster': { target: 'http://localhost:8000', changeOrigin: true },
       '/investigate': { target: 'http://localhost:8000', changeOrigin: true },
       '/benchmark': { target: 'http://localhost:8000', changeOrigin: true },
+      '/copilot': { target: 'http://localhost:8000', changeOrigin: true },
       '/metrics': { target: 'http://localhost:8000', changeOrigin: true },
       '/ws': { target: 'ws://localhost:8000', ws: true, changeOrigin: true },
     },
+
 
 
 
