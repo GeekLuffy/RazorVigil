@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    background-color: #050811;
+    background-color: #080a11;
     color: #e2e8f0;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
@@ -16,23 +16,72 @@
   }
 }
 
-/* ── Ambient Deep Multi-Layer Background Mesh ── */
-.bg-soc-mesh {
-  background-color: #050811;
-  background-image:
-    radial-gradient(ellipse at 12% 0%, rgba(99, 102, 241, 0.09) 0, transparent 50%),
-    radial-gradient(ellipse at 88% 0%, rgba(16, 185, 129, 0.07) 0, transparent 48%),
-    radial-gradient(ellipse at 50% 100%, rgba(244, 63, 94, 0.05) 0, transparent 55%),
-    radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.2) 0, transparent 70%);
+/* ── Aura Gradient Atmosphere ("Moonlit" + Sentinel Multi-Layer Blend) ── */
+.aura-container {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Layer 1: Cool celestial atmospheric dispersion (screen) */
+.aura-layer-1 {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 48% at 78% 18%, rgba(99, 102, 241, 0.22) 0%, rgba(57, 79, 130, 0.08) 48%, transparent 78%),
+    radial-gradient(ellipse 45% 42% at 18% 38%, rgba(16, 185, 129, 0.12) 0%, rgba(13, 148, 136, 0.04) 45%, transparent 72%),
+    radial-gradient(ellipse 60% 55% at 50% 92%, rgba(244, 63, 94, 0.07) 0%, transparent 68%);
+  mix-blend-mode: screen;
+  filter: blur(36px);
+  transform: translateZ(0);
+  will-change: transform;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Layer 2: Core luminous focal highlights (screen) */
+.aura-layer-2 {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 26% 26% at 76% 20%, rgba(180, 198, 255, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 20% 20% at 20% 36%, rgba(52, 211, 153, 0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 22% 22% at 52% 80%, rgba(244, 63, 94, 0.06) 0%, transparent 65%);
+  mix-blend-mode: screen;
+  filter: blur(54px);
+  opacity: 0.85;
+  transform: translateZ(0);
+  will-change: transform;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Film-grain overlay - SVG feTurbulence noise */
+.aura-grain {
+  position: fixed;
+  inset: 0;
+  mix-blend-mode: overlay;
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Modern Floating Glassmorphic Navbar ── */
+.glass-nav {
+  background: rgba(10, 14, 26, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* ── Depth & Surface Cards ── */
 .glass-panel {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(8, 12, 24, 0.85) 100%);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.70) 0%, rgba(8, 12, 24, 0.85) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
 }
 
@@ -58,6 +107,7 @@
   box-shadow: 0 12px 32px -4px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transform: translateY(-1.5px);
 }
+
 
 .soc-card {
   background: linear-gradient(165deg, rgba(15, 23, 42, 0.88) 0%, rgba(9, 13, 26, 0.96) 100%);

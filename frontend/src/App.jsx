@@ -591,219 +591,292 @@ export default function App() {
   const safeRate = stats.total > 0 ? ((tierCounts.safe / stats.total) * 100).toFixed(1) : '94.8'
 
   return (
-    <div className="min-h-screen bg-soc-mesh text-slate-200 p-4 font-sans">
-      {/* Sticky Top Command Bar */}
-      <div className="sticky top-0 z-40 backdrop-blur-xl bg-[#070a13]/90 -mx-4 -mt-4 px-5 py-3 mb-4 border-b border-slate-800/80 shadow-2xl flex flex-wrap items-center justify-between gap-4">
-        {/* Brand & Subtitle */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-600/20 border border-indigo-500/40 rounded-xl text-indigo-400 shadow-md shadow-indigo-950/40">
-            <Shield size={24} />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2 flex-wrap font-sans">
-              RazorShield Sentinel
-              <span className="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full font-bold">
-                Enterprise SOC v1.2
-              </span>
-            </h1>
-            <p className="text-xs text-slate-400 font-sans">Autonomous Dual-Tier Carding &amp; Bot-Abuse Mitigation Engine</p>
-          </div>
-        </div>
+    <div className="aura-container text-slate-200 font-sans min-h-screen">
+      {/* ── Layer 1: Atmospheric Celestial Dispersion (Screen Blend) ── */}
+      <div className="aura-layer-1" aria-hidden="true" />
 
-        {/* Categorized Tab Navigator */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800/90 shadow-inner">
-          {/* Group: Real-Time Defense */}
-          <div className="flex items-center gap-1 bg-slate-900/50 p-0.5 rounded-lg border border-slate-800/50">
-            <button
-              onClick={() => setActiveTab('soc')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'soc' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 1"
-            >
-              <LayoutDashboard size={12} />
-              <span>SOC Gateway</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">1</kbd>
-            </button>
+      {/* ── Layer 2: Luminous Focal Highlighting (Screen Blend) ── */}
+      <div className="aura-layer-2" aria-hidden="true" />
 
-            <button
-              onClick={() => setActiveTab('lab')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'lab' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 2"
-            >
-              <Flame size={12} className="text-amber-400" />
-              <span>Threat Lab</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">2</kbd>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('rules')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'rules' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 3"
-            >
-              <Code2 size={12} />
-              <span>Active WAF</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">3</kbd>
-            </button>
-          </div>
-
-          {/* Group: Deep Intelligence */}
-          <div className="flex items-center gap-1 bg-slate-900/50 p-0.5 rounded-lg border border-slate-800/50">
-            <button
-              onClick={() => setActiveTab('graph')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'graph' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 4"
-            >
-              <Network size={12} />
-              <span>Mule Graph</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">4</kbd>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('arms_race')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'arms_race' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 7"
-            >
-              <Swords size={12} className="text-rose-400" />
-              <span>Arms Race</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">7</kbd>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('disputes')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'disputes' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 5"
-            >
-              <Scale size={12} />
-              <span>Disputes</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">5</kbd>
-            </button>
-          </div>
-
-          {/* Group: Governance & Architecture */}
-          <div className="flex items-center gap-1 bg-slate-900/50 p-0.5 rounded-lg border border-slate-800/50">
-            <button
-              onClick={() => setActiveTab('governance')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'governance' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 6"
-            >
-              <BarChart3 size={12} />
-              <span>Governance</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">6</kbd>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('pitch')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                activeTab === 'pitch' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Shortcut: Press 8"
-            >
-              <FileText size={12} />
-              <span>RBI Specs</span>
-              <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden md:inline">8</kbd>
-            </button>
-          </div>
-
-          <div className="h-4 w-px bg-slate-800 mx-0.5 hidden sm:block" />
-
-          {/* Live Store Button */}
-          <button
-            onClick={() => setIsStoreOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950/60 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-500/40 transition shadow-sm"
-            title="Open Interactive Storefront (Shortcut: S)"
-          >
-            <ShoppingBag size={12} />
-            <span className="font-bold">Live Store</span>
-            <kbd className="text-[9px] font-mono bg-emerald-900/80 px-1 py-0.2 rounded text-emerald-200 hidden md:inline">S</kbd>
-          </button>
-        </div>
-
-        {/* Global Action Modals & Status */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsExportOpen(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 transition shadow-sm"
-            title="Open SDK & WAF Exporter (Shortcut: E)"
-          >
-            <Package size={12} className="text-cyan-400" />
-            <span className="hidden sm:inline">SDK Export</span>
-            <kbd className="text-[9px] font-mono opacity-60 hidden lg:inline">E</kbd>
-          </button>
-
-          <button
-            onClick={() => setIsCopilotOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600/20 to-purple-600/20 hover:from-pink-600/30 hover:to-purple-600/30 text-pink-300 border border-pink-500/40 transition shadow-sm"
-            title="Open Threat Memory Copilot AI Incident Room (Shortcut: C)"
-          >
-            <Bot size={13} className="text-pink-400 animate-pulse" />
-            <span className="hidden sm:inline">AI Copilot</span>
-            <kbd className="text-[9px] font-mono opacity-70 hidden lg:inline">C</kbd>
-          </button>
-
-          <button
-            onClick={() => setIsBenchmarkOpen(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 transition shadow-sm"
-            title="Run Live SLA Stress Benchmark (Shortcut: B)"
-          >
-            <Zap size={12} className="text-amber-400 animate-pulse" />
-            <span className="hidden sm:inline">SLA Benchmark</span>
-            <kbd className="text-[9px] font-mono opacity-60 hidden lg:inline">B</kbd>
-          </button>
-
-          <button
-            onClick={() => setIsGuideOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-950/50 border border-indigo-400/40 transition-all hover:scale-[1.03] active:scale-95"
-            title="Open 1-minute guided interactive tour (Shortcut: ?)"
-          >
-            <Sparkles size={12} className="text-amber-300 animate-pulse" />
-            <span className="hidden sm:inline">Guided Tour</span>
-            <kbd className="text-[9px] font-mono opacity-70 hidden lg:inline">?</kbd>
-          </button>
-
-          <div className="flex items-center gap-1.5 text-xs font-mono ml-1 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800/80">
-            <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            <span className={wsStatus === 'connected' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-              {wsStatus === 'connected' ? 'GATEWAY LIVE' : 'RECONNECTING'}
-            </span>
-          </div>
-        </div>
+      {/* ── Layer 3: Analog Film-Grain Overlay (SVG feTurbulence) ── */}
+      <div className="aura-grain" aria-hidden="true">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <filter id="grain">
+            <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" />
+            <feColorMatrix
+              type="matrix"
+              values="0.181 0.608 0.061 0 0.075
+                      0.181 0.608 0.061 0 0.075
+                      0.181 0.608 0.061 0 0.075
+                      0     0     0     1 0"
+            />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#grain)" />
+        </svg>
       </div>
 
+      {/* ── Page Content Container (Sits Above Atmospheric Layers on z-10) ── */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Sticky Modern Glassmorphic Top Navbar */}
+        <header className="sticky top-0 z-40 glass-nav px-4 sm:px-6 py-3 transition-all">
+          <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
+            {/* Brand Logo & Subtitle */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-500/15 border border-indigo-400/30 rounded-xl text-indigo-400 shadow-md shadow-indigo-950/40">
+                <Shield size={22} className="text-indigo-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-base sm:text-lg font-extrabold text-white tracking-tight font-sans">
+                    RazorShield Sentinel
+                  </span>
+                  <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-bold">
+                    Enterprise SOC v1.2
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 font-sans hidden sm:block">
+                  Autonomous Dual-Tier Carding &amp; Bot-Abuse Mitigation Engine
+                </p>
+              </div>
+            </div>
 
-      {/* Main Tab Content */}
-      {activeTab === 'lab' ? (
-        <ThreatLabWorkspace onTriggerStoreDemo={() => setIsStoreOpen(true)} />
-      ) : activeTab === 'rules' ? (
-        <ActiveDefenseWorkspace copilotNotes={copilotNotes} />
-      ) : activeTab === 'graph' ? (
-        <FraudGraphExplorer />
-      ) : activeTab === 'pitch' ? (
-        <ArchitectureOverview />
-      ) : activeTab === 'disputes' ? (
-        <DisputeCaseWorkspace />
-      ) : activeTab === 'governance' ? (
-        <ModelGovernanceStudio />
-      ) : activeTab === 'arms_race' ? (
-        <RedTeamArmsRaceWorkspace />
-      ) : (
+            {/* Categorized Tab Navigation Pills */}
+            <nav className="flex flex-wrap items-center gap-1.5 bg-slate-950/80 p-1.5 rounded-xl border border-white/[0.08] shadow-inner">
+              {/* Defense Group */}
+              <div className="flex items-center gap-0.5 bg-slate-900/40 p-0.5 rounded-lg border border-white/[0.04]">
+                <button
+                  onClick={() => setActiveTab('soc')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'soc' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 1"
+                >
+                  <LayoutDashboard size={12} />
+                  <span>SOC Gateway</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">1</kbd>
+                </button>
 
+                <button
+                  onClick={() => setActiveTab('lab')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'lab' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 2"
+                >
+                  <Flame size={12} className="text-amber-400" />
+                  <span>Threat Lab</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">2</kbd>
+                </button>
 
-        <>
-          {/* Interactive Threat Attack Launchpad */}
-          <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />
+                <button
+                  onClick={() => setActiveTab('rules')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'rules' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 3"
+                >
+                  <Code2 size={12} />
+                  <span>Active WAF</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">3</kbd>
+                </button>
+              </div>
+
+              {/* Intelligence Group */}
+              <div className="flex items-center gap-0.5 bg-slate-900/40 p-0.5 rounded-lg border border-white/[0.04]">
+                <button
+                  onClick={() => setActiveTab('graph')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'graph' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 4"
+                >
+                  <Network size={12} />
+                  <span>Mule Graph</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">4</kbd>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('arms_race')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'arms_race' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 7"
+                >
+                  <Swords size={12} className="text-rose-400" />
+                  <span>Arms Race</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">7</kbd>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('disputes')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'disputes' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 5"
+                >
+                  <Scale size={12} />
+                  <span>Disputes</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">5</kbd>
+                </button>
+              </div>
+
+              {/* Governance Group */}
+              <div className="flex items-center gap-0.5 bg-slate-900/40 p-0.5 rounded-lg border border-white/[0.04]">
+                <button
+                  onClick={() => setActiveTab('governance')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'governance' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 6"
+                >
+                  <BarChart3 size={12} />
+                  <span>Governance</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">6</kbd>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('pitch')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
+                    activeTab === 'pitch' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                  title="Shortcut: Press 8"
+                >
+                  <FileText size={12} />
+                  <span>RBI Specs</span>
+                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">8</kbd>
+                </button>
+              </div>
+
+              <div className="h-4 w-px bg-slate-800 mx-0.5 hidden sm:block" />
+
+              {/* Live Storefront Button */}
+              <button
+                onClick={() => setIsStoreOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950/60 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-500/40 transition shadow-sm"
+                title="Open Interactive Storefront (Shortcut: S)"
+              >
+                <ShoppingBag size={12} />
+                <span className="font-bold">Live Store</span>
+                <kbd className="text-[9px] font-mono bg-emerald-900/80 px-1 py-0.2 rounded text-emerald-200 hidden md:inline">S</kbd>
+              </button>
+            </nav>
+
+            {/* Global Action Modals & Status */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsExportOpen(true)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition shadow-sm"
+                title="Open SDK & WAF Exporter (Shortcut: E)"
+              >
+                <Package size={12} className="text-cyan-400" />
+                <span className="hidden sm:inline">SDK Export</span>
+                <kbd className="text-[9px] font-mono opacity-60 hidden lg:inline">E</kbd>
+              </button>
+
+              <button
+                onClick={() => setIsCopilotOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600/20 to-purple-600/20 hover:from-pink-600/30 hover:to-purple-600/30 text-pink-300 border border-pink-500/40 transition shadow-sm"
+                title="Open Threat Memory Copilot AI Incident Room (Shortcut: C)"
+              >
+                <Bot size={13} className="text-pink-400 animate-pulse" />
+                <span className="hidden sm:inline">AI Copilot</span>
+                <kbd className="text-[9px] font-mono opacity-70 hidden lg:inline">C</kbd>
+              </button>
+
+              <button
+                onClick={() => setIsBenchmarkOpen(true)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition shadow-sm"
+                title="Run Live SLA Stress Benchmark (Shortcut: B)"
+              >
+                <Zap size={12} className="text-amber-400 animate-pulse" />
+                <span className="hidden sm:inline">SLA Benchmark</span>
+                <kbd className="text-[9px] font-mono opacity-60 hidden lg:inline">B</kbd>
+              </button>
+
+              <button
+                onClick={() => setIsGuideOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-950/50 border border-indigo-400/40 transition-all hover:scale-[1.03] active:scale-95"
+                title="Open 1-minute guided interactive tour (Shortcut: ?)"
+              >
+                <Sparkles size={12} className="text-amber-300 animate-pulse" />
+                <span className="hidden sm:inline">Guided Tour</span>
+                <kbd className="text-[9px] font-mono opacity-70 hidden lg:inline">?</kbd>
+              </button>
+
+              <div className="flex items-center gap-1.5 text-xs font-mono ml-1 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-white/[0.08]">
+                <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                <span className={wsStatus === 'connected' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                  {wsStatus === 'connected' ? 'GATEWAY LIVE' : 'RECONNECTING'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* ── Main Workspace Content Area (Structured Max-Width Canvas) ── */}
+        <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+          {activeTab === 'lab' ? (
+            <ThreatLabWorkspace onTriggerStoreDemo={() => setIsStoreOpen(true)} />
+          ) : activeTab === 'rules' ? (
+            <ActiveDefenseWorkspace copilotNotes={copilotNotes} />
+          ) : activeTab === 'graph' ? (
+            <FraudGraphExplorer />
+          ) : activeTab === 'pitch' ? (
+            <ArchitectureOverview />
+          ) : activeTab === 'disputes' ? (
+            <DisputeCaseWorkspace />
+          ) : activeTab === 'governance' ? (
+            <ModelGovernanceStudio />
+          ) : activeTab === 'arms_race' ? (
+            <RedTeamArmsRaceWorkspace />
+          ) : (
+            <>
+              {/* ── High-Impact Modern Hero Section ── */}
+              <div className="mb-6 pt-1 pb-2">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/[0.06] pb-5">
+                  <div className="space-y-1.5 max-w-3xl">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                      Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Defense Engine
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-sans">
+                      Autonomous Real-Time AI Risk Gateway
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl">
+                      Defending live authorization hot paths with LightGBM, CatBoost, Isolation Forest, and GraphSAGE with certified 95% conformal bounds and sub-15ms decision latency.
+                    </p>
+                  </div>
+
+                  {/* Hero Quick Action CTA Hub */}
+                  <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                    <button
+                      onClick={() => setIsStoreOpen(true)}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                    >
+                      <ShoppingBag size={14} />
+                      <span>Test Storefront</span>
+                    </button>
+                    <button
+                      onClick={() => setIsBenchmarkOpen(true)}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 transition flex items-center gap-2"
+                    >
+                      <Zap size={14} className="text-amber-400" />
+                      <span>50-Worker Stress SLA</span>
+                    </button>
+                    <button
+                      onClick={() => setIsCopilotOpen(true)}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-pink-500/15 hover:bg-pink-500/25 text-pink-300 border border-pink-500/40 transition flex items-center gap-2"
+                    >
+                      <Bot size={14} className="text-pink-400" />
+                      <span>Copilot Incident Room</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Threat Attack Launchpad */}
+              <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />
+
 
           {/* Real-Time Traffic Composition Radar HUD Bar */}
           <div className="soc-card rounded-xl p-3.5 mb-4 bg-gradient-to-r from-slate-950 via-slate-900/90 to-slate-950 border border-slate-800 shadow-md">
@@ -1055,82 +1128,81 @@ export default function App() {
           </div>
         </>
       )}
+        </main>
 
-      {/* Slide-Out Forensic Transaction Detail Drawer */}
-      <TransactionDetailDrawer
-        tx={selectedTx}
-        isOpen={Boolean(selectedTx)}
-        onClose={() => setSelectedTx(null)}
-      />
+        {/* Slide-Out Forensic Transaction Detail Drawer */}
+        <TransactionDetailDrawer
+          tx={selectedTx}
+          isOpen={Boolean(selectedTx)}
+          onClose={() => setSelectedTx(null)}
+        />
 
-      {/* Embedded Merchant Storefront Modal */}
-      {isStoreOpen && (
-        <MerchantStore
-          onClose={() => setIsStoreOpen(false)}
-          onPaymentComplete={(amount) => {
-            setRecoveredGmv(prev => prev + amount)
+        {/* Embedded Merchant Storefront Modal */}
+        {isStoreOpen && (
+          <MerchantStore
+            onClose={() => setIsStoreOpen(false)}
+            onPaymentComplete={(amount) => {
+              setRecoveredGmv(prev => prev + amount)
+            }}
+          />
+        )}
+
+        {/* Executive 1-Min Guided Tour Modal */}
+        <ExecutiveGuideModal
+          isOpen={isGuideOpen}
+          onClose={() => setIsGuideOpen(false)}
+          onLaunchStore={() => {
+            setIsGuideOpen(false)
+            setIsStoreOpen(true)
+          }}
+          onNavigateTab={(tab) => {
+            setIsGuideOpen(false)
+            setActiveTab(tab)
           }}
         />
-      )}
 
-      {/* Executive 1-Min Guided Tour Modal */}
-      <ExecutiveGuideModal
-        isOpen={isGuideOpen}
-        onClose={() => setIsGuideOpen(false)}
-        onLaunchStore={() => {
-          setIsGuideOpen(false)
-          setIsStoreOpen(true)
-        }}
-        onNavigateTab={(tab) => {
-          setIsGuideOpen(false)
-          setActiveTab(tab)
-        }}
-      />
+        {/* Live SLA Stress Benchmark Modal */}
+        <StressBenchmarkModal
+          isOpen={isBenchmarkOpen}
+          onClose={() => setIsBenchmarkOpen(false)}
+        />
 
-      {/* Live SLA Stress Benchmark Modal */}
-      <StressBenchmarkModal
-        isOpen={isBenchmarkOpen}
-        onClose={() => setIsBenchmarkOpen(false)}
-      />
+        {/* 1-Click Merchant Export & Multi-Language SDK Modal */}
+        <IntegrationExportModal
+          isOpen={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+        />
 
-      {/* 1-Click Merchant Export & Multi-Language SDK Modal */}
-      <IntegrationExportModal
-        isOpen={isExportOpen}
-        onClose={() => setIsExportOpen(false)}
-      />
+        {/* Interactive Threat Memory Copilot Incident Room Drawer */}
+        <CopilotIncidentRoom
+          isOpen={isCopilotOpen}
+          onClose={() => setIsCopilotOpen(false)}
+          pinnedTx={selectedTx}
+          onSelectTx={setSelectedTx}
+        />
 
+        {/* Floating Copilot Launcher Button */}
+        <button
+          onClick={() => setIsCopilotOpen(prev => !prev)}
+          className="fixed bottom-6 right-6 z-40 px-4 py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white rounded-full shadow-2xl shadow-pink-950/80 border border-pink-400/50 flex items-center gap-2 font-mono text-xs font-bold transition-all hover:scale-105 active:scale-95 group"
+          title="Open interactive Threat Memory Copilot AI Incident Room"
+        >
+          <Bot size={18} className="animate-pulse text-pink-200 group-hover:rotate-12 transition-transform" />
+          <span className="hidden sm:inline">AI Copilot</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping ml-0.5" />
+        </button>
 
-      {/* Interactive Threat Memory Copilot Incident Room Drawer */}
-      <CopilotIncidentRoom
-        isOpen={isCopilotOpen}
-        onClose={() => setIsCopilotOpen(false)}
-        pinnedTx={selectedTx}
-        onSelectTx={setSelectedTx}
-      />
-
-      {/* Floating Copilot Launcher Button */}
-      <button
-        onClick={() => setIsCopilotOpen(prev => !prev)}
-        className="fixed bottom-6 right-6 z-40 px-4 py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white rounded-full shadow-2xl shadow-pink-950/80 border border-pink-400/50 flex items-center gap-2 font-mono text-xs font-bold transition-all hover:scale-105 active:scale-95 group"
-        title="Open interactive Threat Memory Copilot AI Incident Room"
-      >
-        <Bot size={18} className="animate-pulse text-pink-200 group-hover:rotate-12 transition-transform" />
-        <span className="hidden sm:inline">AI Copilot</span>
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping ml-0.5" />
-      </button>
-
-      {/* Footer */}
-
-
-      <div className="mt-8 pt-4 border-t border-slate-900/80 text-center text-xs text-slate-500 font-sans flex flex-wrap items-center justify-between gap-2">
-        <span>Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Autonomous Payment Defense Engine</span>
-        <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-          Synchronous SLA &lt;10ms · RBI 2025/2026 Sovereign Compliance
-        </span>
+        {/* Footer */}
+        <footer className="mt-auto border-t border-white/[0.06] bg-slate-950/40 backdrop-blur-md px-6 py-4 text-xs text-slate-500 font-sans">
+          <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
+            <span>Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Autonomous Payment Defense Engine</span>
+            <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+              Synchronous Hot-Path SLA &lt;15ms · Split Conformal Coverage 95.4%
+            </span>
+          </div>
+        </footer>
       </div>
-
-
     </div>
   )
 }
