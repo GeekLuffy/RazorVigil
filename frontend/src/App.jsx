@@ -618,192 +618,102 @@ export default function App() {
       {/* ── Page Content Container (Sits Above Atmospheric Layers on z-10) ── */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Sticky Modern Glassmorphic Top Navbar */}
-        <header className="sticky top-0 z-40 glass-nav px-4 sm:px-6 py-3 transition-all">
-          <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
-            {/* Brand Logo & Subtitle */}
-            <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-40 glass-nav px-4 lg:px-8 py-2.5 transition-all">
+          <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+            {/* Left: Brand Identity */}
+            <div className="flex items-center gap-2.5 shrink-0">
               <div className="p-2 bg-indigo-500/15 border border-indigo-400/30 rounded-xl text-indigo-400 shadow-md shadow-indigo-950/40">
-                <Shield size={22} className="text-indigo-400" />
+                <Shield size={20} className="text-indigo-400" />
               </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-base sm:text-lg font-extrabold text-white tracking-tight font-sans">
-                    RazorShield Sentinel
-                  </span>
-                  <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-bold">
-                    Enterprise SOC v1.2
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-400 font-sans hidden sm:block">
-                  Autonomous Dual-Tier Carding &amp; Bot-Abuse Mitigation Engine
-                </p>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-extrabold text-white tracking-tight font-sans">
+                  RazorShield Sentinel
+                </span>
+                <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-bold hidden sm:inline">
+                  Enterprise SOC v1.2
+                </span>
               </div>
             </div>
 
-            {/* Categorized Tab Navigation Pills */}
-            <nav className="flex flex-wrap items-center gap-1.5 bg-slate-950/80 p-1.5 rounded-xl border border-white/[0.08] shadow-inner">
-              {/* Defense Group */}
-              <div className="flex items-center gap-0.5 bg-slate-900/40 p-0.5 rounded-lg border border-white/[0.04]">
-                <button
-                  onClick={() => setActiveTab('soc')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'soc' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 1"
-                >
-                  <LayoutDashboard size={12} />
-                  <span>SOC Gateway</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">1</kbd>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('lab')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'lab' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 2"
-                >
-                  <Flame size={12} className="text-amber-400" />
-                  <span>Threat Lab</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">2</kbd>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('rules')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'rules' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 3"
-                >
-                  <Code2 size={12} />
-                  <span>Active WAF</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">3</kbd>
-                </button>
-              </div>
-
-              {/* Intelligence Group */}
-              <div className="flex items-center gap-0.5 bg-slate-900/40 p-0.5 rounded-lg border border-white/[0.04]">
-                <button
-                  onClick={() => setActiveTab('graph')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'graph' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 4"
-                >
-                  <Network size={12} />
-                  <span>Mule Graph</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">4</kbd>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('arms_race')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'arms_race' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 7"
-                >
-                  <Swords size={12} className="text-rose-400" />
-                  <span>Arms Race</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">7</kbd>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('disputes')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'disputes' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 5"
-                >
-                  <Scale size={12} />
-                  <span>Disputes</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">5</kbd>
-                </button>
-              </div>
-
-              {/* Governance Group */}
-              <div className="flex items-center gap-0.5 bg-slate-900/40 p-0.5 rounded-lg border border-white/[0.04]">
-                <button
-                  onClick={() => setActiveTab('governance')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'governance' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 6"
-                >
-                  <BarChart3 size={12} />
-                  <span>Governance</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">6</kbd>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('pitch')}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold font-sans transition-all ${
-                    activeTab === 'pitch' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title="Shortcut: Press 8"
-                >
-                  <FileText size={12} />
-                  <span>RBI Specs</span>
-                  <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">8</kbd>
-                </button>
-              </div>
-
-              <div className="h-4 w-px bg-slate-800 mx-0.5 hidden sm:block" />
-
-              {/* Live Storefront Button */}
-              <button
-                onClick={() => setIsStoreOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950/60 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-500/40 transition shadow-sm"
-                title="Open Interactive Storefront (Shortcut: S)"
-              >
-                <ShoppingBag size={12} />
-                <span className="font-bold">Live Store</span>
-                <kbd className="text-[9px] font-mono bg-emerald-900/80 px-1 py-0.2 rounded text-emerald-200 hidden md:inline">S</kbd>
-              </button>
+            {/* Center: Categorized Tab Navigation Pills */}
+            <nav className="hidden md:flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-white/[0.08] shadow-inner overflow-x-auto">
+              {[
+                { id: 'soc', label: 'SOC Gateway', icon: LayoutDashboard, key: '1' },
+                { id: 'lab', label: 'Threat Lab', icon: Flame, key: '2' },
+                { id: 'rules', label: 'Active WAF', icon: Code2, key: '3' },
+                { id: 'graph', label: 'Mule Graph', icon: Network, key: '4' },
+                { id: 'arms_race', label: 'Arms Race', icon: Swords, key: '7' },
+                { id: 'disputes', label: 'Disputes', icon: Scale, key: '5' },
+                { id: 'governance', label: 'Governance', icon: BarChart3, key: '6' },
+                { id: 'pitch', label: 'RBI Specs', icon: FileText, key: '8' },
+              ].map((tab) => {
+                const Icon = tab.icon
+                const isActive = activeTab === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      isActive
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`}
+                    title={`Shortcut: Press ${tab.key}`}
+                  >
+                    <Icon size={12} className={isActive ? 'text-white' : 'text-slate-400'} />
+                    <span>{tab.label}</span>
+                    <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">{tab.key}</kbd>
+                  </button>
+                )
+              })}
             </nav>
 
-            {/* Global Action Modals & Status */}
-            <div className="flex items-center gap-2">
+            {/* Right: Quick Action Hub */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => setIsExportOpen(true)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition shadow-sm"
-                title="Open SDK & WAF Exporter (Shortcut: E)"
+                onClick={() => setIsStoreOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition shadow-sm"
+                title="Open Live Merchant Store (S)"
               >
-                <Package size={12} className="text-cyan-400" />
-                <span className="hidden sm:inline">SDK Export</span>
-                <kbd className="text-[9px] font-mono opacity-60 hidden lg:inline">E</kbd>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Live Store</span>
               </button>
 
               <button
                 onClick={() => setIsCopilotOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600/20 to-purple-600/20 hover:from-pink-600/30 hover:to-purple-600/30 text-pink-300 border border-pink-500/40 transition shadow-sm"
-                title="Open Threat Memory Copilot AI Incident Room (Shortcut: C)"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-pink-500/15 hover:bg-pink-500/25 text-pink-300 border border-pink-500/40 transition shadow-sm"
+                title="Open AI Copilot (C)"
               >
                 <Bot size={13} className="text-pink-400 animate-pulse" />
                 <span className="hidden sm:inline">AI Copilot</span>
-                <kbd className="text-[9px] font-mono opacity-70 hidden lg:inline">C</kbd>
               </button>
 
-              <button
-                onClick={() => setIsBenchmarkOpen(true)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition shadow-sm"
-                title="Run Live SLA Stress Benchmark (Shortcut: B)"
-              >
-                <Zap size={12} className="text-amber-400 animate-pulse" />
-                <span className="hidden sm:inline">SLA Benchmark</span>
-                <kbd className="text-[9px] font-mono opacity-60 hidden lg:inline">B</kbd>
-              </button>
+              {/* Quick Tools Icons with Tooltips */}
+              <div className="flex items-center gap-0.5 bg-slate-950/60 p-0.5 rounded-lg border border-white/[0.06]">
+                <button
+                  onClick={() => setIsBenchmarkOpen(true)}
+                  className="p-1.5 rounded-md text-amber-400 hover:bg-amber-500/15 transition"
+                  title="Run SLA Stress Benchmark (B)"
+                >
+                  <Zap size={13} />
+                </button>
+                <button
+                  onClick={() => setIsExportOpen(true)}
+                  className="p-1.5 rounded-md text-cyan-400 hover:bg-cyan-500/15 transition"
+                  title="SDK & WAF Exporter (E)"
+                >
+                  <Package size={13} />
+                </button>
+                <button
+                  onClick={() => setIsGuideOpen(true)}
+                  className="p-1.5 rounded-md text-indigo-400 hover:bg-indigo-500/15 transition"
+                  title="1-Min Guided Tour (?)"
+                >
+                  <Sparkles size={13} />
+                </button>
+              </div>
 
-              <button
-                onClick={() => setIsGuideOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-950/50 border border-indigo-400/40 transition-all hover:scale-[1.03] active:scale-95"
-                title="Open 1-minute guided interactive tour (Shortcut: ?)"
-              >
-                <Sparkles size={12} className="text-amber-300 animate-pulse" />
-                <span className="hidden sm:inline">Guided Tour</span>
-                <kbd className="text-[9px] font-mono opacity-70 hidden lg:inline">?</kbd>
-              </button>
-
-              <div className="flex items-center gap-1.5 text-xs font-mono ml-1 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-white/[0.08]">
+              <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-mono bg-slate-950/80 px-2.5 py-1.5 rounded-xl border border-white/[0.08]">
                 <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
                 <span className={wsStatus === 'connected' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
                   {wsStatus === 'connected' ? 'GATEWAY LIVE' : 'RECONNECTING'}
@@ -832,10 +742,10 @@ export default function App() {
           ) : (
             <>
               {/* ── High-Impact Modern Hero Section ── */}
-              <div className="mb-6 pt-1 pb-2">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/[0.06] pb-5">
-                  <div className="space-y-1.5 max-w-3xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono font-medium">
+              <div className="mb-5 pt-1 pb-1">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/[0.06] pb-4">
+                  <div className="space-y-1 max-w-3xl">
+                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono font-medium">
                       <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
                       Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Defense Engine
                     </div>
@@ -847,88 +757,78 @@ export default function App() {
                     </p>
                   </div>
 
-                  {/* Hero Quick Action CTA Hub */}
+                  {/* Hero CTA Hub */}
                   <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                     <button
+                      onClick={() => setActiveTab('lab')}
+                      className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-950/50 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                    >
+                      <Flame size={14} className="text-amber-400" />
+                      <span>Launch Threat Lab</span>
+                    </button>
+                    <button
                       onClick={() => setIsStoreOpen(true)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                      className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-2"
                     >
                       <ShoppingBag size={14} />
                       <span>Test Storefront</span>
-                    </button>
-                    <button
-                      onClick={() => setIsBenchmarkOpen(true)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 transition flex items-center gap-2"
-                    >
-                      <Zap size={14} className="text-amber-400" />
-                      <span>50-Worker Stress SLA</span>
-                    </button>
-                    <button
-                      onClick={() => setIsCopilotOpen(true)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-pink-500/15 hover:bg-pink-500/25 text-pink-300 border border-pink-500/40 transition flex items-center gap-2"
-                    >
-                      <Bot size={14} className="text-pink-400" />
-                      <span>Copilot Incident Room</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Interactive Threat Attack Launchpad */}
-              <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />
-
-
-          {/* Real-Time Traffic Composition Radar HUD Bar */}
-          <div className="soc-card rounded-xl p-3.5 mb-4 bg-gradient-to-r from-slate-950 via-slate-900/90 to-slate-950 border border-slate-800 shadow-md">
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-bold text-slate-300 uppercase tracking-wider text-[11px] font-sans">
-                  Real-Time Traffic Radar HUD
-                </span>
-                <span className="text-slate-500 text-[10px]">
-                  ({stats.total} authorizations evaluated · avg {stats.avgLatency ? `${stats.avgLatency}ms` : '9.2ms'})
-                </span>
+              {/* Real-Time Traffic Composition Radar HUD Bar */}
+              <div className="soc-card rounded-xl p-3 mb-4 bg-gradient-to-r from-slate-950 via-slate-900/90 to-slate-950 border border-slate-800 shadow-md">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs font-mono">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-bold text-slate-300 uppercase tracking-wider text-[11px] font-sans">
+                      Real-Time Traffic Radar HUD
+                    </span>
+                    <span className="text-slate-500 text-[10px]">
+                      ({stats.total} authorizations evaluated · avg {stats.avgLatency ? `${stats.avgLatency}ms` : '9.2ms'})
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 text-[11px]">
+                    <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Safe Genuine: {safeRate}%
+                    </span>
+                    <span className="text-amber-400 font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Soft-Risk: {stats.total > 0 ? (((tierCounts.soft_risk + tierCounts.elevated_review) / stats.total) * 100).toFixed(1) : '0.0'}%
+                    </span>
+                    <span className="text-rose-400 font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Quarantined: {botRate}%
+                    </span>
+                    <span className="text-indigo-400 font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" /> AI Agent: {stats.total > 0 ? ((tierCounts.verified_agent / stats.total) * 100).toFixed(1) : '0.0'}%
+                    </span>
+                  </div>
+                </div>
+                {/* Segmented Distribution Bar */}
+                <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden flex shadow-inner border border-slate-800/60">
+                  <div
+                    className="bg-emerald-500 h-full transition-all duration-500"
+                    style={{ width: `${safeRate}%` }}
+                    title={`Safe Transactions: ${safeRate}%`}
+                  />
+                  <div
+                    className="bg-amber-500 h-full transition-all duration-500"
+                    style={{ width: `${stats.total > 0 ? (((tierCounts.soft_risk + tierCounts.elevated_review) / stats.total) * 100).toFixed(1) : 0}%` }}
+                    title="Soft-Risk Hold (UPI QR Step-Up)"
+                  />
+                  <div
+                    className="bg-rose-500 h-full transition-all duration-500"
+                    style={{ width: `${botRate}%` }}
+                    title={`Quarantined / Tarpit Block: ${botRate}%`}
+                  />
+                  <div
+                    className="bg-indigo-500 h-full transition-all duration-500"
+                    style={{ width: `${stats.total > 0 ? ((tierCounts.verified_agent / stats.total) * 100).toFixed(1) : 0}%` }}
+                    title="Verified AP2 Agent"
+                  />
+                </div>
               </div>
-              <div className="flex flex-wrap items-center gap-3 text-[11px]">
-                <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Safe Genuine: {safeRate}%
-                </span>
-                <span className="text-amber-400 font-bold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Soft-Risk: {stats.total > 0 ? (((tierCounts.soft_risk + tierCounts.elevated_review) / stats.total) * 100).toFixed(1) : '0.0'}%
-                </span>
-                <span className="text-rose-400 font-bold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Quarantined: {botRate}%
-                </span>
-                <span className="text-indigo-400 font-bold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" /> AI Agent: {stats.total > 0 ? ((tierCounts.verified_agent / stats.total) * 100).toFixed(1) : '0.0'}%
-                </span>
-              </div>
-            </div>
-            {/* Segmented Distribution Bar */}
-            <div className="w-full h-2.5 rounded-full bg-slate-950 overflow-hidden flex shadow-inner border border-slate-800/60">
-              <div
-                className="bg-emerald-500 h-full transition-all duration-500"
-                style={{ width: `${safeRate}%` }}
-                title={`Safe Transactions: ${safeRate}%`}
-              />
-              <div
-                className="bg-amber-500 h-full transition-all duration-500"
-                style={{ width: `${stats.total > 0 ? (((tierCounts.soft_risk + tierCounts.elevated_review) / stats.total) * 100).toFixed(1) : 0}%` }}
-                title="Soft-Risk Hold (UPI QR Step-Up)"
-              />
-              <div
-                className="bg-rose-500 h-full transition-all duration-500"
-                style={{ width: `${botRate}%` }}
-                title={`Quarantined / Tarpit Block: ${botRate}%`}
-              />
-              <div
-                className="bg-indigo-500 h-full transition-all duration-500"
-                style={{ width: `${stats.total > 0 ? ((tierCounts.verified_agent / stats.total) * 100).toFixed(1) : 0}%` }}
-                title="Verified AP2 Agent"
-              />
-            </div>
-          </div>
+
 
           {/* 4 Luminous Sparkline Hero KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-4">
