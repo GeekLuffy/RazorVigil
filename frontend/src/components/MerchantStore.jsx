@@ -19,26 +19,55 @@ function loadRazorpayScript() {
 }
 
 export default function MerchantStore({ onClose, onPaymentComplete }) {
-  const [selectedProduct, setSelectedProduct] = useState({
-    name: 'Air Jordan 1 Retro High OG "Chicago"',
-    price: 16999,
-    image: '👟',
-    sku: 'AJ1-CHI-2026'
-  })
+  const PRODUCTS = [
+    {
+      id: 'aj1',
+      name: 'Nike Air Jordan 1 Retro High OG "Chicago"',
+      price: 16999,
+      icon: '👟',
+      category: 'Luxury Footwear',
+      sku: 'AJ1-CHI-2026',
+      badge: '🔥 Bestseller',
+      bgGrad: 'from-rose-500/20 to-orange-500/10'
+    },
+    {
+      id: 'macbook',
+      name: 'Apple MacBook Pro 16" M3 Max (Space Black)',
+      price: 199900,
+      icon: '💻',
+      category: 'Flagship Electronics',
+      sku: 'MBP16-M3X-2026',
+      badge: '⚡ High Value Target',
+      bgGrad: 'from-indigo-500/20 to-purple-500/10'
+    },
+    {
+      id: 'sony',
+      name: 'Sony WH-1000XM5 Noise Canceling Headphones',
+      price: 29990,
+      icon: '🎧',
+      category: 'Premium Audio',
+      sku: 'SONY-WH5-2026',
+      badge: '✨ Fast Seller',
+      bgGrad: 'from-cyan-500/20 to-blue-500/10'
+    }
+  ]
+
+  const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0])
 
   // Form State
   const [cardName, setCardName] = useState('Rahul Sharma')
-  const [cardNumber, setCardNumber] = useState('')
+  const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242')
   const [expiry, setExpiry] = useState('12/28')
   const [cvv, setCvv] = useState('888')
   const [vpnMode, setVpnMode] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRzpNativeLoading, setIsRzpNativeLoading] = useState(false)
 
   // Real-time Biometrics Collection
   const [keystrokeDeltas, setKeystrokeDeltas] = useState([])
   const [mousePoints, setMousePoints] = useState([])
-  const [liveEntropy, setLiveEntropy] = useState(0.0)
-  const [liveJitter, setLiveJitter] = useState(0.0)
+  const [liveEntropy, setLiveEntropy] = useState(2.65)
+  const [liveJitter, setLiveJitter] = useState(0.68)
   const lastKeyTime = useRef(null)
   const pageLoadTime = useRef(Date.now())
 
@@ -79,8 +108,6 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       // Ignored if browser blocks WebRTC
     }
   }, [])
-
-
 
   const calculateEntropy = (deltas) => {
     if (deltas.length < 3) return 2.65
@@ -169,6 +196,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
     }
     otpLastKeyTime.current = now
   }
+
 
   const submitThreeDsOtp = async (isBotSim = false) => {
     if (!threeDsModal) return
@@ -521,6 +549,87 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
     }
   }
 
+  const handleNativeRazorpayCheckout = async () => {
+    setIsRzpNativeLoading(true)
+    try {
+      const cfg = await fetch(`${API_BASE}/config`).then(r => r.json()).catch(() => ({ razorpay_key_id: 'rzp_test_demo12345678' }))
+      const keyId = cfg.razorpay_key_id || 'rzp_test_demo12345678'
+
+      const rawPan = cardNumber.replace(/\s+/g, '')
+      const timeOnPage = Math.max(12.0, (Date.now() - pageLoadTime.current) / 1000)
+      const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Asia/Kolkata'
+
+      const res = await fetch(`${API_BASE}/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: selectedProduct.price,
+          bin6: rawPan.slice(0, 6) || '411111',
+          card_hash: `card_rzp_native_${rawPan.slice(-4) || '1111'}`,
+          billing_name: cardName,
+          device_fingerprint: `dev_human_${Date.now() % 100000}`,
+          ip_hash: `ip_airtel_res_${Date.now() % 100000}`,
+          asn_type: vpnMode ? 'datacenter' : 'residential',
+          ja3_ua_mismatch: false,
+          keystroke_entropy: Math.max(liveEntropy, 2.65),
+          mouse_jitter_score: Math.max(liveJitter, 0.68),
+          paste_event: false,
+          time_on_page_s: timeOnPage,
+          client_webrtc_ip: webrtcLeakIp || undefined,
+          client_timezone: tz,
+          is_vpn_simulated: vpnMode,
+        })
+      })
+      const data = await res.json()
+      setCheckoutResult(data)
+
+      await loadRazorpayScript()
+      if (window.Razorpay && !keyId.startsWith('rzp_test_demo')) {
+        const rzp = new window.Razorpay({
+          key: keyId,
+          amount: selectedProduct.price * 100,
+          currency: 'INR',
+          name: 'RazorShield Sovereign Store',
+          description: selectedProduct.name,
+          order_id: data.razorpay_order_id,
+          handler: async function (resp) {
+            await verifyPaymentOnBackend(resp.razorpay_order_id || data.razorpay_order_id, resp.razorpay_payment_id, resp.razorpay_signature)
+          },
+          prefill: {
+            name: cardName,
+            email: 'customer@razorshield.io',
+            contact: '9876543210',
+          },
+          theme: { color: '#4f46e5' },
+        })
+        rzp.open()
+      } else {
+        // Fallback to interactive 3DS2 Challenge Modal
+        setThreeDsModal({
+          order_id: data.razorpay_order_id || `order_demo_${Date.now()}`,
+          amount: selectedProduct.price,
+          key_id: keyId,
+          transaction_id: data.transaction_id || `tx_${Date.now()}`,
+          cardLast4: rawPan.slice(-4) || '4242',
+          cardName: cardName || 'Rahul Sharma',
+          bankName: 'HDFC Bank',
+          cardBrand: 'VISA',
+        })
+        setOtpInput('')
+        setOtpDeltas([])
+        otpLastKeyTime.current = null
+        setOtpLiveEntropy(0.0)
+        setOtpTimer(45)
+        setOtpResult(null)
+        setShowSmsToast(true)
+      }
+    } catch (e) {
+      alert('Razorpay Checkout error: ' + e.message)
+    } finally {
+      setIsRzpNativeLoading(false)
+    }
+  }
+
   const verifyPaymentOnBackend = async (orderId, paymentId, signature) => {
     try {
       const res = await fetch(`${API_BASE}/checkout/verify`, {
@@ -536,7 +645,6 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       const verifyData = await res.json()
       if (verifyData.status === 'success') {
         setPaymentVerified({ orderId, paymentId })
-        setRzpModal(null)
         if (onPaymentComplete) onPaymentComplete(selectedProduct.price)
       }
     } catch (e) {
@@ -575,48 +683,97 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
   }
 
   return (
-    <div onMouseMove={handleMouseMove} className="fixed inset-0 z-50 bg-[#070a13]/95 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative">
+    <div onMouseMove={handleMouseMove} className="fixed inset-0 z-50 bg-[#060811]/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      <div className="bg-slate-900/95 border border-white/[0.1] rounded-3xl w-full max-w-5xl shadow-2xl shadow-black/80 overflow-hidden flex flex-col md:flex-row relative animate-scale-up">
 
         {/* Close Button */}
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition"
+            className="absolute top-4 right-4 z-20 p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition shadow-md border border-white/[0.08]"
+            title="Close Storefront"
           >
             <X size={18} />
           </button>
         )}
 
-        {/* Product Column */}
-        <div className="w-full md:w-5/12 bg-slate-950 p-6 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col justify-between">
+        {/* Product Showcase Column */}
+        <div className="w-full md:w-5/12 bg-slate-950/90 p-6 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-              <div className="flex items-center gap-2 text-xs font-mono text-indigo-400 uppercase tracking-widest">
+              <div className="flex items-center gap-2 text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
                 <ShoppingBag size={14} />
-                Merchant Checkout Demo
+                Merchant Storefront
               </div>
-              <span className="text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold">
-                🧪 SYNTHETIC TEST CARDS
+              <span className="text-[9px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">
+                🟢 TEST STORE
               </span>
             </div>
 
-
-            <div className="aspect-square bg-slate-900/60 rounded-xl border border-slate-800 flex items-center justify-center text-7xl shadow-inner mb-4">
-              {selectedProduct.image}
+            {/* Product Category Selector Tabs */}
+            <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-900 rounded-xl border border-slate-800 mb-4">
+              {PRODUCTS.map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setSelectedProduct(p)}
+                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium transition ${
+                    selectedProduct.id === p.id
+                      ? 'bg-indigo-600 text-white font-bold shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <span>{p.icon}</span>
+                  <span className="truncate">{p.id.toUpperCase()}</span>
+                </button>
+              ))}
             </div>
 
-            <h3 className="text-base font-bold text-white leading-snug">{selectedProduct.name}</h3>
-            <p className="text-xs text-slate-500 font-mono mt-1">SKU: {selectedProduct.sku}</p>
+            {/* Product Display Card */}
+            <div className={`p-5 rounded-2xl border border-slate-800 bg-gradient-to-br ${selectedProduct.bgGrad} shadow-inner mb-4 relative overflow-hidden`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30 font-bold">
+                  {selectedProduct.category}
+                </span>
+                <span className="text-[10px] font-sans font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/30">
+                  {selectedProduct.badge}
+                </span>
+              </div>
 
-            <div className="mt-4 pt-4 border-t border-slate-800/80 flex items-baseline justify-between">
-              <span className="text-xs text-slate-400">Total Due:</span>
-              <span className="text-xl font-bold text-white font-mono">₹{selectedProduct.price.toLocaleString('en-IN')}</span>
+              <div className="text-6xl text-center my-4 filter drop-shadow-lg">
+                {selectedProduct.icon}
+              </div>
+
+              <h3 className="text-sm font-bold text-white leading-snug">{selectedProduct.name}</h3>
+              <div className="flex items-center justify-between text-xs text-slate-400 font-mono mt-1">
+                <span>SKU: {selectedProduct.sku}</span>
+                <span className="text-emerald-400 font-bold">In Stock</span>
+              </div>
+            </div>
+
+            {/* Order Price Breakdown */}
+            <div className="space-y-1.5 text-xs text-slate-400 font-mono border-t border-slate-800/80 pt-3">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="text-slate-200">₹{(selectedProduct.price * 0.8474).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>GST (18% Integrated)</span>
+                <span className="text-slate-200">₹{(selectedProduct.price * 0.1526).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+              </div>
+              <div className="flex justify-between text-emerald-400">
+                <span>Express Delivery</span>
+                <span>FREE (Included)</span>
+              </div>
+              <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-slate-800">
+                <span className="font-sans">Total Amount</span>
+                <span className="font-mono text-emerald-400 font-extrabold">₹{selectedProduct.price.toLocaleString('en-IN')}</span>
+              </div>
             </div>
           </div>
 
-          {/* Live Biometrics Card */}
-          <div className="mt-6 bg-slate-900/90 rounded-xl p-3 border border-slate-800 text-[11px] font-mono space-y-1.5">
+          {/* Live Biometrics Gauge Card */}
+          <div className="mt-4 bg-slate-900/90 rounded-xl p-3 border border-slate-800 text-[11px] font-mono space-y-1.5">
             <div className="text-slate-400 font-semibold uppercase tracking-wider flex items-center justify-between">
               <span>Live Biometric Signals</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
@@ -642,24 +799,23 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
           </div>
         </div>
 
-        {/* Form Column */}
+        {/* Payment & Holographic Card Column */}
         <div className="w-full md:w-7/12 p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
                 <Lock size={13} className="text-indigo-400" />
-                Payment Information
+                Payment Information &amp; 3DS2 Gateway
               </span>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => setShowConfig(!showConfig)}
-                  className="text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 transition shrink-0 whitespace-nowrap"
+                  className="text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition shrink-0 whitespace-nowrap"
                 >
                   ⚙️ API Config
                 </button>
               </div>
-
             </div>
 
             {/* Razorpay Gateway Keys Drawer */}
@@ -698,41 +854,108 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
               </form>
             )}
 
+            {/* Dynamic Holographic Bank Card Preview */}
+            <div className={`relative rounded-2xl p-5 mb-4 text-white shadow-xl transition-all duration-500 overflow-hidden border ${
+              activePreset === 'bot' || activePreset === 'telegram'
+                ? 'bg-gradient-to-tr from-slate-950 via-rose-950/60 to-slate-900 border-rose-500/40 shadow-rose-950/30'
+                : activePreset === 'vpn'
+                ? 'bg-gradient-to-tr from-slate-950 via-amber-950/60 to-slate-900 border-amber-500/40 shadow-amber-950/30'
+                : activePreset === 'canary'
+                ? 'bg-gradient-to-tr from-slate-950 via-yellow-950/70 to-slate-900 border-yellow-500/50 shadow-yellow-950/30'
+                : 'bg-gradient-to-tr from-slate-950 via-indigo-950/70 to-slate-900 border-indigo-500/40 shadow-indigo-950/40'
+            }`}>
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-6 rounded-md bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-inner border border-amber-200/50">
+                    <div className="w-5 h-4 border border-amber-800/40 rounded-sm grid grid-cols-2 gap-0.5 p-0.5 opacity-70">
+                      <div className="border-r border-b border-amber-900/40" />
+                      <div className="border-b border-amber-900/40" />
+                      <div className="border-r border-amber-900/40" />
+                      <div />
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-slate-300 tracking-wider">
+                    {activePreset === 'canary' ? 'CANARY HONEYTOKEN' : 'RAZORSHIELD SECURE'}
+                  </span>
+                </div>
+                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-white/10 border border-white/10 uppercase tracking-wider">
+                  {cardNumber.startsWith('5') ? 'Mastercard' : cardNumber.startsWith('4') ? 'VISA' : 'RuPay'}
+                </span>
+              </div>
+
+              {/* Card Number Display */}
+              <div className="text-lg sm:text-xl font-mono tracking-[0.22em] font-bold text-slate-100 my-2 drop-shadow">
+                {cardNumber || '•••• •••• •••• ••••'}
+              </div>
+
+              {/* Card Footer Details */}
+              <div className="flex items-end justify-between mt-3 text-xs font-mono relative z-10 text-slate-300">
+                <div>
+                  <div className="text-[9px] uppercase tracking-wider text-slate-400 font-sans">Cardholder</div>
+                  <div className="font-bold tracking-wide uppercase truncate max-w-[180px]">{cardName || 'YOUR NAME'}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[9px] uppercase tracking-wider text-slate-400 font-sans">Expires</div>
+                  <div className="font-bold tracking-wider">{expiry || 'MM/YY'}</div>
+                </div>
+              </div>
+            </div>
+
             {/* Quick Demo Autofill Presets */}
             <div className="flex flex-wrap items-center gap-1.5 mb-3 bg-slate-950/70 p-2 rounded-xl border border-slate-800/80">
               <span className="text-[10px] font-mono text-slate-500 uppercase mr-1">Presets:</span>
               <button
                 type="button"
                 onClick={() => autofillPreset('human')}
-                className="text-[10px] font-mono bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 transition"
+                className={`text-[10px] font-mono px-2 py-0.5 rounded border transition ${
+                  activePreset === 'human'
+                    ? 'bg-emerald-500/30 text-emerald-200 border-emerald-400 font-bold'
+                    : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                }`}
               >
                 ✓ Genuine
               </button>
               <button
                 type="button"
                 onClick={() => autofillPreset('vpn')}
-                className="text-[10px] font-mono bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 transition"
+                className={`text-[10px] font-mono px-2 py-0.5 rounded border transition ${
+                  activePreset === 'vpn'
+                    ? 'bg-amber-500/30 text-amber-200 border-amber-400 font-bold'
+                    : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
+                }`}
               >
                 ⚠ VPN Recovery
               </button>
               <button
                 type="button"
                 onClick={() => autofillPreset('bot')}
-                className="text-[10px] font-mono bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded border border-red-500/30 transition"
+                className={`text-[10px] font-mono px-2 py-0.5 rounded border transition ${
+                  activePreset === 'bot'
+                    ? 'bg-red-500/30 text-red-200 border-red-400 font-bold'
+                    : 'bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30'
+                }`}
               >
                 🚫 Carding Bot
               </button>
               <button
                 type="button"
                 onClick={() => autofillPreset('telegram')}
-                className="text-[10px] font-mono bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30 transition"
+                className={`text-[10px] font-mono px-2 py-0.5 rounded border transition ${
+                  activePreset === 'telegram'
+                    ? 'bg-rose-500/30 text-rose-200 border-rose-400 font-bold'
+                    : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border-rose-500/30'
+                }`}
               >
                 🤖 TG Scraper
               </button>
               <button
                 type="button"
                 onClick={() => autofillPreset('canary')}
-                className="text-[10px] font-mono bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 transition"
+                className={`text-[10px] font-mono px-2 py-0.5 rounded border transition ${
+                  activePreset === 'canary'
+                    ? 'bg-yellow-500/30 text-yellow-200 border-yellow-400 font-bold'
+                    : 'bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                }`}
               >
                 🐤 Canary #7
               </button>
@@ -752,7 +975,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-400 font-medium mb-1">Card Number (Type to measure entropy)</label>
+                <label className="block text-[11px] text-slate-400 font-medium mb-1">Card Number (Type to measure live entropy)</label>
                 <input
                   type="text"
                   placeholder="4242 4242 4242 4242"
@@ -789,7 +1012,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-between">
+              <div className="pt-1 flex items-center justify-between">
                 <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
                   <input
                     type="checkbox"
@@ -801,23 +1024,46 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
                 </label>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full mt-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <>
-                    <RefreshCw size={14} className="animate-spin" />
-                    Screening with RazorShield Sentinel…
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck size={14} />
-                    Pay ₹{selectedProduct.price.toLocaleString('en-IN')} with RazorShield
-                  </>
-                )}
-              </button>
+              {/* Dual Action Buttons: RazorShield Direct & Razorpay Native Checkout */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || isRzpNativeLoading}
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-600/30 transition disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>Screening Hot Path…</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck size={14} />
+                      <span>Pay ₹{selectedProduct.price.toLocaleString('en-IN')} (Shield)</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleNativeRazorpayCheckout}
+                  disabled={isSubmitting || isRzpNativeLoading}
+                  className="w-full bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition disabled:opacity-50"
+                  title="Launch official Razorpay Test Mode checkout popup"
+                >
+                  {isRzpNativeLoading ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>Opening Razorpay…</span>
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard size={14} className="text-blue-400" />
+                      <span>Razorpay Test Popup</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
 
             {/* Payment Verified Success Box */}
@@ -833,6 +1079,7 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
                 </div>
               </div>
             )}
+
 
             {/* Risk Decision Box */}
             {checkoutResult && !paymentVerified && (
