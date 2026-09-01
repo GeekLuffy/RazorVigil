@@ -6,7 +6,7 @@ import {
 import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
-  ArrowRight, Search, Play, Pause, Clock, ChevronRight
+  ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network
 } from 'lucide-react'
 
 
