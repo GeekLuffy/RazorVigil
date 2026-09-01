@@ -22,6 +22,8 @@ import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer'
 import AttackLaunchpad from './components/AttackLaunchpad'
 import ExecutiveGuideModal from './components/ExecutiveGuideModal'
+import StressBenchmarkModal from './components/StressBenchmarkModal'
+
 
 
 
@@ -269,8 +271,11 @@ export default function App() {
   const [searchFilter, setSearchFilter] = useState('')
   const [tierFilter, setTierFilter] = useState('ALL')
   const [isGuideOpen, setIsGuideOpen] = useState(false)
+  const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false)
+
 
   // Sparklines trend state
+
   const [gmvSpark, setGmvSpark] = useState([{ v: 12 }, { v: 18 }, { v: 24 }, { v: 35 }, { v: 48 }])
   const [botSpark, setBotSpark] = useState([{ v: 2 }, { v: 4 }, { v: 3 }, { v: 8 }, { v: 12 }])
   const [latSpark, setLatSpark] = useState([{ v: 9.8 }, { v: 9.1 }, { v: 10.4 }, { v: 9.2 }, { v: 8.9 }])
@@ -622,6 +627,15 @@ export default function App() {
         {/* Global Controls & Status */}
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setIsBenchmarkOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 transition shadow-sm"
+            title="Run live concurrent stress benchmark against the 8-layer quad ensemble"
+          >
+            <Zap size={13} className="text-amber-400 animate-pulse" />
+            <span className="hidden sm:inline">⚡ SLA</span> Benchmark
+          </button>
+
+          <button
             onClick={() => setIsGuideOpen(true)}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-950/50 border border-indigo-400/40 transition-all hover:scale-[1.03] active:scale-95"
             title="Open 1-minute guided interactive tour for evaluators & judges"
@@ -629,6 +643,7 @@ export default function App() {
             <Sparkles size={13} className="text-amber-300 animate-pulse" />
             <span className="hidden sm:inline">1-Min</span> Guided Tour
           </button>
+
 
           <div className="flex items-center gap-2 text-xs font-mono ml-1 bg-slate-950/70 px-2.5 py-1 rounded-xl border border-slate-800/80">
             <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
@@ -887,7 +902,14 @@ export default function App() {
         }}
       />
 
+      {/* Live SLA Stress Benchmark Modal */}
+      <StressBenchmarkModal
+        isOpen={isBenchmarkOpen}
+        onClose={() => setIsBenchmarkOpen(false)}
+      />
+
       {/* Footer */}
+
       <div className="mt-8 pt-4 border-t border-slate-900/80 text-center text-xs text-slate-500 font-sans flex flex-wrap items-center justify-between gap-2">
         <span>Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Autonomous Payment Defense Engine</span>
         <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5">
