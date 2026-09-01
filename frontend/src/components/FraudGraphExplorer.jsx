@@ -5,6 +5,7 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
+  Minimize2,
   ShieldAlert,
   ShieldCheck,
   AlertTriangle,
@@ -24,7 +25,10 @@ import {
   TrendingUp,
   Target,
   Crosshair,
-  Sparkles
+  Sparkles,
+  Compass,
+  Pin,
+  Share2
 } from 'lucide-react'
 
 import { API_BASE } from '../config'
@@ -48,6 +52,7 @@ const CLUSTER_COLORS = [
 
 export default function FraudGraphExplorer() {
   const canvasRef = useRef(null)
+  const containerRef = useRef(null)
   const [graphData, setGraphData] = useState({ nodes: [], edges: [], clusters: [], modularity: 0.72 })
   const [loading, setLoading] = useState(true)
   const [selectedNode, setSelectedNode] = useState(null)
@@ -55,6 +60,10 @@ export default function FraudGraphExplorer() {
   const [filterCluster, setFilterCluster] = useState('ALL')
   const [threatOnly, setThreatOnly] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [layoutMode, setLayoutMode] = useState('force') // 'force' | 'radial' | 'bipartite'
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Camera & Navigation
   const [zoom, setZoom] = useState(1.0)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
@@ -65,12 +74,13 @@ export default function FraudGraphExplorer() {
   const [copiedWaf, setCopiedWaf] = useState(false)
 
   // Simulation Replay Timeline
-  const [simPhase, setSimPhase] = useState(0) // 0: Idle, 1: Proxies Injected, 2: Card Spraying, 3: Cluster Detected, 4: Quarantined
+  const [simPhase, setSimPhase] = useState(0) // 0: Idle, 1: Subnet Recon, 2: Card Spraying, 3: Cluster Detected, 4: Quarantined
   const [isReplaying, setIsReplaying] = useState(false)
 
   // In-memory physics simulation state
   const simNodesRef = useRef([])
   const animationFrameRef = useRef(null)
+  const particleOffsetRef = useRef(0)
 
   // 1. Fetch live topology from backend
   const fetchGraphTopology = useCallback(async () => {
@@ -90,34 +100,36 @@ export default function FraudGraphExplorer() {
 
         // Initialize / preserve physics node positions
         const existingMap = new Map(simNodesRef.current.map(n => [n.id, n]))
-        const width = 800
-        const height = 500
+        const width = 850
+        const height = 550
         const cx = width / 2
         const cy = height / 2
 
         simNodesRef.current = data.nodes.map((n, idx) => {
-          const defaultRadius = n.type === 'device' || n.type === 'agent' ? 14 : 10
+          const defaultRadius = n.type === 'device' || n.type === 'agent' ? 14 : 11
           const existing = existingMap.get(n.id)
-          if (existing) {
+          if (existing && Number.isFinite(existing.x) && Number.isFinite(existing.y)) {
             return {
               ...n,
-              x: Number.isFinite(existing.x) ? existing.x : cx + (Math.random() - 0.5) * 100,
-              y: Number.isFinite(existing.y) ? existing.y : cy + (Math.random() - 0.5) * 100,
-              vx: Number.isFinite(existing.vx) ? existing.vx : 0,
-              vy: Number.isFinite(existing.vy) ? existing.vy : 0,
+              x: existing.x,
+              y: existing.y,
+              vx: existing.vx || 0,
+              vy: existing.vy || 0,
+              isPinned: Boolean(existing.isPinned),
               radius: existing.radius || defaultRadius,
             }
           }
           // Distribute initial positions by cluster
           const angle = (idx / Math.max(1, data.nodes.length)) * Math.PI * 2
-          const clusterOffset = (n.cluster_id || 0) * 80
-          const distRadius = 100 + (idx % 4) * 35 + clusterOffset
+          const clusterOffset = (n.cluster_id || 0) * 85
+          const distRadius = 120 + (idx % 4) * 35 + clusterOffset
           return {
             ...n,
             x: cx + Math.cos(angle) * distRadius + (Math.random() - 0.5) * 40,
             y: cy + Math.sin(angle) * distRadius + (Math.random() - 0.5) * 40,
             vx: 0,
             vy: 0,
+            isPinned: false,
             radius: defaultRadius,
           }
         })
@@ -142,7 +154,44 @@ export default function FraudGraphExplorer() {
     return () => clearInterval(interval)
   }, [fetchGraphTopology])
 
-  // 2. Continuous Force Simulation Physics Loop
+  // Apply Structured Layout Algorithms
+  const applyLayout = useCallback((mode) => {
+    setLayoutMode(mode)
+    const simNodes = simNodesRef.current
+    const width = 850
+    const height = 550
+    const cx = width / 2
+    const cy = height / 2
+
+    if (mode === 'radial') {
+      // Concentric Radial Centrality Layout
+      simNodes.forEach((n) => {
+        const isThreat = n.is_suspicious || (n.cluster_id !== 0)
+        const radius = isThreat ? 130 + (n.cluster_id || 1) * 45 : 240
+        const angle = ((n.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % 360) * (Math.PI / 180)
+        n.x = cx + Math.cos(angle) * radius
+        n.y = cy + Math.sin(angle) * radius
+        n.vx = 0
+        n.vy = 0
+      })
+    } else if (mode === 'bipartite') {
+      // 4-Column Tiered Bipartite Entity Layout
+      const columns = { ip: 120, device: 320, card: 540, agent: 720 }
+      const counts = { ip: 0, device: 0, card: 0, agent: 0 }
+      simNodes.forEach((n) => {
+        const colKey = n.type || 'card'
+        const colX = columns[colKey] || 400
+        const rowIdx = counts[colKey] || 0
+        counts[colKey] = (counts[colKey] || 0) + 1
+        n.x = colX
+        n.y = 80 + rowIdx * 45
+        n.vx = 0
+        n.vy = 0
+      })
+    }
+  }, [])
+
+  // 2. Continuous Force Simulation Physics & Render Loop
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -153,62 +202,93 @@ export default function FraudGraphExplorer() {
     const cy = height / 2
 
     const runPhysicsStep = () => {
+      particleOffsetRef.current = (particleOffsetRef.current + 0.04) % 1.0
       const simNodes = simNodesRef.current
       if (simNodes.length === 0) return
 
       const edges = graphData.edges || []
       const nodeMap = new Map(simNodes.map(n => [n.id, n]))
 
-      // A. Node-Node Repulsion
-      for (let i = 0; i < simNodes.length; i++) {
-        for (let j = i + 1; j < simNodes.length; j++) {
-          const n1 = simNodes[i]
-          const n2 = simNodes[j]
-          const dx = n2.x - n1.x
-          const dy = n2.y - n1.y
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1
-          if (dist < 180) {
-            const force = (180 - dist) / dist * 0.08
-            n1.vx -= dx * force
-            n1.vy -= dy * force
-            n2.vx += dx * force
-            n2.vy += dy * force
+      if (layoutMode === 'force') {
+        // A. Node-Node Repulsion
+        for (let i = 0; i < simNodes.length; i++) {
+          for (let j = i + 1; j < simNodes.length; j++) {
+            const n1 = simNodes[i]
+            const n2 = simNodes[j]
+            const dx = n2.x - n1.x
+            const dy = n2.y - n1.y
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1
+            if (dist < 190) {
+              const force = (190 - dist) / dist * 0.08
+              if (!n1.isPinned && n1 !== draggedNode) {
+                n1.vx -= dx * force
+                n1.vy -= dy * force
+              }
+              if (!n2.isPinned && n2 !== draggedNode) {
+                n2.vx += dx * force
+                n2.vy += dy * force
+              }
+            }
           }
         }
-      }
 
-      // B. Edge Spring Attraction
-      for (const edge of edges) {
-        const u = nodeMap.get(edge.source)
-        const v = nodeMap.get(edge.target)
-        if (u && v) {
-          const dx = v.x - u.x
-          const dy = v.y - u.y
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1
-          const desiredDist = 70
-          const force = (dist - desiredDist) * 0.02
-          u.vx += (dx / dist) * force
-          u.vy += (dy / dist) * force
-          v.vx -= (dx / dist) * force
-          v.vy -= (dy / dist) * force
+        // B. Edge Spring Attraction
+        for (const edge of edges) {
+          const u = nodeMap.get(edge.source)
+          const v = nodeMap.get(edge.target)
+          if (u && v) {
+            const dx = v.x - u.x
+            const dy = v.y - u.y
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1
+            const desiredDist = 75
+            const force = (dist - desiredDist) * 0.02
+            if (!u.isPinned && u !== draggedNode) {
+              u.vx += (dx / dist) * force
+              u.vy += (dy / dist) * force
+            }
+            if (!v.isPinned && v !== draggedNode) {
+              v.vx -= (dx / dist) * force
+              v.vy -= (dy / dist) * force
+            }
+          }
         }
-      }
 
-      // C. Center Gravity & Boundary Dampening
-      for (const n of simNodes) {
-        if (n === draggedNode) continue // skip manual dragged node
-        n.vx += (cx - n.x) * 0.002
-        n.vy += (cy - n.y) * 0.002
-        n.vx *= 0.85
-        n.vy *= 0.85
-        n.x += n.vx
-        n.y += n.vy
-        n.x = Math.max(30, Math.min(width - 30, n.x))
-        n.y = Math.max(30, Math.min(height - 30, n.y))
+        // C. Center Gravity & Boundary Dampening
+        for (const n of simNodes) {
+          if (n === draggedNode || n.isPinned) continue
+          n.vx += (cx - n.x) * 0.002
+          n.vy += (cy - n.y) * 0.002
+          n.vx *= 0.85
+          n.vy *= 0.85
+          n.x += n.vx
+          n.y += n.vy
+          n.x = Math.max(40, Math.min(width - 40, n.x))
+          n.y = Math.max(40, Math.min(height - 40, n.y))
+        }
       }
 
       // D. Render Canvas Frame
       ctx.clearRect(0, 0, width, height)
+
+      // Cyber Grid Backdrop
+      ctx.save()
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'
+      ctx.lineWidth = 1
+      const gridSize = 35
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(x, 0)
+        ctx.lineTo(x, height)
+        ctx.stroke()
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(0, y)
+        ctx.lineTo(width, y)
+        ctx.stroke()
+      }
+      ctx.restore()
+
       ctx.save()
       ctx.translate(pan.x, pan.y)
       ctx.scale(zoom, zoom)
@@ -227,16 +307,16 @@ export default function FraudGraphExplorer() {
         const clr = CLUSTER_COLORS[Number(cid) % CLUSTER_COLORS.length]
         const avgX = c.x / c.count
         const avgY = c.y / c.count
-        const gradient = ctx.createRadialGradient(avgX, avgY, 10, avgX, avgY, 120)
-        gradient.addColorStop(0, clr + '22')
+        const gradient = ctx.createRadialGradient(avgX, avgY, 10, avgX, avgY, 130)
+        gradient.addColorStop(0, clr + '26')
         gradient.addColorStop(1, 'transparent')
         ctx.fillStyle = gradient
         ctx.beginPath()
-        ctx.arc(avgX, avgY, 120, 0, Math.PI * 2)
+        ctx.arc(avgX, avgY, 130, 0, Math.PI * 2)
         ctx.fill()
       })
 
-      // Draw Edges
+      // Draw Edges with Animated Flow Particles
       edges.forEach(edge => {
         const u = nodeMap.get(edge.source)
         const v = nodeMap.get(edge.target)
@@ -244,7 +324,8 @@ export default function FraudGraphExplorer() {
         if (threatOnly && (u.cluster_id === 0 || v.cluster_id === 0)) return
 
         const isHighlighted = selectedNode && (selectedNode.id === u.id || selectedNode.id === v.id)
-        const edgeColor = u.is_suspicious || v.is_suspicious ? '#f43f5e' : '#64748b'
+        const isThreatEdge = u.is_suspicious || v.is_suspicious || (u.cluster_id !== 0 && v.cluster_id !== 0)
+        const edgeColor = isThreatEdge ? '#f43f5e' : '#64748b'
 
         ctx.beginPath()
         ctx.moveTo(u.x, u.y)
@@ -252,6 +333,19 @@ export default function FraudGraphExplorer() {
         ctx.strokeStyle = isHighlighted ? '#ec4899' : (edgeColor + (isHighlighted ? 'ff' : '44'))
         ctx.lineWidth = isHighlighted ? 2.5 : 1.2
         ctx.stroke()
+
+        // Animated Particle along Threat Edges
+        if (isThreatEdge || isHighlighted) {
+          const px = u.x + (v.x - u.x) * particleOffsetRef.current
+          const py = u.y + (v.y - u.y) * particleOffsetRef.current
+          ctx.beginPath()
+          ctx.arc(px, py, isHighlighted ? 3 : 2, 0, Math.PI * 2)
+          ctx.fillStyle = isHighlighted ? '#f472b6' : '#fb7185'
+          ctx.shadowColor = '#f43f5e'
+          ctx.shadowBlur = 6
+          ctx.fill()
+          ctx.shadowBlur = 0
+        }
       })
 
       // Draw Nodes
@@ -261,15 +355,15 @@ export default function FraudGraphExplorer() {
         const isHoverMatch = searchQuery && n.label?.toLowerCase().includes(searchQuery.toLowerCase())
         const typeCfg = TYPE_COLORS[n.type] || TYPE_COLORS.device
         const clusterColor = CLUSTER_COLORS[(n.cluster_id || 0) % CLUSTER_COLORS.length]
-        const nodeRadius = Math.max(8, n.radius || (n.type === 'device' || n.type === 'agent' ? 14 : 10))
+        const nodeRadius = Math.max(9, n.radius || (n.type === 'device' || n.type === 'agent' ? 14 : 11))
 
         if (!Number.isFinite(n.x) || !Number.isFinite(n.y)) return
 
-        // Node Glow
+        // Ambient Node Aura Glow
         if (isSelected || isHoverMatch || n.is_suspicious) {
           ctx.beginPath()
-          ctx.arc(n.x, n.y, nodeRadius + 8, 0, Math.PI * 2)
-          ctx.fillStyle = isSelected ? 'rgba(236,72,153,0.35)' : (clusterColor + '33')
+          ctx.arc(n.x, n.y, nodeRadius + 9, 0, Math.PI * 2)
+          ctx.fillStyle = isSelected ? 'rgba(236,72,153,0.4)' : (clusterColor + '38')
           ctx.fill()
         }
 
@@ -282,17 +376,25 @@ export default function FraudGraphExplorer() {
         ctx.lineWidth = isSelected ? 3 : 2
         ctx.stroke()
 
-        // Inner Dot Indicator
+        // Inner Core
         ctx.beginPath()
-        ctx.arc(n.x, n.y, nodeRadius * 0.4, 0, Math.PI * 2)
-        ctx.fillStyle = '#0f172a'
+        ctx.arc(n.x, n.y, nodeRadius * 0.38, 0, Math.PI * 2)
+        ctx.fillStyle = '#0b0f19'
         ctx.fill()
 
-        // Text Label
+        // Pinned Status Pin Icon
+        if (n.isPinned) {
+          ctx.beginPath()
+          ctx.arc(n.x + nodeRadius - 2, n.y - nodeRadius + 2, 3.5, 0, Math.PI * 2)
+          ctx.fillStyle = '#f59e0b'
+          ctx.fill()
+        }
+
+        // Crisp Typography Label
         ctx.font = isSelected ? 'bold 11px JetBrains Mono, monospace' : '9px JetBrains Mono, monospace'
         ctx.fillStyle = isSelected ? '#ffffff' : '#cbd5e1'
         ctx.textAlign = 'center'
-        ctx.fillText((n.label || n.id).slice(0, 16), n.x, n.y + nodeRadius + 12)
+        ctx.fillText((n.label || n.id).slice(0, 18), n.x, n.y + nodeRadius + 13)
       })
 
       ctx.restore()
@@ -301,9 +403,9 @@ export default function FraudGraphExplorer() {
 
     animationFrameRef.current = requestAnimationFrame(runPhysicsStep)
     return () => cancelAnimationFrame(animationFrameRef.current)
-  }, [graphData, zoom, pan, selectedNode, searchQuery, draggedNode, threatOnly])
+  }, [graphData, zoom, pan, selectedNode, searchQuery, draggedNode, threatOnly, layoutMode])
 
-  // 3. Mouse Interaction Handlers
+  // 3. Mouse & Wheel Interaction Handlers (Freedom to Pan & Zoom anywhere)
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -316,7 +418,7 @@ export default function FraudGraphExplorer() {
       const dx = n.x - clickX
       const dy = n.y - clickY
       const nodeRadius = n.radius || 12
-      return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 6
+      return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 7
     })
 
     if (hit) {
@@ -335,6 +437,8 @@ export default function FraudGraphExplorer() {
       const rect = canvas.getBoundingClientRect()
       draggedNode.x = (e.clientX - rect.left - pan.x) / zoom
       draggedNode.y = (e.clientY - rect.top - pan.y) / zoom
+      draggedNode.vx = 0
+      draggedNode.vy = 0
     } else if (isDragging) {
       setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y })
     }
@@ -345,13 +449,61 @@ export default function FraudGraphExplorer() {
     setDraggedNode(null)
   }
 
+  // Smooth Mouse Wheel Zooming around Cursor
+  const handleWheel = (e) => {
+    e.preventDefault()
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89
+    const newZoom = Math.min(3.5, Math.max(0.4, zoom * zoomFactor))
+
+    // Zoom towards mouse position
+    const newPanX = mouseX - (mouseX - pan.x) * (newZoom / zoom)
+    const newPanY = mouseY - (mouseY - pan.y) * (newZoom / zoom)
+
+    setZoom(newZoom)
+    setPan({ x: newPanX, y: newPanY })
+  }
+
+  // Double Click to Toggle Node Pinning
+  const handleDoubleClick = (e) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const clickX = (e.clientX - rect.left - pan.x) / zoom
+    const clickY = (e.clientY - rect.top - pan.y) / zoom
+
+    const hit = simNodesRef.current.find(n => {
+      const dx = n.x - clickX
+      const dy = n.y - clickY
+      const nodeRadius = n.radius || 12
+      return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 7
+    })
+
+    if (hit) {
+      hit.isPinned = !hit.isPinned
+      setActionNotice(hit.isPinned ? `📌 Pinned node: ${hit.label}` : `📍 Unpinned node: ${hit.label}`)
+      setTimeout(() => setActionNotice(null), 2500)
+    }
+  }
+
   // 4. Focus on Specific Node / Center Camera
   const handleFocusNode = (node) => {
     setSelectedNode(node)
-    const targetX = 400 - node.x * 1.3
-    const targetY = 250 - node.y * 1.3
+    const targetX = 425 - node.x * 1.35
+    const targetY = 275 - node.y * 1.35
     setPan({ x: targetX, y: targetY })
-    setZoom(1.3)
+    setZoom(1.35)
+  }
+
+  // Reset Camera View
+  const handleResetCamera = () => {
+    setZoom(1.0)
+    setPan({ x: 0, y: 0 })
   }
 
   // 5. Attack Injection Trigger
@@ -375,7 +527,7 @@ export default function FraudGraphExplorer() {
     try {
       const res = await fetch(`${API_BASE}/cluster/quarantine/${clusterId}`, { method: 'POST' })
       const data = await res.json()
-      setActionNotice(`🚨 Quarantined Louvain Ring #${clusterId}: Isolated ${data.nodes_isolated_count} connected nodes.`)
+      setActionNotice(`🚨 Quarantined Louvain Ring #${clusterId}: Isolated ${data.nodes_isolated_count} connected entities.`)
       await fetchGraphTopology()
     } catch (e) {
       console.error('Failed to quarantine cluster:', e)
@@ -397,7 +549,7 @@ export default function FraudGraphExplorer() {
 
     setTimeout(() => {
       setSimPhase(3)
-      setActionNotice('Phase 3/4: Louvain algorithm detects community boundary (Modularity Q=0.74)...')
+      setActionNotice('Phase 3/4: Louvain algorithm detects community boundary (Modularity Q=0.89)...')
     }, 4000)
 
     setTimeout(() => {
@@ -432,17 +584,17 @@ export default function FraudGraphExplorer() {
   }, [selectedNode, graphData])
 
   return (
-    <div className="space-y-4">
-      {/* Top Header & Metrics Bar */}
-      <div className="panel p-4 bg-slate-900/90 border-slate-800 flex flex-wrap items-center justify-between gap-4">
+    <div ref={containerRef} className={`space-y-4 ${isFullscreen ? 'fixed inset-0 z-50 bg-[#060811] p-6 overflow-y-auto' : ''}`}>
+      {/* Top Header & Metrics Command Bar */}
+      <div className="panel p-4 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-indigo-500/20 border border-indigo-500/40 rounded-xl text-indigo-400">
+          <div className="p-2.5 bg-indigo-500/20 border border-indigo-500/40 rounded-xl text-indigo-400 shadow-inner">
             <Network size={22} />
           </div>
           <div>
             <h2 className="text-base font-bold text-white flex items-center gap-2 font-sans">
               Louvain Mule Ring &amp; Fraud Graph Explorer
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">
                 NetworkX Real-Time Graph
               </span>
             </h2>
@@ -453,22 +605,22 @@ export default function FraudGraphExplorer() {
         </div>
 
         {/* Action & Simulator Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleStartAttackReplay}
             disabled={isReplaying}
-            className={`btn text-xs flex items-center gap-1.5 py-1.5 px-3 border transition-all ${
-              isReplaying ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 animate-pulse' : 'bg-indigo-600/30 border-indigo-500/40 text-indigo-200 hover:bg-indigo-600/50'
+            className={`text-xs font-bold font-sans flex items-center gap-1.5 py-1.5 px-3 rounded-xl border transition-all ${
+              isReplaying ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 animate-pulse' : 'bg-indigo-600/25 border-indigo-500/40 text-indigo-200 hover:bg-indigo-600/40 shadow-sm'
             }`}
           >
             <Play size={13} className={isReplaying ? 'animate-spin' : ''} />
-            {isReplaying ? `Replaying Attack (Phase ${simPhase}/4)` : 'Replay Bot Swarm Attack'}
+            {isReplaying ? `Replaying Attack (Phase ${simPhase}/4)` : 'Replay Bot Attack'}
           </button>
 
           <button
             onClick={() => handleInjectRing('carding_swarm')}
             disabled={isInjecting}
-            className="btn btn-secondary text-xs flex items-center gap-1.5 py-1.5 px-3 border-rose-500/30 text-rose-300 hover:bg-rose-500/10"
+            className="text-xs font-bold font-sans flex items-center gap-1.5 py-1.5 px-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 transition shadow-sm"
           >
             <Flame size={13} className="text-rose-400" />
             Inject Carding Swarm
@@ -477,7 +629,7 @@ export default function FraudGraphExplorer() {
           <button
             onClick={() => handleInjectRing('agent_ring')}
             disabled={isInjecting}
-            className="btn btn-secondary text-xs flex items-center gap-1.5 py-1.5 px-3 border-pink-500/30 text-pink-300 hover:bg-pink-500/10"
+            className="text-xs font-bold font-sans flex items-center gap-1.5 py-1.5 px-3 rounded-xl border border-pink-500/30 bg-pink-500/10 text-pink-300 hover:bg-pink-500/20 transition shadow-sm"
           >
             <Bot size={13} className="text-pink-400" />
             Inject Rogue Agent Ring
@@ -485,10 +637,19 @@ export default function FraudGraphExplorer() {
 
           <button
             onClick={fetchGraphTopology}
-            className="btn btn-secondary text-xs flex items-center gap-1.5 py-1.5 px-3"
+            className="text-xs font-bold font-sans flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+            title="Refresh Live Graph Topology"
           >
             <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
             Refresh
+          </button>
+
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen Mode'}
+          >
+            {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
         </div>
       </div>
@@ -504,18 +665,18 @@ export default function FraudGraphExplorer() {
         </div>
       )}
 
-      {/* Main Grid: Graph Canvas (2/3) + Forensic Inspector (1/3) */}
+      {/* Main Grid: Visual Graph Canvas (2/3) + Forensic Inspector (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Visual Graph Canvas Area */}
-        <div className="lg:col-span-2 panel p-0 bg-[#080d1a] border-slate-800 rounded-xl relative overflow-hidden flex flex-col min-h-[580px]">
-          {/* Canvas Filter Header */}
-          <div className="p-3 bg-slate-900/80 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs z-10">
-            <div className="flex items-center gap-2">
+        <div className="lg:col-span-2 panel p-0 bg-[#070b16] border border-slate-800 rounded-2xl relative overflow-hidden flex flex-col min-h-[600px] shadow-2xl">
+          {/* Canvas Filter Header & Layout Algorithm Switcher */}
+          <div className="p-3 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs z-10">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-slate-400 font-mono text-[11px]">Type:</span>
               <select
                 value={filterType}
                 onChange={e => setFilterType(e.target.value)}
-                className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-200 font-mono text-xs"
+                className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
               >
                 <option value="ALL">All Types</option>
                 <option value="CARD">Cards (PAN)</option>
@@ -524,11 +685,11 @@ export default function FraudGraphExplorer() {
                 <option value="AGENT">AI Agents</option>
               </select>
 
-              <span className="text-slate-400 font-mono text-[11px] ml-2">Cluster:</span>
+              <span className="text-slate-400 font-mono text-[11px] ml-1">Cluster:</span>
               <select
                 value={filterCluster}
                 onChange={e => setFilterCluster(e.target.value)}
-                className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-200 font-mono text-xs"
+                className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
               >
                 <option value="ALL">All Clusters</option>
                 {graphData.clusters?.map(c => (
@@ -538,17 +699,38 @@ export default function FraudGraphExplorer() {
                 ))}
               </select>
 
+              {/* Layout Mode Switcher */}
+              <div className="flex items-center gap-0.5 bg-slate-950 p-0.5 rounded-lg border border-slate-800 ml-1">
+                {[
+                  { id: 'force', label: 'Force', icon: Compass },
+                  { id: 'radial', label: 'Radial', icon: Target },
+                  { id: 'bipartite', label: 'Tiered', icon: Layers },
+                ].map(l => (
+                  <button
+                    key={l.id}
+                    onClick={() => applyLayout(l.id)}
+                    className={`px-2 py-1 rounded text-[10px] font-mono font-bold transition flex items-center gap-1 ${
+                      layoutMode === l.id ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                    }`}
+                    title={`${l.label} Layout Algorithm`}
+                  >
+                    <l.icon size={11} />
+                    <span>{l.label}</span>
+                  </button>
+                ))}
+              </div>
+
               {/* Threat Only Toggle */}
               <button
                 onClick={() => setThreatOnly(!threatOnly)}
-                className={`ml-2 px-2.5 py-1 rounded text-[11px] font-mono flex items-center gap-1 border transition ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono flex items-center gap-1 border transition ${
                   threatOnly
                     ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 font-bold'
                     : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
                 <ShieldAlert size={12} />
-                {threatOnly ? 'Threat Rings Only' : 'Show All Traffic'}
+                {threatOnly ? 'Threats Only' : 'All Traffic'}
               </button>
             </div>
 
@@ -561,52 +743,54 @@ export default function FraudGraphExplorer() {
                   placeholder="Search node or IP..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 rounded pl-8 pr-3 py-1 text-slate-200 font-mono text-xs w-36 focus:w-44 transition-all"
+                  className="bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1 text-slate-200 font-mono text-xs w-36 focus:w-44 focus:outline-none focus:border-indigo-500 transition-all"
                 />
               </div>
 
-              {/* Zoom Controls */}
-              <div className="flex items-center bg-slate-950 border border-slate-800 rounded p-0.5">
+              {/* Zoom & Reset Controls */}
+              <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg p-0.5">
                 <button
-                  onClick={() => setZoom(z => Math.max(0.6, z - 0.15))}
-                  className="p-1 text-slate-400 hover:text-white"
+                  onClick={() => setZoom(z => Math.max(0.4, z - 0.15))}
+                  className="p-1 text-slate-400 hover:text-white transition"
                   title="Zoom Out"
                 >
-                  <ZoomOut size={14} />
+                  <ZoomOut size={13} />
                 </button>
-                <span className="px-1 font-mono text-[10px] text-slate-400">{Math.round(zoom * 100)}%</span>
+                <span className="px-1.5 font-mono text-[10px] text-slate-400">{Math.round(zoom * 100)}%</span>
                 <button
-                  onClick={() => setZoom(z => Math.min(2.0, z + 0.15))}
-                  className="p-1 text-slate-400 hover:text-white"
+                  onClick={() => setZoom(z => Math.min(3.0, z + 0.15))}
+                  className="p-1 text-slate-400 hover:text-white transition"
                   title="Zoom In"
                 >
-                  <ZoomIn size={14} />
+                  <ZoomIn size={13} />
                 </button>
                 <button
-                  onClick={() => { setZoom(1.0); setPan({ x: 0, y: 0 }) }}
-                  className="p-1 text-slate-400 hover:text-white ml-1 border-l border-slate-800"
-                  title="Reset View"
+                  onClick={handleResetCamera}
+                  className="p-1 text-slate-400 hover:text-white ml-1 border-l border-slate-800 transition"
+                  title="Center & Reset View"
                 >
-                  <Maximize2 size={13} />
+                  <Maximize2 size={12} />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Canvas Rendering Area */}
-          <div className="relative flex-1 cursor-grab active:cursor-grabbing bg-radial-grid">
+          {/* Interactive Canvas Rendering Area */}
+          <div className="relative flex-1 cursor-grab active:cursor-grabbing">
             <canvas
               ref={canvasRef}
-              width={800}
-              height={500}
+              width={850}
+              height={550}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
+              onWheel={handleWheel}
+              onDoubleClick={handleDoubleClick}
               className="w-full h-full block"
             />
 
-            {/* Floating Legend */}
-            <div className="absolute bottom-3 left-3 bg-slate-950/90 backdrop-blur-md border border-slate-800/80 p-2.5 rounded-lg text-[11px] font-mono space-y-1 z-10 shadow-lg pointer-events-none">
+            {/* Floating Quick Legend */}
+            <div className="absolute bottom-3 left-3 bg-slate-950/90 backdrop-blur-md border border-slate-800/80 p-2.5 rounded-xl text-[11px] font-mono space-y-1 z-10 shadow-lg pointer-events-none">
               <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Entity Legend</div>
               <div className="flex items-center gap-2 text-slate-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" /> Card Hash (PAN/BIN)
@@ -622,15 +806,20 @@ export default function FraudGraphExplorer() {
               </div>
             </div>
 
-            {/* Total Counts Tag */}
-            <div className="absolute top-3 right-3 bg-slate-950/90 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-400 z-10">
-              <span className="text-white font-bold">{filteredNodes.length}</span> nodes · <span className="text-white font-bold">{graphData.edges?.length || 0}</span> edges
+            {/* Real-Time Counts Badge */}
+            <div className="absolute top-3 right-3 bg-slate-950/90 border border-slate-800 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-400 z-10 shadow-md">
+              <span className="text-white font-bold">{filteredNodes.length}</span> nodes · <span className="text-white font-bold">{graphData.edges?.length || 0}</span> edges · <span className="text-emerald-400 font-bold">Q={graphData.modularity}</span>
+            </div>
+
+            {/* Navigation Tip */}
+            <div className="absolute bottom-3 right-3 text-[10px] font-mono text-slate-500 bg-slate-950/80 px-2 py-1 rounded-lg border border-slate-800/80 pointer-events-none">
+              🖱️ Scroll to Zoom · Drag to Pan · DblClick to Pin
             </div>
           </div>
         </div>
 
-        {/* Forensic Node & Mule Ring Inspector Drawer */}
-        <div className="panel p-4 bg-slate-900/90 border-slate-800 rounded-xl flex flex-col justify-between space-y-4">
+        {/* Forensic Entity & Mule Ring Inspector Drawer */}
+        <div className="panel p-5 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-col justify-between space-y-4 shadow-xl">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
@@ -638,7 +827,7 @@ export default function FraudGraphExplorer() {
                 Entity &amp; Blast Radius Inspector
               </span>
               {selectedNode && (
-                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
                   selectedNode.is_quarantined
                     ? 'bg-slate-800 text-slate-400 border-slate-700'
                     : selectedNode.is_suspicious
@@ -653,39 +842,39 @@ export default function FraudGraphExplorer() {
             {selectedNode ? (
               <div className="mt-3 space-y-3 font-mono text-xs">
                 {/* Node Identity Card */}
-                <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-1.5">
+                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5 shadow-inner">
                   <div className="flex items-center justify-between text-slate-400 text-[10px] uppercase">
                     <span>Selected Entity</span>
                     <button
                       onClick={() => handleFocusNode(selectedNode)}
-                      className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[10px]"
+                      className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[10px] font-bold"
                     >
-                      <Crosshair size={11} /> Focus
+                      <Crosshair size={11} /> Focus Node
                     </button>
                   </div>
                   <div className="font-bold text-white text-sm break-all">{selectedNode.label}</div>
-                  <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-900 text-slate-400">
+                  <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-900 text-slate-400">
                     <span>Type: <strong className="text-indigo-300 capitalize">{selectedNode.type}</strong></span>
-                    <span>Degree: <strong className="text-amber-400">{selectedNode.degree} links</strong></span>
+                    <span>Degree: <strong className="text-amber-400">{selectedNode.degree || 1} links</strong></span>
                   </div>
                 </div>
 
                 {/* Financial Blast Radius & Risk Estimation Card */}
                 {selectedClusterMeta && (
-                  <div className="p-3 bg-rose-950/30 rounded-lg border border-rose-500/30 space-y-2">
+                  <div className="p-3.5 bg-rose-950/30 rounded-xl border border-rose-500/30 space-y-2.5">
                     <div className="flex items-center justify-between text-[10px] text-rose-300 font-bold uppercase">
                       <span className="flex items-center gap-1"><TrendingUp size={12} /> Blast Radius Analysis</span>
                       <span>Cluster #{selectedClusterMeta.cluster_id}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-center pt-1">
-                      <div className="p-1.5 bg-slate-950/80 rounded border border-rose-900/40">
-                        <div className="text-[10px] text-slate-400">At-Risk GMV</div>
+                      <div className="p-2 bg-slate-950/80 rounded-lg border border-rose-900/40">
+                        <div className="text-[10px] text-slate-400 font-sans">At-Risk GMV</div>
                         <div className="text-sm font-bold text-rose-400">
                           ₹{selectedClusterMeta.estimated_at_risk_gmv?.toLocaleString('en-IN') || '45,000'}
                         </div>
                       </div>
-                      <div className="p-1.5 bg-slate-950/80 rounded border border-rose-900/40">
-                        <div className="text-[10px] text-slate-400">Attack Velocity</div>
+                      <div className="p-2 bg-slate-950/80 rounded-lg border border-rose-900/40">
+                        <div className="text-[10px] text-slate-400 font-sans">Attack Velocity</div>
                         <div className="text-sm font-bold text-amber-400">
                           {selectedClusterMeta.velocity_qps || 12.4} req/s
                         </div>
@@ -701,26 +890,26 @@ export default function FraudGraphExplorer() {
 
                 {/* Cloudflare WAF Signature Generation */}
                 {selectedClusterMeta?.waf_rule && (
-                  <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 space-y-1.5">
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
                     <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase">
                       <span>Cloudflare WAF Expression</span>
                       <button
                         onClick={() => handleCopyWaf(selectedClusterMeta.waf_rule)}
-                        className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[10px]"
+                        className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[10px] font-bold"
                       >
                         <Copy size={11} /> {copiedWaf ? 'Copied!' : 'Copy'}
                       </button>
                     </div>
-                    <div className="text-[10px] text-slate-300 bg-slate-900 p-1.5 rounded font-mono break-all max-h-16 overflow-y-auto">
+                    <div className="text-[10px] text-slate-300 bg-slate-900 p-2 rounded-lg font-mono break-all max-h-16 overflow-y-auto border border-slate-800/80">
                       {selectedClusterMeta.waf_rule}
                     </div>
                   </div>
                 )}
 
-                {/* Connected Entity Traversal */}
-                <div className="space-y-1">
-                  <div className="text-slate-400 text-[10px] uppercase">Direct Connected Neighbors</div>
-                  <div className="max-h-28 overflow-y-auto space-y-1 pr-1">
+                {/* Connected Entity Direct Traversal */}
+                <div className="space-y-1.5">
+                  <div className="text-slate-400 text-[10px] uppercase font-bold">Direct Connected Neighbors</div>
+                  <div className="max-h-32 overflow-y-auto space-y-1 pr-1">
                     {graphData.edges
                       ?.filter(e => e.source === selectedNode.id || e.target === selectedNode.id)
                       .map((e, idx) => {
@@ -730,10 +919,10 @@ export default function FraudGraphExplorer() {
                           <div
                             key={idx}
                             onClick={() => neighbor && handleFocusNode(neighbor)}
-                            className="p-1.5 bg-slate-950 hover:bg-slate-800/80 cursor-pointer rounded border border-slate-800/80 flex items-center justify-between transition-all"
+                            className="p-1.5 bg-slate-950 hover:bg-slate-800/80 cursor-pointer rounded-lg border border-slate-800/80 flex items-center justify-between transition-all"
                           >
                             <span className="truncate text-slate-300 text-[11px]">{neighbor?.label || neighborId}</span>
-                            <span className="text-[10px] text-slate-500 font-mono">w={e.weight}</span>
+                            <span className="text-[10px] text-slate-500 font-mono">w={e.weight || 1.0}</span>
                           </div>
                         )
                       })}
@@ -742,7 +931,7 @@ export default function FraudGraphExplorer() {
               </div>
             ) : (
               <div className="p-8 text-center text-slate-500 text-xs font-mono">
-                Click any node on the graph canvas to inspect its community ring relationships.
+                Click any entity on the graph canvas to inspect its community ring and blast radius.
               </div>
             )}
           </div>
@@ -753,10 +942,10 @@ export default function FraudGraphExplorer() {
               <button
                 onClick={() => handleQuarantineCluster(selectedNode.cluster_id)}
                 disabled={selectedNode.is_quarantined}
-                className={`w-full btn text-xs font-mono font-bold py-2 flex items-center justify-center gap-2 ${
+                className={`w-full text-xs font-mono font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg ${
                   selectedNode.is_quarantined
-                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed border-slate-700'
-                    : 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-950/50'
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                    : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-950/50'
                 }`}
               >
                 <Lock size={14} />
@@ -764,7 +953,7 @@ export default function FraudGraphExplorer() {
               </button>
 
               <div className="text-[10px] text-slate-500 text-center font-sans">
-                Quarantining forces instantaneous O(1) Redis honeypot routing for all {selectedNode.degree}+ linked entities.
+                Quarantining forces instantaneous O(1) Redis honeypot routing for all {selectedNode.degree || 1}+ linked entities.
               </div>
             </div>
           )}
