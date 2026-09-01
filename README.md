@@ -52,26 +52,26 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 
 ```mermaid
 graph TD
-    REQ[Incoming Checkout Request] --> L0[Layer 0: Anti-Checker Tarpit]
-    L0 --> L1[Layer 1: 50 Armed Canary Honeytokens]
-    L1 --> L2[Layer 2: Sliding-Window Velocity]
-    L2 --> L3[Layer 3: ASN and WebRTC Classifier]
-    L3 --> L4[Layer 4: Kinetic Biometric Gate]
-    L4 --> L5[Layer 5: Quad-Ensemble ML Scoring]
-    L5 --> L6[Layer 6: Zero-Trust 3DS2 Verification]
-    L6 --> L7[Layer 7: Louvain Graph Engine]
-    L7 --> CF[Split Conformal Calibration]
-    CF --> MEL[Bayesian Action Tiering]
+    REQ["Incoming Checkout Request"] --> L0["Layer 0: Anti-Checker Tarpit"]
+    L0 --> L1["Layer 1: 50 Armed Canary Honeytokens"]
+    L1 --> L2["Layer 2: Sliding-Window Velocity"]
+    L2 --> L3["Layer 3: ASN and WebRTC Classifier"]
+    L3 --> L4["Layer 4: Kinetic Biometric Gate"]
+    L4 --> L5["Layer 5: Quad-Ensemble ML Scoring"]
+    L5 --> L6["Layer 6: Zero-Trust 3DS2 Verification"]
+    L6 --> L7["Layer 7: Louvain Graph Engine"]
+    L7 --> CF["Split Conformal Calibration"]
+    CF --> MEL["Bayesian Action Tiering"]
 
-    MEL --> T1[Tier 1: Instant Approval - Under 12ms]
-    MEL --> T2[Tier 2: Soft-Risk Hold - Dynamic UPI QR]
-    MEL --> T3[Tier 3: Tarpit and Block - 8s Poison Delay]
+    MEL --> T1["Tier 1: Instant Approval (Under 12ms)"]
+    MEL --> T2["Tier 2: Soft-Risk Hold (Dynamic UPI QR)"]
+    MEL --> T3["Tier 3: Tarpit and Block (8s Poison Delay)"]
 
-    T1 -.-> A1[Louvain Mule Ring Explorer]
-    T2 -.-> A2[Threat Memory Copilot RAG]
-    T3 -.-> A3[Red-Team Arms Race Simulator]
-    A1 --- A4[Dispute Evidence Dossier PDF]
-    A2 --- A5[PSI Drift and Doubly Robust Monitor]
+    T1 -.-> A1["Louvain Mule Ring Explorer"]
+    T2 -.-> A2["Threat Memory Copilot RAG"]
+    T3 -.-> A3["Red-Team Arms Race Simulator"]
+    A1 --> A4["Dispute Evidence Dossier PDF"]
+    A2 --> A5["PSI Drift and Doubly Robust Monitor"]
 ```
 
 ---
@@ -80,11 +80,12 @@ graph TD
 
 ```mermaid
 graph LR
-    SCORE[ML Risk Score]
-    SCORE -->|Low Risk: Below Threshold| GENUINE[Decision: Genuine - Instant Approval]
-    SCORE -->|Uncertain: Within Interval| UNCERTAIN[Decision: Uncertain - Step-Up to UPI QR]
-    SCORE -->|High Risk: Above Threshold| FRAUD[Decision: Fraud - Honeypot Block]
+    SCORE["ML Risk Score"]
+    SCORE -->|Low Risk| GENUINE["Decision: Genuine (Instant Approval)"]
+    SCORE -->|Uncertain| UNCERTAIN["Decision: Uncertain (Step-Up to UPI QR)"]
+    SCORE -->|High Risk| FRAUD["Decision: Fraud (Honeypot Block)"]
 ```
+
 
 
 ---
