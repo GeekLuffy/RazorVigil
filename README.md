@@ -90,28 +90,49 @@ $$a^* = \arg\min_{a \in \{\text{Pass}, \text{Recovery}, \text{HardBlock}\}} \mat
 
 ---
 
-## 🧪 Verification & Reproduction (42 / 42 Tests Green)
+## 📚 Official Documentation (Diataxis Framework)
+
+Comprehensive guides, API specifications, and architectural documentation are available in the [`docs/`](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs) directory:
+
+| Quadrant | Document | Purpose |
+| :--- | :--- | :--- |
+| 🎓 **Tutorial** | **[Getting Started Quickstart](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/tutorial-quickstart.md)** | Go from zero to defending live checkouts in $\le 3$ steps. |
+| 🛠️ **How-To** | **[Drop-in SDK Integration (<5 Lines)](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/howto-merchant-integration.md)** | Integrate in Node.js, Python, Go, and Java Spring Boot. |
+| 🛠️ **How-To** | **[Live Parallel Stress Benchmarks](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/howto-stress-benchmarks.md)** | Verify sub-15ms synchronous SLA under 50 concurrent workers. |
+| 🛠️ **How-To** | **[WAF & Risk Rules Export](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/howto-waf-and-rules-export.md)** | Deploy synthesized Cloudflare WAF and Razorpay Thirdwatch rules. |
+| 🛠️ **How-To** | **[RBI Dispute Defense Dossiers](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/howto-dispute-representation.md)** | Generate dispute evidence packages with SHA-256 anchoring. |
+| 📋 **Reference** | **[REST & WebSocket API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/reference-api.md)** | Complete endpoints specification, payloads, and status codes. |
+| 📋 **Reference** | **[Quad-Ensemble Models & Math Specs](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/reference-models-and-math.md)** | Formulas for Conformal Sets, Focal Loss, and Louvain Modularity. |
+| 🧠 **Explanation**| **[Architecture Decisions & Trade-Offs](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/explanation-architecture-and-tradeoffs.md)** | Deep dive into synchronous SLAs, tarpit poisoning, and graph dynamics. |
+
+---
+
+## 🧪 Verification & Reproduction (59 / 59 Tests Green)
 
 Run the full automated test suite:
 
 ```bash
-# Execute all 42 unit, adversarial, conformal, and stress tests
+# Execute all 59 unit, adversarial, conformal, and stress tests
 python -m pytest tests/ -v
 ```
 
 ### Launch the Platform:
 ```bash
-# 1. Start the unified FastAPI & React UI daemon
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+# 1. Start the FastAPI backend server
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 
-# 2. Access the Live SOC Platform
-Open http://localhost:8000/
-Open http://localhost:8000/docs (OpenAPI / Swagger Specs)
+# 2. Start the Vite React frontend
+cd frontend && npm run dev
+
+# 3. Access the Live SOC Platform
+Open http://localhost:5173/ (SOC Command Center Dashboard)
+Open http://127.0.0.1:8000/docs (OpenAPI / Swagger Specs)
 ```
 
 ---
 
 ## 📚 Academic & Industry Citations
+
 1. **NeurIPS 2023**: *Uncertainty Quantification over Graphs with Conformalized Graph Neural Networks (CF-GNN)* — Huang et al.
 2. **IEEE TNNLS 2022**: *Focal Loss and Cost-Sensitive Deep Learning for Severe Transaction Fraud Imbalance* — Lin, Goyal et al.
 3. **ACM SIGKDD 2020**: *Enhancing Graph Neural Networks for Fraud Detection via Dual-Stage Neighbor Selection (Care-GNN)* — Dou et al.
