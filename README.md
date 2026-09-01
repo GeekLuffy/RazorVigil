@@ -51,49 +51,27 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 ### Synchronous Hot Path vs. Asynchronous Intelligence Plane
 
 ```mermaid
-flowchart TD
-    REQ([Incoming Checkout Request]) --> L0
+graph TD
+    REQ[Incoming Checkout Request] --> L0[Layer 0: Anti-Checker Tarpit]
+    L0 --> L1[Layer 1: 50 Armed Canary Honeytokens]
+    L1 --> L2[Layer 2: Sliding-Window Velocity]
+    L2 --> L3[Layer 3: ASN and WebRTC Classifier]
+    L3 --> L4[Layer 4: Kinetic Biometric Gate]
+    L4 --> L5[Layer 5: Quad-Ensemble ML Scoring]
+    L5 --> L6[Layer 6: Zero-Trust 3DS2 Verification]
+    L6 --> L7[Layer 7: Louvain Graph Engine]
+    L7 --> CF[Split Conformal Calibration]
+    CF --> MEL[Bayesian Action Tiering]
 
-    subgraph HOT [Synchronous Hot Path - Under 15ms SLA]
-        direction TB
-        L0["Layer 0: Anti-Checker Tarpit (Luhn + Micro-Auth Trap)"]
-        L1["Layer 1: 50 Armed Canary Honeytokens (Zero FPR Escape)"]
-        L2["Layer 2: Sliding-Window Velocity (Redis 10s / 1m / 10m / 1h)"]
-        L3["Layer 3: ASN and WebRTC Classifier (JA3 + Subnet Defense)"]
-        L4["Layer 4: Kinetic Biometric Gate (Keystroke Shannon Entropy)"]
-        L5["Layer 5: Quad-Ensemble ML (LGBM + CatBoost + IF + GraphSAGE)"]
-        L6["Layer 6: Zero-Trust 3DS2 (Ed25519 Nonces + CAVV Validation)"]
-        L7["Layer 7: Louvain Graph Engine (Temporal Modularity Q=0.8994)"]
-        CF["Split Conformal Calibration (95% Certified Coverage)"]
-        MEL["Bayesian Minimum Expected Loss Action Tiering"]
+    MEL --> T1[Tier 1: Instant Approval - Under 12ms]
+    MEL --> T2[Tier 2: Soft-Risk Hold - Dynamic UPI QR]
+    MEL --> T3[Tier 3: Tarpit and Block - 8s Poison Delay]
 
-        L0 --> L1
-        L1 --> L2
-        L2 --> L3
-        L3 --> L4
-        L4 --> L5
-        L5 --> L6
-        L6 --> L7
-        L7 --> CF
-        CF --> MEL
-    end
-
-    MEL --> T1["Tier 1: Instant Approval (Clean Genuine - Under 12ms)"]
-    MEL --> T2["Tier 2: Soft-Risk Hold (Dynamic UPI QR Step-Up)"]
-    MEL --> T3["Tier 3: Tarpit and Block (High-Confidence Botnet)"]
-
-    subgraph ASYNC [Asynchronous Intelligence Plane - Background Engine]
-        direction TB
-        A1["Louvain Mule Ring Explorer (Q=0.8994 Modularity)"]
-        A2["Threat Memory Copilot RAG (8D Cosine Similarity)"]
-        A3["Red-Team Arms Race Simulator (5-Round Coevolution)"]
-        A4["Dispute Evidence Dossier (ReportLab PDF + SHA-256)"]
-        A5["PSI Drift Monitor (Doubly Robust Evaluation)"]
-    end
-
-    T1 -.-> A1
-    T2 -.-> A2
-    T3 -.-> A3
+    T1 -.-> A1[Louvain Mule Ring Explorer]
+    T2 -.-> A2[Threat Memory Copilot RAG]
+    T3 -.-> A3[Red-Team Arms Race Simulator]
+    A1 --- A4[Dispute Evidence Dossier PDF]
+    A2 --- A5[PSI Drift and Doubly Robust Monitor]
 ```
 
 ---
@@ -101,13 +79,13 @@ flowchart TD
 ### Split Conformal Decision Routing
 
 ```mermaid
-flowchart LR
-    SCORE["ML Risk Score P(Fraud|X)"]
-    
-    SCORE -->|P less than 1-q| GENUINE["Prediction Set: {genuine} -> Instant Approval"]
-    SCORE -->|1-q to q| UNCERTAIN["Prediction Set: {genuine, fraud} -> Dynamic UPI QR Step-Up"]
-    SCORE -->|P greater than q| FRAUD["Prediction Set: {fraud} -> Honeypot Block"]
+graph LR
+    SCORE[ML Risk Score]
+    SCORE -->|Low Risk: Below Threshold| GENUINE[Decision: Genuine - Instant Approval]
+    SCORE -->|Uncertain: Within Interval| UNCERTAIN[Decision: Uncertain - Step-Up to UPI QR]
+    SCORE -->|High Risk: Above Threshold| FRAUD[Decision: Fraud - Honeypot Block]
 ```
+
 
 ---
 
