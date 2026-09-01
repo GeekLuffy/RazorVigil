@@ -98,7 +98,7 @@ export default function App() {
     verified_agent: 31
   })
 
-  const [transactions, setTransactions] = useState([])
+  const [transactions, setTransactions] = useState(INITIAL_SEED_TRANSACTIONS)
   const [chartData, setChartData] = useState([
     { t: '10:00', safe: 120, high_confidence_bot: 2, soft_risk: 4, avg_latency: 8.2, amount: 25000 },
     { t: '10:15', safe: 145, high_confidence_bot: 5, soft_risk: 8, avg_latency: 9.1, amount: 32000 },
@@ -170,18 +170,25 @@ export default function App() {
   // ?? Initial Snapshot Ingestion ?????????????????????????????????????????????????
   const fetchSnapshot = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/metrics/summary`)
-      if (res.ok) {
+      // 1. Fetch live metrics
+      const res = await fetch(`${API_BASE}/metrics/summary`).catch(() => null)
+      if (res && res.ok) {
         const data = await res.json()
         if (data.stats) setStats(prev => ({ ...prev, ...data.stats }))
         if (data.tier_counts) setTierCounts(prev => ({ ...prev, ...data.tier_counts }))
-        if (data.recent_transactions?.length) {
-          setTransactions(data.recent_transactions)
-          if (!selectedTx) setSelectedTx(data.recent_transactions[0])
+      }
+
+      // 2. Fetch recent transactions buffer
+      const txRes = await fetch(`${API_BASE}/api/transactions/recent`).catch(() => null)
+      if (txRes && txRes.ok) {
+        const txData = await txRes.json()
+        if (Array.isArray(txData) && txData.length > 0) {
+          setTransactions(txData)
+          if (!selectedTx) setSelectedTx(txData[0])
         }
       }
     } catch (e) {
-      console.warn('API Snapshot fetch failed, using local simulation cache:', e)
+      console.warn('API Snapshot fetch fallback:', e)
     }
   }, [selectedTx])
 
