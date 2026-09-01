@@ -85,35 +85,45 @@ export default function FraudGraphExplorer() {
         const cy = height / 2
 
         simNodesRef.current = data.nodes.map((n, idx) => {
+          const defaultRadius = n.type === 'device' || n.type === 'agent' ? 14 : 10
           const existing = existingMap.get(n.id)
           if (existing) {
-            return { ...n, x: existing.x, y: existing.y, vx: existing.vx, vy: existing.vy }
+            return {
+              ...n,
+              x: Number.isFinite(existing.x) ? existing.x : cx + (Math.random() - 0.5) * 100,
+              y: Number.isFinite(existing.y) ? existing.y : cy + (Math.random() - 0.5) * 100,
+              vx: Number.isFinite(existing.vx) ? existing.vx : 0,
+              vy: Number.isFinite(existing.vy) ? existing.vy : 0,
+              radius: existing.radius || defaultRadius,
+            }
           }
           // Distribute initial positions by cluster
-          const angle = (idx / data.nodes.length) * Math.PI * 2
-          const clusterOffset = n.cluster_id * 80
-          const radius = 100 + (idx % 4) * 35 + clusterOffset
+          const angle = (idx / Math.max(1, data.nodes.length)) * Math.PI * 2
+          const clusterOffset = (n.cluster_id || 0) * 80
+          const distRadius = 100 + (idx % 4) * 35 + clusterOffset
           return {
             ...n,
-            x: cx + Math.cos(angle) * radius + (Math.random() - 0.5) * 40,
-            y: cy + Math.sin(angle) * radius + (Math.random() - 0.5) * 40,
+            x: cx + Math.cos(angle) * distRadius + (Math.random() - 0.5) * 40,
+            y: cy + Math.sin(angle) * distRadius + (Math.random() - 0.5) * 40,
             vx: 0,
             vy: 0,
-            radius: n.type === 'device' || n.type === 'agent' ? 14 : 10,
+            radius: defaultRadius,
           }
         })
 
-        if (!selectedNode && data.nodes.length > 0) {
-          const susp = data.nodes.find(n => n.is_suspicious) || data.nodes[0]
-          setSelectedNode(susp)
-        }
+        setSelectedNode(prev => {
+          if (prev) {
+            return data.nodes.find(n => n.id === prev.id) || prev
+          }
+          return data.nodes.find(n => n.is_suspicious) || data.nodes[0] || null
+        })
       }
     } catch (e) {
       console.error('Failed to fetch graph topology:', e)
     } finally {
       setLoading(false)
     }
-  }, [selectedNode])
+  }, [])
 
   useEffect(() => {
     fetchGraphTopology()
@@ -234,21 +244,24 @@ export default function FraudGraphExplorer() {
       // Draw Nodes
       simNodes.forEach(n => {
         const isSelected = selectedNode && selectedNode.id === n.id
-        const isHoverMatch = searchQuery && n.label.toLowerCase().includes(searchQuery.toLowerCase())
+        const isHoverMatch = searchQuery && n.label?.toLowerCase().includes(searchQuery.toLowerCase())
         const typeCfg = TYPE_COLORS[n.type] || TYPE_COLORS.device
-        const clusterColor = CLUSTER_COLORS[n.cluster_id % CLUSTER_COLORS.length]
+        const clusterColor = CLUSTER_COLORS[(n.cluster_id || 0) % CLUSTER_COLORS.length]
+        const nodeRadius = Math.max(8, n.radius || (n.type === 'device' || n.type === 'agent' ? 14 : 10))
+
+        if (!Number.isFinite(n.x) || !Number.isFinite(n.y)) return
 
         // Node Glow
         if (isSelected || isHoverMatch || n.is_suspicious) {
           ctx.beginPath()
-          ctx.arc(n.x, n.y, n.radius + 8, 0, Math.PI * 2)
+          ctx.arc(n.x, n.y, nodeRadius + 8, 0, Math.PI * 2)
           ctx.fillStyle = isSelected ? 'rgba(236,72,153,0.35)' : (clusterColor + '33')
           ctx.fill()
         }
 
         // Node Circle Body
         ctx.beginPath()
-        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2)
+        ctx.arc(n.x, n.y, nodeRadius, 0, Math.PI * 2)
         ctx.fillStyle = n.is_quarantined ? '#334155' : typeCfg.bg
         ctx.fill()
         ctx.strokeStyle = isSelected ? '#ffffff' : clusterColor
@@ -257,7 +270,7 @@ export default function FraudGraphExplorer() {
 
         // Inner Dot or Icon Indicator
         ctx.beginPath()
-        ctx.arc(n.x, n.y, n.radius * 0.4, 0, Math.PI * 2)
+        ctx.arc(n.x, n.y, nodeRadius * 0.4, 0, Math.PI * 2)
         ctx.fillStyle = '#0f172a'
         ctx.fill()
 
@@ -265,12 +278,13 @@ export default function FraudGraphExplorer() {
         ctx.font = isSelected ? 'bold 11px JetBrains Mono, monospace' : '9px JetBrains Mono, monospace'
         ctx.fillStyle = isSelected ? '#ffffff' : '#cbd5e1'
         ctx.textAlign = 'center'
-        ctx.fillText(n.label.slice(0, 16), n.x, n.y + n.radius + 12)
+        ctx.fillText((n.label || n.id).slice(0, 16), n.x, n.y + nodeRadius + 12)
       })
 
       ctx.restore()
       animationFrameRef.current = requestAnimationFrame(runPhysicsStep)
     }
+
 
     animationFrameRef.current = requestAnimationFrame(runPhysicsStep)
     return () => cancelAnimationFrame(animationFrameRef.current)
