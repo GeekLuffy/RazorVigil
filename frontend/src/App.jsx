@@ -6,8 +6,9 @@ import {
 import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
-  ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network
+  ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot
 } from 'lucide-react'
+
 
 
 import ThreatLabWorkspace from './components/ThreatLabWorkspace'
