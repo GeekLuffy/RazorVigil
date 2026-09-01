@@ -25,9 +25,12 @@ export default defineConfig({
       '/governance': { target: 'http://localhost:8000', changeOrigin: true },
       '/rules': { target: 'http://localhost:8000', changeOrigin: true },
       '/antichecker': { target: 'http://localhost:8000', changeOrigin: true },
+      '/cluster': { target: 'http://localhost:8000', changeOrigin: true },
+      '/investigate': { target: 'http://localhost:8000', changeOrigin: true },
       '/metrics': { target: 'http://localhost:8000', changeOrigin: true },
       '/ws': { target: 'ws://localhost:8000', ws: true, changeOrigin: true },
     },
+
 
   },
 })

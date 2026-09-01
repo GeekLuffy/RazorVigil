@@ -64,9 +64,18 @@ export default function FraudGraphExplorer() {
   const fetchGraphTopology = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/cluster/graph`)
-      const data = await res.json()
+      if (!res.ok) return
+      const text = await res.text()
+      let data
+      try {
+        data = JSON.parse(text)
+      } catch (err) {
+        console.warn('Non-JSON response from /cluster/graph:', err)
+        return
+      }
       if (data && Array.isArray(data.nodes)) {
         setGraphData(data)
+
 
         // Initialize / preserve physics node positions
         const existingMap = new Map(simNodesRef.current.map(n => [n.id, n]))
