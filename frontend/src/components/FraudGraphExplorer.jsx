@@ -350,20 +350,29 @@ export default function FraudGraphExplorer() {
 
       // Draw Nodes
       simNodes.forEach(n => {
-        if (threatOnly && n.cluster_id === 0) return
         const isSelected = selectedNode && selectedNode.id === n.id
         const isHoverMatch = searchQuery && n.label?.toLowerCase().includes(searchQuery.toLowerCase())
         const typeCfg = TYPE_COLORS[n.type] || TYPE_COLORS.device
         const clusterColor = CLUSTER_COLORS[(n.cluster_id || 0) % CLUSTER_COLORS.length]
-        const nodeRadius = Math.max(9, n.radius || (n.type === 'device' || n.type === 'agent' ? 14 : 11))
+        const nodeRadius = Math.max(10, n.radius || (n.type === 'device' || n.type === 'agent' ? 15 : 12))
 
         if (!Number.isFinite(n.x) || !Number.isFinite(n.y)) return
 
+        const matchesType = filterType === 'ALL' || n.type === filterType.toLowerCase()
+        const matchesCluster = filterCluster === 'ALL' || n.cluster_id === Number(filterCluster)
+        const matchesThreat = !threatOnly || n.cluster_id !== 0
+        const isDimmed = !matchesType || !matchesCluster || !matchesThreat
+
+        ctx.save()
+        if (isDimmed) {
+          ctx.globalAlpha = 0.15
+        }
+
         // Ambient Node Aura Glow
-        if (isSelected || isHoverMatch || n.is_suspicious) {
+        if (isSelected || isHoverMatch || (n.is_suspicious && !isDimmed)) {
           ctx.beginPath()
-          ctx.arc(n.x, n.y, nodeRadius + 9, 0, Math.PI * 2)
-          ctx.fillStyle = isSelected ? 'rgba(236,72,153,0.4)' : (clusterColor + '38')
+          ctx.arc(n.x, n.y, nodeRadius + 10, 0, Math.PI * 2)
+          ctx.fillStyle = isSelected ? 'rgba(236,72,153,0.45)' : (clusterColor + '40')
           ctx.fill()
         }
 
@@ -373,7 +382,7 @@ export default function FraudGraphExplorer() {
         ctx.fillStyle = n.is_quarantined ? '#334155' : typeCfg.bg
         ctx.fill()
         ctx.strokeStyle = isSelected ? '#ffffff' : clusterColor
-        ctx.lineWidth = isSelected ? 3 : 2
+        ctx.lineWidth = isSelected ? 3.5 : 2
         ctx.stroke()
 
         // Inner Core
@@ -391,10 +400,12 @@ export default function FraudGraphExplorer() {
         }
 
         // Crisp Typography Label
-        ctx.font = isSelected ? 'bold 11px JetBrains Mono, monospace' : '9px JetBrains Mono, monospace'
-        ctx.fillStyle = isSelected ? '#ffffff' : '#cbd5e1'
+        ctx.font = isSelected ? 'bold 11px JetBrains Mono, monospace' : '9.5px JetBrains Mono, monospace'
+        ctx.fillStyle = isSelected ? '#ffffff' : isDimmed ? '#64748b' : '#cbd5e1'
         ctx.textAlign = 'center'
-        ctx.fillText((n.label || n.id).slice(0, 18), n.x, n.y + nodeRadius + 13)
+        ctx.fillText((n.label || n.id).slice(0, 18), n.x, n.y + nodeRadius + 14)
+
+        ctx.restore()
       })
 
       ctx.restore()
@@ -403,22 +414,34 @@ export default function FraudGraphExplorer() {
 
     animationFrameRef.current = requestAnimationFrame(runPhysicsStep)
     return () => cancelAnimationFrame(animationFrameRef.current)
-  }, [graphData, zoom, pan, selectedNode, searchQuery, draggedNode, threatOnly, layoutMode])
+  }, [graphData, zoom, pan, selectedNode, searchQuery, draggedNode, threatOnly, layoutMode, filterType, filterCluster])
 
-  // 3. Mouse & Wheel Interaction Handlers (Freedom to Pan & Zoom anywhere)
-  const handleMouseDown = (e) => {
+  // Helper to convert mouse event to internal canvas coordinate space
+  const getCanvasCoords = (e) => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    if (!canvas) return { x: 0, y: 0, clickX: 0, clickY: 0 }
     const rect = canvas.getBoundingClientRect()
-    const clickX = (e.clientX - rect.left - pan.x) / zoom
-    const clickY = (e.clientY - rect.top - pan.y) / zoom
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const canvasX = (e.clientX - rect.left) * scaleX
+    const canvasY = (e.clientY - rect.top) * scaleY
+    const clickX = (canvasX - pan.x) / zoom
+    const clickY = (canvasY - pan.y) / zoom
+    return { canvasX, canvasY, clickX, clickY }
+  }
 
-    // Find clicked node
+  // 3. Mouse & Wheel Interaction Handlers (Full Click & Drag Support)
+  const [isHoveringNode, setIsHoveringNode] = useState(false)
+
+  const handleMouseDown = (e) => {
+    const { clickX, clickY } = getCanvasCoords(e)
+
+    // Find clicked node with generous hit radius
     const hit = simNodesRef.current.find(n => {
       const dx = n.x - clickX
       const dy = n.y - clickY
-      const nodeRadius = n.radius || 12
-      return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 7
+      const nodeRadius = n.radius || 14
+      return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 12
     })
 
     if (hit) {
@@ -426,21 +449,30 @@ export default function FraudGraphExplorer() {
       setDraggedNode(hit)
     } else {
       setIsDragging(true)
-      setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
+      const { canvasX, canvasY } = getCanvasCoords(e)
+      setDragStart({ x: canvasX - pan.x, y: canvasY - pan.y })
     }
   }
 
   const handleMouseMove = (e) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const { canvasX, canvasY, clickX, clickY } = getCanvasCoords(e)
+
     if (draggedNode) {
-      const rect = canvas.getBoundingClientRect()
-      draggedNode.x = (e.clientX - rect.left - pan.x) / zoom
-      draggedNode.y = (e.clientY - rect.top - pan.y) / zoom
+      draggedNode.x = clickX
+      draggedNode.y = clickY
       draggedNode.vx = 0
       draggedNode.vy = 0
     } else if (isDragging) {
-      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y })
+      setPan({ x: canvasX - dragStart.x, y: canvasY - dragStart.y })
+    } else {
+      // Check if mouse is hovering over any node
+      const hit = simNodesRef.current.find(n => {
+        const dx = n.x - clickX
+        const dy = n.y - clickY
+        const nodeRadius = n.radius || 14
+        return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 12
+      })
+      setIsHoveringNode(Boolean(hit))
     }
   }
 
@@ -452,18 +484,14 @@ export default function FraudGraphExplorer() {
   // Smooth Mouse Wheel Zooming around Cursor
   const handleWheel = (e) => {
     e.preventDefault()
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
+    const { canvasX, canvasY } = getCanvasCoords(e)
 
     const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89
     const newZoom = Math.min(3.5, Math.max(0.4, zoom * zoomFactor))
 
-    // Zoom towards mouse position
-    const newPanX = mouseX - (mouseX - pan.x) * (newZoom / zoom)
-    const newPanY = mouseY - (mouseY - pan.y) * (newZoom / zoom)
+    // Zoom towards mouse position in canvas coordinates
+    const newPanX = canvasX - (canvasX - pan.x) * (newZoom / zoom)
+    const newPanY = canvasY - (canvasY - pan.y) * (newZoom / zoom)
 
     setZoom(newZoom)
     setPan({ x: newPanX, y: newPanY })
@@ -471,17 +499,13 @@ export default function FraudGraphExplorer() {
 
   // Double Click to Toggle Node Pinning
   const handleDoubleClick = (e) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const clickX = (e.clientX - rect.left - pan.x) / zoom
-    const clickY = (e.clientY - rect.top - pan.y) / zoom
+    const { clickX, clickY } = getCanvasCoords(e)
 
     const hit = simNodesRef.current.find(n => {
       const dx = n.x - clickX
       const dy = n.y - clickY
-      const nodeRadius = n.radius || 12
-      return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 7
+      const nodeRadius = n.radius || 14
+      return Math.sqrt(dx * dx + dy * dy) <= nodeRadius + 12
     })
 
     if (hit) {
@@ -688,7 +712,20 @@ export default function FraudGraphExplorer() {
               <span className="text-slate-400 font-mono text-[11px] ml-1">Cluster:</span>
               <select
                 value={filterCluster}
-                onChange={e => setFilterCluster(e.target.value)}
+                onChange={e => {
+                  const val = e.target.value
+                  setFilterCluster(val)
+                  if (val !== 'ALL') {
+                    const clusterNodes = simNodesRef.current.filter(n => n.cluster_id === Number(val))
+                    if (clusterNodes.length > 0) {
+                      const avgX = clusterNodes.reduce((s, n) => s + n.x, 0) / clusterNodes.length
+                      const avgY = clusterNodes.reduce((s, n) => s + n.y, 0) / clusterNodes.length
+                      setPan({ x: 425 - avgX * 1.3, y: 275 - avgY * 1.3 })
+                      setZoom(1.3)
+                      setSelectedNode(clusterNodes.find(n => n.is_suspicious) || clusterNodes[0])
+                    }
+                  }
+                }}
                 className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
               >
                 <option value="ALL">All Clusters</option>
@@ -776,7 +813,7 @@ export default function FraudGraphExplorer() {
           </div>
 
           {/* Interactive Canvas Rendering Area */}
-          <div className="relative flex-1 cursor-grab active:cursor-grabbing">
+          <div className={`relative flex-1 ${isHoveringNode ? 'cursor-pointer' : isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
             <canvas
               ref={canvasRef}
               width={850}
