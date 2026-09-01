@@ -17,15 +17,18 @@ All empirical performance benchmarks are evaluated on a held-out test partition 
 
 ## 📊 Key Verified Benchmarks
 
-| Performance Metric | Tabular GBDT Blend (LGB+CB) | Heterogeneous Neural Hybrid (FT-Trans + GBDT) | Baseline Decision Tree | Official Gateway Rubric |
-| :--- | :---: | :---: | :---: | :---: |
-| **Held-Out Test PR-AUC** | **0.9997** `[0.9995, 0.9999]` | **0.9999** `[0.9997, 1.0000]` | 0.8120 | $\ge 0.900$ |
-| **Held-Out Test ROC-AUC** | **0.9999** `[0.9998, 0.9999]` | **0.9999** `[0.9998, 1.0000]` | 0.8840 | $\ge 0.950$ |
-| **Full-Funnel Fraud Catch Rate** | **99.60%** `[99.36%, 99.80%]` | **99.72%** `[99.45%, 99.88%]` | 72.10% | $\ge 95.0\%$ |
-| **Adversarial Bot Recall (Stealth CDP)**| **97.60%** `[96.20%, 98.80%]` | **98.20%** `[97.10%, 99.10%]` | 64.20% | $\ge 85.0\%$ |
-| **Zero-Day CVV Cycling Recall** | 8.20% *(Supervised failure)* | **76.80%** `[73.40%, 80.40%]` | 4.80% | — |
-| **Conformal Coverage Rate ($\alpha=0.05$)**| — | **95.40%** `[94.90%, 95.80%]` | — | $\ge 95.0\%$ |
-| **Sequential P99 Latency** | **13.86 ms** | **14.20 ms** | 4.20 ms | $< 50.0\text{ ms SLA}$ |
+*Source: `docs/metrics.json` v1.0.0. Held-out test N=10,000. Bootstrap 95% CI (1,000 resamples).*
+
+| Performance Metric | Tabular GBDT Blend (0.55LGB+0.45CB) | Static 4-Way Blend | **Persistence-Gated P2** ✅ (Deployed) |
+| :--- | :---: | :---: | :---: |
+| **Held-Out Test PR-AUC** | **0.9997** `[0.9995, 0.9999]` | **0.9991** `[0.9983, 0.9997]` | **0.9963** `[0.9944, 0.9979]` |
+| **Held-Out Test ROC-AUC** | **0.9999** `[0.9998, 0.9999]` | **0.9996** `[0.9991, 0.9999]` | **0.9986** `[0.9980, 0.9992]` |
+| **Full-Funnel Fraud Catch Rate** | **99.60%** `[99.36%, 99.80%]` | **99.57%** `[99.33%, 99.80%]` | **99.57%** `[99.33%, 99.80%]` |
+| **Adversarial Bot Recall** | **97.60%** `[96.20%, 98.80%]` | **97.00%** `[95.60%, 98.40%]` | **97.00%** `[95.60%, 98.40%]` |
+| **Zero-Day CVV Cycling Recall** | 8.20% *(supervised failure)* | 8.20% *(supervised failure)* | **76.80%** `[73.40%, 80.40%]` |
+| **Conformal Coverage ($\alpha=0.05$)** | — | — | **95.40%** `[94.90%, 95.80%]` |
+| **Edge-Case Genuine FPR (VPN/travelers)** | 6.00% | 5.60% | **10.60%** *(validated trade-off)* |
+| **Sequential P99 Latency** | **13.86 ms** | **14.10 ms** | **14.20 ms** |
 
 ---
 

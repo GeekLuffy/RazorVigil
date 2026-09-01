@@ -62,7 +62,7 @@ Interactive RAG conversational endpoint over live transaction store, Louvain gra
 {
   "reply": "### 🔍 Deep Forensic Reasoning for `tx_live_8831`...",
   "citations": [
-    "RBI Master Direction 2025/2026 on Digital Payment Security Controls (§7.2)",
+    "RBI (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)",
     "EMVCo 3-D Secure Protocol Specification v2.2.0"
   ],
   "suggested_actions": [

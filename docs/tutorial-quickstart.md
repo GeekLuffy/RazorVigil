@@ -98,7 +98,7 @@ curl -X POST http://localhost:8000/checkout \
 ## 🏆 What You Built & Explored
 
 You now have a fully operational local instance of RazorShield Sentinel with:
-- **8-Layer Risk Pipeline**: LightGBM, CatBoost, PyTorch FT-Transformer, and Isolation Forest.
+- **8-Layer Risk Pipeline**: LightGBM + CatBoost + Isolation Forest + GraphSAGE (persistence-gated P2 ensemble).
 - **Real-Time SOC Command Center**: Live WebSocket streaming at 60 FPS.
 - **Threat Memory Copilot RAG**: Ready to interrogate in the chat drawer.
 

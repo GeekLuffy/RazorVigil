@@ -354,7 +354,7 @@ export default function ExecutiveGuideModal({
             <ul className="list-disc list-inside space-y-1 text-slate-400 text-[11px]">
               <li>Operates strictly as an <strong>Autonomous AI Risk Manager</strong> in the payment lifecycle.</li>
               <li>Seamless graceful degradation to UPI QR recovery prevents cart abandonment.</li>
-              <li>Zero false declines, certified 95% conformal coverage, and complete audit trails.</li>
+              <li>0.09% Normal Genuine FPR; 10.6% Edge-Case Genuine FPR (VPN/travelers) — explicitly validated trade-off, certified 95% conformal coverage, and complete audit trails.</li>
             </ul>
           </div>
         </div>

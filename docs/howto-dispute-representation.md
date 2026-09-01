@@ -46,7 +46,7 @@ sha256sum RBI_Dispute_Dossier_TX9988.pdf
 ---
 
 ## 📜 Regulatory Stance: Liability Shift Guarantee
-Under **RBI Master Direction 2025/2026 (§7.2)** and **EMVCo 3DS 2.2**:
+Under the **Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)** and **EMVCo 3DS 2.2**:
 - When verifiable cryptographic CAVV tokens and positive behavioral biometrics are proven, **100% of chargeback financial liability shifts from the Merchant to the Issuing Bank**.
 
 ---

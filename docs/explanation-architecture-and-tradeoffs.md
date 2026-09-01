@@ -33,7 +33,7 @@ Traditional fraud engines use arbitrary risk score cutoffs (e.g., `"score > 0.70
 Split Conformal Prediction provides **distribution-free mathematical error coverage guarantees**:
 * If the model is uncertain, it outputs prediction set `["genuine", "fraud"]` rather than guessing.
 * Uncertain transactions are automatically routed to a **Dynamic Out-of-Band UPI QR step-up** (5-minute hold) rather than being falsely rejected.
-* Result: **$0.00\%$ false decline rate** on genuine shoppers.
+* Normal Genuine FPR: **0.09%** `[0.00%, 0.27%]` (N=6,500). Edge-Case Genuine FPR (VPN/travelers): **10.6%** at persistence-gated P2 — an explicitly validated trade-off for maximum zero-day CVV recall.
 
 ---
 
@@ -69,4 +69,5 @@ This ensures community detection reflects active syndicates while dynamically pr
 | **In-Memory Pre-Warmed Models** | Sub-15ms gating speed | ~380MB server memory footprint |
 | **Split Conformal Sets** | Certified 95% statistical coverage | Requires 2,000-sample calibration set |
 | **Deterministic Layer 0 Tarpits** | Starves botnet concurrency | Requires edge reverse-proxy coordination |
-| **Out-of-Band UPI QR Holds** | Zero false declines | Requires 5-minute inventory reservation buffer |
+| **Persistence-Gated P2 Config** | 76.8% zero-day CVV recall (vs 8.2% baseline) | 10.6% Edge-Case Genuine FPR (VPN/travelers) |
+
