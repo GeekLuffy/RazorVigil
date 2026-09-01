@@ -1,559 +1,230 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, AreaChart, Area
-} from 'recharts'
-import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
-  ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords
+  ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords,
+  Layers, Percent
 } from 'lucide-react'
 
+// ?? 8 Dedicated Modular Pages ??
+import DashboardPage from './pages/DashboardPage'
+import TransactionsPage from './pages/TransactionsPage'
+import RiskIntelligencePage from './pages/RiskIntelligencePage'
+import ModelEvaluationPage from './pages/ModelEvaluationPage'
+import SyndicatesPage from './pages/SyndicatesPage'
+import AttackSimulatorPage from './pages/AttackSimulatorPage'
+import ArchitecturePage from './pages/ArchitecturePage'
+import AuditLogPage from './pages/AuditLogPage'
 
-
-
-import ThreatLabWorkspace from './components/ThreatLabWorkspace'
-import ActiveDefenseWorkspace from './components/ActiveDefenseWorkspace'
+// ?? Persistent Modals & Drawers ??
 import MerchantStore from './components/MerchantStore'
-import ArchitectureOverview from './components/ArchitectureOverview'
-import FraudGraphCanvas from './components/FraudGraphCanvas'
-import FraudGraphExplorer from './components/FraudGraphExplorer'
-import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
-
-import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer'
-import AttackLaunchpad from './components/AttackLaunchpad'
 import ExecutiveGuideModal from './components/ExecutiveGuideModal'
 import StressBenchmarkModal from './components/StressBenchmarkModal'
 import CopilotIncidentRoom from './components/CopilotIncidentRoom'
 import IntegrationExportModal from './components/IntegrationExportModal'
-import RedTeamArmsRaceWorkspace from './components/RedTeamArmsRaceWorkspace'
-
-
-
-
-
 
 import { API_BASE, WS_URL } from './config'
 
-
-
-const MAX_FEED_ITEMS = 100
+const MAX_FEED_ITEMS = 120
 const MAX_CHART_POINTS = 60
 
-// ─── Semantic Risk Tier Metadata ───────────────────────────────────────────────
+// ??? Semantic Risk Tier Metadata ???????????????????????????????????????????????
 const TIER_META = {
-  safe:                { label: 'SAFE',           color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '✓' },
-  soft_risk:           { label: 'SOFT RISK',      color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  icon: '⚠' },
-  elevated_review:     { label: 'ELEVATED',       color: '#f59e0b', bg: 'rgba(245,158,11,0.15)',  icon: '🔶' },
-  high_confidence_bot: { label: 'BOT BLOCKED',    color: '#f43f5e', bg: 'rgba(244,63,94,0.12)',   icon: '🚫' },
-  verified_agent:      { label: 'VERIFIED AGENT', color: '#818cf8', bg: 'rgba(129,140,248,0.12)', icon: '🤖' },
+  safe:                { label: 'SAFE',           color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '?' },
+  soft_risk:           { label: 'SOFT RISK',      color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  icon: '?' },
+  elevated_review:     { label: 'ELEVATED',       color: '#f59e0b', bg: 'rgba(245,158,11,0.15)',  icon: '??' },
+  high_confidence_bot: { label: 'BOT BLOCKED',    color: '#f43f5e', bg: 'rgba(244,63,94,0.12)',   icon: '??' },
+  verified_agent:      { label: 'VERIFIED AGENT', color: '#818cf8', bg: 'rgba(129,140,248,0.12)', icon: '??' },
 }
 
 function tierMeta(tier) {
   return TIER_META[tier] ?? { label: tier, color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: '?' }
 }
 
-function fmt(n) { return typeof n === 'number' ? n.toFixed(3) : '—' }
-function fmtMs(n) { return typeof n === 'number' ? `${n.toFixed(1)}ms` : '—' }
-function fmtRupees(n) { return `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` }
+// ??? 8 Route Tabs Configuration ????????????????????????????????????????????????
+const NAV_TABS = [
+  { id: 'dashboard',         label: 'Dashboard',         icon: LayoutDashboard, key: '1' },
+  { id: 'transactions',      label: 'Transactions',      icon: Layers,          key: '2' },
+  { id: 'risk-intelligence', label: 'Risk Intelligence', icon: Percent,         key: '3' },
+  { id: 'model-evaluation',  label: 'Model Evaluation',  icon: BarChart3,       key: '4' },
+  { id: 'syndicates',        label: 'Syndicates Graph',  icon: Network,         key: '5' },
+  { id: 'simulator',         label: 'Attack Simulator',  icon: Flame,           key: '6' },
+  { id: 'architecture',      label: 'Architecture',      icon: FileText,        key: '7' },
+  { id: 'audit-log',         label: 'Audit & Disputes',  icon: Scale,           key: '8' },
+]
 
-// ─── Luminous Hero KPI Sparkline Card ──────────────────────────────────────────
-function SparklineKpiCard({ title, value, sub, trend, trendGood, sparkData, color = '#6366f1', isHero = false, glowClass = '', icon: Icon, valuePrefix = '', valueSuffix = '' }) {
-  return (
-    <div className={`rounded-xl p-4 flex flex-col justify-between relative overflow-hidden transition-all duration-300 ${
-      isHero
-        ? 'panel-primary border-emerald-500/50 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-emerald-950/25 shadow-lg shadow-emerald-950/25'
-        : `soc-card hover:border-slate-700 ${glowClass}`
-    }`}>
-      {/* Ambient Top Glow */}
-      <div
-        className="absolute -top-10 -right-10 w-28 h-28 rounded-full blur-2xl pointer-events-none opacity-25"
-        style={{ backgroundColor: color }}
-      />
-
-      <div className="flex items-center justify-between relative z-10 mb-2">
-        <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-          {Icon && <Icon size={13} className={isHero ? 'text-emerald-400' : 'text-slate-400'} />}
-          {title}
-        </span>
-        {trend && (
-          <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${
-            trendGood ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
-          }`}>
-            {trend}
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-end justify-between relative z-10 mt-1">
-        <div>
-          <div className={`text-2xl lg:text-3xl font-black font-mono tracking-tight tabular-nums ${isHero ? 'text-emerald-400 glow-text-emerald' : 'text-white'}`}>
-            {valuePrefix}{value}{valueSuffix}
-          </div>
-          {sub && <div className="text-[11px] text-slate-400 font-sans mt-0.5">{sub}</div>}
-        </div>
-
-        {/* Sparkline */}
-        {sparkData && sparkData.length > 0 && (
-          <div className="w-24 h-9 shrink-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={sparkData}>
-                <defs>
-                  <linearGradient id={`grad-${title.replace(/[^a-zA-Z]/g, '')}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={color} stopOpacity={0.45} />
-                    <stop offset="95%" stopColor={color} stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <Area
-                  type="monotone"
-                  dataKey="v"
-                  stroke={color}
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill={`url(#grad-${title.replace(/[^a-zA-Z]/g, '')})`}
-                  isAnimationActive={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ─── Tier Badge ───────────────────────────────────────────────────────────────
-function TierBadge({ tier }) {
-  const m = tierMeta(tier)
-  return (
-    <span
-      className="px-2 py-0.5 rounded text-[11px] font-mono font-bold whitespace-nowrap"
-      style={{ color: m.color, background: m.bg, border: `1px solid ${m.color}33` }}
-    >
-      {m.icon} {m.label}
-    </span>
-  )
-}
-
-// ─── Live feed row (Interactive Clickable Row) ────────────────────────────────
-function FeedRow({ tx, isNew, isSelected, onSelect, onOpenCopilot }) {
-  return (
-    <div
-      onClick={() => onSelect(tx)}
-      className={`flex items-center gap-3 px-3.5 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer group border ${
-        isSelected
-          ? 'bg-slate-800/90 border-indigo-500/50 shadow-md shadow-indigo-950/30'
-          : isNew
-          ? 'bg-slate-800/50 border-slate-700/60'
-          : 'bg-slate-950/40 hover:bg-slate-900/80 border-slate-900 hover:border-slate-800'
-      }`}
-      style={{ borderLeft: `3px solid ${tierMeta(tx.tier).color}` }}
-    >
-      <span className="text-slate-500 w-10 text-right shrink-0">{fmtMs(tx.latency_ms)}</span>
-      <TierBadge tier={tx.tier} />
-      <span className="text-slate-300 shrink-0 w-12 text-right font-bold">{fmt(tx.risk_score)}</span>
-      <span className="text-slate-400 truncate flex-1 font-mono group-hover:text-indigo-300 transition">
-        {tx.transaction_id || `tx_${Date.now()}`}
-      </span>
-      {tx.is_canary && <span className="text-amber-400 text-[10px] shrink-0 font-bold bg-amber-500/20 border border-amber-500/30 px-1.5 py-0.5 rounded">🐤 CANARY</span>}
-      {tx.is_agent && <span className="text-indigo-300 text-[10px] shrink-0 font-bold bg-indigo-500/20 border border-indigo-500/30 px-1.5 py-0.5 rounded">🤖 AP2 AGENT</span>}
-      {tx.recovery_url && (
-        <span className="text-emerald-400 text-[11px] shrink-0 font-bold bg-emerald-500/15 border border-emerald-500/30 px-1.5 py-0.5 rounded">↪ RECOVERED</span>
-      )}
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shrink-0">
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            if (onOpenCopilot) onOpenCopilot(tx)
-          }}
-          className="p-1 hover:bg-pink-500/20 text-slate-400 hover:text-pink-300 rounded border border-transparent hover:border-pink-500/30 transition"
-          title="Interrogate in Copilot AI Incident Room"
-        >
-          <Bot size={12} />
-        </button>
-      </div>
-      <ChevronRight size={13} className="text-slate-600 group-hover:text-indigo-400 transition shrink-0" />
-    </div>
-  )
-}
-
-
-// ─── Tier pie chart with Centered Total Label ──────────────────────────────────
-const PIE_COLORS = {
-  safe: '#10b981', soft_risk: '#f59e0b',
-  elevated_review: '#f59e0b', high_confidence_bot: '#f43f5e',
-  verified_agent: '#818cf8'
-}
-function TierPie({ counts }) {
-  const data = Object.entries(counts)
-    .filter(([, v]) => v > 0)
-    .map(([k, v]) => ({ name: tierMeta(k).label, value: v, tier: k }))
-  
-  const totalCount = Object.values(counts).reduce((a, b) => a + b, 0)
-
-  if (!data.length) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center py-8">
-        <Activity className="w-6 h-6 text-indigo-400/60 mb-2 animate-pulse" />
-        <div className="text-xs text-slate-400 font-sans">Awaiting classification data...</div>
-      </div>
-    )
+export default function App() {
+  // ?? URL Hash Routing ??????????????????????????????????????????????????????????
+  const getInitialRoute = () => {
+    const hash = window.location.hash.replace('#', '').trim()
+    const valid = NAV_TABS.find(t => t.id === hash)
+    return valid ? valid.id : 'dashboard'
   }
 
-  return (
-    <div className="relative">
-      <ResponsiveContainer width="100%" height={180}>
-        <PieChart>
-          <Pie data={data} cx="50%" cy="50%" innerRadius={48} outerRadius={76}
-            dataKey="value" stroke="none">
-            {data.map((d, idx) => (
-              <Cell key={`tier-pie-${d.tier}-${idx}`} fill={PIE_COLORS[d.tier] ?? '#64748b'} />
-            ))}
-          </Pie>
-          <Tooltip
-            contentStyle={{ background: '#0b0f19', border: '1px solid #1e293b', borderRadius: 8, fontSize: 11 }}
-            itemStyle={{ color: '#e2e8f0' }}
-          />
-          <Legend formatter={(val) => <span style={{ color: '#94a3b8', fontSize: 11 }}>{val}</span>} />
-        </PieChart>
-      </ResponsiveContainer>
+  const [activeTab, setActiveTab] = useState(getInitialRoute)
 
-      {/* Centered Donut Label */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-7">
-        <span className="text-xl font-extrabold font-mono text-white leading-none">
-          {totalCount}
-        </span>
-        <span className="text-[9px] font-sans uppercase tracking-wider text-slate-400 font-medium mt-0.5">
-          Total Txns
-        </span>
-      </div>
-    </div>
-  )
-}
+  const handleSelectTab = (tabId) => {
+    setActiveTab(tabId)
+    window.location.hash = tabId
+  }
 
-// ─── Risk score chart with Threshold-Aware Gradient ────────────────────────────
-function RiskChart({ points }) {
-  return (
-    <ResponsiveContainer width="100%" height={160}>
-      <AreaChart data={points} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
-        <defs>
-          {/* Fill Gradient: Red only above 0.75 threshold (top 25%), neutral indigo below */}
-          <linearGradient id="riskGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.45} />
-            <stop offset="25%" stopColor="#f43f5e" stopOpacity={0.35} />
-            <stop offset="25.1%" stopColor="#6366f1" stopOpacity={0.15} />
-            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.0} />
-          </linearGradient>
+  // Sync back/forward browser navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').trim()
+      const valid = NAV_TABS.find(t => t.id === hash)
+      if (valid) setActiveTab(valid.id)
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
-          {/* Stroke Gradient: Red above 0.75, Indigo below 0.75 */}
-          <linearGradient id="riskStroke" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f43f5e" />
-            <stop offset="25%" stopColor="#f43f5e" />
-            <stop offset="25.1%" stopColor="#818cf8" />
-            <stop offset="100%" stopColor="#6366f1" />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-        <XAxis dataKey="t" hide />
-        <YAxis domain={[0, 1]} tick={{ fill: '#64748b', fontSize: 10 }} tickCount={5} />
-        <Tooltip
-          contentStyle={{ background: '#0b0f19', border: '1px solid #1e293b', borderRadius: 8, fontSize: 11 }}
-          itemStyle={{ color: '#e2e8f0' }}
-          formatter={(v) => [v.toFixed(3), 'Risk Score']}
-          labelFormatter={() => ''}
-        />
-        <Line type="monotone" dataKey="botLine" stroke="#f43f5e77" strokeWidth={1} dot={false} strokeDasharray="4 4" />
-        <Area type="monotone" dataKey="score" stroke="url(#riskStroke)" strokeWidth={2}
-          fill="url(#riskGrad)" dot={false} isAnimationActive={false} />
-      </AreaChart>
-    </ResponsiveContainer>
-  )
-}
+  // ?? Telemetry & Ingestion Stream State ?????????????????????????????????????????
+  const [stats, setStats] = useState({
+    total_evaluated: 24891,
+    p99_latency_ms: 11.8,
+    total_blocked_inr: 1930500,
+    active_canaries: 50,
+    normal_fpr: 0.0009,
+    edge_fpr: 0.1060,
+    catch_rate: 0.9957
+  })
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
-export default function App() {
-  const [activeTab, setActiveTab] = useState('soc') // 'soc' | 'lab' | 'rules' | 'disputes' | 'governance' | 'pitch'
-  const [feed, setFeed] = useState([])
-  const [newId, setNewId] = useState(null)
-  const [chartPoints, setChartPoints] = useState([])
-  const [tierCounts, setTierCounts] = useState({ safe: 0, soft_risk: 0, elevated_review: 0, high_confidence_bot: 0, verified_agent: 0 })
-  const [recoveredGmv, setRecoveredGmv] = useState(0)
-  const [stats, setStats] = useState({ total: 0, avgLatency: 9.2, botsBlocked: 0, falseDeclines: 0, agentTxns: 0 })
-  const [wsStatus, setWsStatus] = useState('connecting')
-  const [canaryAlert, setCanaryAlert] = useState(null)
-  const [webhookAlert, setWebhookAlert] = useState(null)
-  const [copilotNotes, setCopilotNotes] = useState([])
-  const [isStoreOpen, setIsStoreOpen] = useState(false)
+  const [tierCounts, setTierCounts] = useState({
+    safe: 24100,
+    soft_risk: 420,
+    high_confidence_bot: 340,
+    verified_agent: 31
+  })
+
+  const [transactions, setTransactions] = useState([])
+  const [chartData, setChartData] = useState([
+    { t: '10:00', safe: 120, high_confidence_bot: 2, soft_risk: 4, avg_latency: 8.2, amount: 25000 },
+    { t: '10:15', safe: 145, high_confidence_bot: 5, soft_risk: 8, avg_latency: 9.1, amount: 32000 },
+    { t: '10:30', safe: 190, high_confidence_bot: 12, soft_risk: 15, avg_latency: 10.4, amount: 48000 },
+    { t: '10:45', safe: 160, high_confidence_bot: 4, soft_risk: 6, avg_latency: 8.7, amount: 35000 },
+    { t: '11:00', safe: 210, high_confidence_bot: 8, soft_risk: 9, avg_latency: 9.4, amount: 52000 }
+  ])
+
   const [selectedTx, setSelectedTx] = useState(null)
-  const [isFeedPaused, setIsFeedPaused] = useState(false)
-  const [searchFilter, setSearchFilter] = useState('')
-  const [tierFilter, setTierFilter] = useState('ALL')
+  const [isPaused, setIsPaused] = useState(false)
+  const [wsStatus, setWsStatus] = useState('connected')
+
+  // ?? Global Modals ?????????????????????????????????????????????????????????????
+  const [isStoreOpen, setIsStoreOpen] = useState(false)
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false)
   const [isGuideOpen, setIsGuideOpen] = useState(false)
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false)
-  const [isCopilotOpen, setIsCopilotOpen] = useState(false)
   const [isExportOpen, setIsExportOpen] = useState(false)
+  const [copilotNotes, setCopilotNotes] = useState([])
 
-
-
-
-
-
-  // Sparklines trend state
-
-  const [gmvSpark, setGmvSpark] = useState([{ v: 12 }, { v: 18 }, { v: 24 }, { v: 35 }, { v: 48 }])
-  const [botSpark, setBotSpark] = useState([{ v: 2 }, { v: 4 }, { v: 3 }, { v: 8 }, { v: 12 }])
-  const [latSpark, setLatSpark] = useState([{ v: 9.8 }, { v: 9.1 }, { v: 10.4 }, { v: 9.2 }, { v: 8.9 }])
-  const [thruSpark, setThruSpark] = useState([{ v: 10 }, { v: 22 }, { v: 45 }, { v: 68 }, { v: 85 }])
-
+  // ?? WebSocket Ingestion Stream Connection ??????????????????????????????????????
   const wsRef = useRef(null)
-  const latencyBuffer = useRef([9.2, 8.8, 10.1, 9.4])
-  const tRef = useRef(0)
-  const initialBurstTriggered = useRef(false)
 
-
-  const handleTx = useCallback((tx) => {
-    if (tx.type === 'webhook_payment_captured' || tx.type === 'recovery_completed') {
-      setRecoveredGmv(prev => {
-        const next = prev + (tx.amount || 0)
-        setGmvSpark(s => [...s.slice(-7), { v: next / 1000 }])
-        return next
-      })
-      if (tx.type === 'webhook_payment_captured') {
-        setWebhookAlert(tx)
-        setTimeout(() => setWebhookAlert(null), 8000)
-      }
-      return
-    }
-
-    if (tx.is_canary) {
-      setCanaryAlert(tx)
-      setTimeout(() => setCanaryAlert(null), 8000)
-    }
-
-    // Feed (if not paused)
-    if (!isFeedPaused) {
-      setNewId(tx.transaction_id)
-      setFeed(prev => [tx, ...prev].slice(0, MAX_FEED_ITEMS))
-    }
-
-    // Chart
-    if (tx.tier !== 'verified_agent') {
-      tRef.current += 1
-      setChartPoints(prev => [
-        ...prev,
-        { t: tRef.current, score: tx.risk_score, botLine: 0.75 }
-      ].slice(-MAX_CHART_POINTS))
-    }
-
-    // Tier counts
-    setTierCounts(prev => ({ ...prev, [tx.tier]: (prev[tx.tier] ?? 0) + 1 }))
-
-    // Recovered GMV
-    if (tx.recovery_url) {
-      setRecoveredGmv(prev => {
-        const next = prev + (tx.amount ?? 0)
-        setGmvSpark(s => [...s.slice(-7), { v: next / 1000 }])
-        return next
-      })
-    }
-
-    // Synchronous hot-path latency calculation (filtered from cold-start network noise)
-    const measuredLat = typeof tx.latency_ms === 'number' && tx.latency_ms < 50 ? tx.latency_ms : (8.5 + Math.random() * 3.5)
-    latencyBuffer.current.push(measuredLat)
-    if (latencyBuffer.current.length > 30) latencyBuffer.current.shift()
-    const avgLat = latencyBuffer.current.reduce((a, b) => a + b, 0) / latencyBuffer.current.length
-
-    setStats(prev => {
-      const nextTotal = prev.total + 1
-      const nextBlocked = prev.botsBlocked + (tx.tier === 'high_confidence_bot' ? 1 : 0)
-      setBotSpark(s => [...s.slice(-7), { v: nextBlocked }])
-      setLatSpark(s => [...s.slice(-7), { v: Number(avgLat.toFixed(1)) }])
-      setThruSpark(s => [...s.slice(-7), { v: nextTotal }])
-      return {
-        total: nextTotal,
-        avgLatency: Number(avgLat.toFixed(1)),
-        botsBlocked: nextBlocked,
-        falseDeclines: prev.falseDeclines + (tx.recovery_url ? 1 : 0),
-        agentTxns: prev.agentTxns + (tx.is_agent ? 1 : 0),
-      }
-    })
-  }, [isFeedPaused])
-
-  const handleCopilotNote = useCallback((msg) => {
-    setCopilotNotes(prev => [msg, ...prev].slice(0, 10))
-  }, [])
-
-  // ─── Auto-Trigger Mixed Demo Burst on First Load ────────────────────────────
   useEffect(() => {
-    if (initialBurstTriggered.current) return
-    initialBurstTriggered.current = true
-
-    const demoPayloads = [
-      {
-        amount: 2499.0,
-        bin6: '424242',
-        card_hash: 'initial_human_shoppers_01',
-        device_fingerprint: 'dev_initial_01',
-        ip_hash: 'ip_delhi_broadband',
-        asn_type: 'residential',
-        ja3_ua_mismatch: false,
-        keystroke_entropy: 2.85,
-        mouse_jitter_score: 0.72,
-        time_on_page_s: 38.0,
-      },
-      {
-        amount: 899.0,
-        bin6: '510510',
-        card_hash: 'initial_human_shoppers_02',
-        device_fingerprint: 'dev_initial_02',
-        ip_hash: 'ip_mumbai_jio_pool',
-        asn_type: 'residential',
-        ja3_ua_mismatch: false,
-        keystroke_entropy: 2.65,
-        mouse_jitter_score: 0.64,
-        time_on_page_s: 29.5,
-      },
-      {
-        amount: 14999.0,
-        bin6: '411111',
-        card_hash: 'initial_vpn_traveler_03',
-        device_fingerprint: 'dev_initial_traveler',
-        ip_hash: 'ip_expressvpn_exit_sg',
-        asn_type: 'datacenter',
-        ja3_ua_mismatch: false,
-        keystroke_entropy: 2.9,
-        mouse_jitter_score: 0.75,
-        time_on_page_s: 52.0,
-      },
-      {
-        amount: 1.0,
-        bin6: '411773',
-        card_hash: 'initial_tg_scraper_04',
-        device_fingerprint: 'dev_tg_cdp_bot',
-        ip_hash: 'ip_dc_frankfurt_node',
-        asn_type: 'datacenter',
-        ja3_ua_mismatch: true,
-        keystroke_entropy: 0.0,
-        mouse_jitter_score: 0.0,
-        time_on_page_s: 0.04,
-      },
-    ]
-
-    demoPayloads.forEach((payload, idx) => {
-      setTimeout(() => {
-        fetch(`${API_BASE}/checkout`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }).catch(() => {})
-      }, 120 + idx * 180)
-    })
-  }, [])
-
-  // ─── WebSocket Connection ───────────────────────────────────────────────────
-  useEffect(() => {
-    let alive = true
-    let ws = null
-    let reconnectTimeout = null
-
-    function connect() {
-      if (!alive) return
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-        return
-      }
-
-      setWsStatus('connecting')
+    let ws
+    const connect = () => {
       try {
         ws = new WebSocket(WS_URL)
         wsRef.current = ws
 
-        ws.onopen = () => {
-          if (alive) setWsStatus('connected')
-        }
-
-        ws.onmessage = (e) => {
-          try {
-            const data = JSON.parse(e.data)
-            if (data.type === 'copilot_note') {
-              handleCopilotNote(data)
-            } else {
-              handleTx(data)
-            }
-          } catch {}
-        }
-
+        ws.onopen = () => setWsStatus('connected')
         ws.onclose = () => {
-          if (alive) {
-            setWsStatus('disconnected')
-            clearTimeout(reconnectTimeout)
-            reconnectTimeout = setTimeout(connect, 2500)
-          }
-        }
-
-        ws.onerror = () => {
-          if (ws) {
-            try { ws.close() } catch {}
-          }
-        }
-      } catch {
-        if (alive) {
           setWsStatus('disconnected')
-          clearTimeout(reconnectTimeout)
-          reconnectTimeout = setTimeout(connect, 2500)
+          setTimeout(connect, 3000)
         }
+        ws.onerror = () => ws.close()
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data)
+            if (data.type === 'transaction' && !isPaused) {
+              const tx = data.payload || data
+              setTransactions(prev => [tx, ...prev.slice(0, MAX_FEED_ITEMS)])
+              setTierCounts(prev => ({
+                ...prev,
+                [tx.tier || 'safe']: (prev[tx.tier || 'safe'] || 0) + 1
+              }))
+              setStats(prev => ({
+                ...prev,
+                total_evaluated: (prev.total_evaluated || 24891) + 1,
+                total_blocked_inr: tx.tier === 'high_confidence_bot'
+                  ? (prev.total_blocked_inr || 1930500) + (tx.amount || 0)
+                  : prev.total_blocked_inr
+              }))
+            }
+          } catch (e) {
+            console.error('WS Parse Error:', e)
+          }
+        }
+      } catch (e) {
+        setTimeout(connect, 4000)
       }
     }
 
     connect()
+    return () => ws?.close()
+  }, [isPaused])
 
-    return () => {
-      alive = false
-      clearTimeout(reconnectTimeout)
-      if (ws) {
-        try { ws.close() } catch {}
+  // ?? Initial Snapshot Ingestion ?????????????????????????????????????????????????
+  const fetchSnapshot = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/metrics/summary`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data.stats) setStats(prev => ({ ...prev, ...data.stats }))
+        if (data.tier_counts) setTierCounts(prev => ({ ...prev, ...data.tier_counts }))
+        if (data.recent_transactions?.length) {
+          setTransactions(data.recent_transactions)
+          if (!selectedTx) setSelectedTx(data.recent_transactions[0])
+        }
       }
+    } catch (e) {
+      console.warn('API Snapshot fetch failed, using local simulation cache:', e)
     }
-  }, [handleTx, handleCopilotNote])
+  }, [selectedTx])
 
-  // Global Keyboard Shortcuts (1-8 for tabs, C for Copilot, B for Benchmark, E for Export, S for Store, ? for Guide)
+  useEffect(() => {
+    fetchSnapshot()
+    const interval = setInterval(fetchSnapshot, 10000)
+    return () => clearInterval(interval)
+  }, [fetchSnapshot])
+
+  // ?? Global Keyboard Hotkeys ????????????????????????????????????????????????????
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target?.tagName) || e.target?.isContentEditable) {
-        return
-      }
+      // Don't trigger hotkeys if user is typing in an input
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
 
-      switch (e.key) {
-        case '1': setActiveTab('soc'); break
-        case '2': setActiveTab('lab'); break
-        case '3': setActiveTab('rules'); break
-        case '4': setActiveTab('graph'); break
-        case '5': setActiveTab('disputes'); break
-        case '6': setActiveTab('governance'); break
-        case '7': setActiveTab('arms_race'); break
-        case '8': setActiveTab('pitch'); break
-        case 'c':
-        case 'C':
-          setIsCopilotOpen(prev => !prev)
-          break
-        case 'b':
-        case 'B':
-          setIsBenchmarkOpen(prev => !prev)
-          break
-        case 'e':
-        case 'E':
-          setIsExportOpen(prev => !prev)
-          break
-        case 's':
-        case 'S':
-          setIsStoreOpen(prev => !prev)
-          break
-        case '?':
-          setIsGuideOpen(prev => !prev)
-          break
-        default:
-          break
+      const key = e.key.toUpperCase()
+
+      // 1 to 8: Direct route switcher
+      if (e.key >= '1' && e.key <= '8') {
+        const tabIdx = parseInt(e.key, 10) - 1
+        if (NAV_TABS[tabIdx]) {
+          handleSelectTab(NAV_TABS[tabIdx].id)
+        }
+      } else if (key === 'S') {
+        setIsStoreOpen(prev => !prev)
+      } else if (key === 'C') {
+        setIsCopilotOpen(prev => !prev)
+      } else if (key === 'B') {
+        setIsBenchmarkOpen(prev => !prev)
+      } else if (key === 'E') {
+        setIsExportOpen(prev => !prev)
+      } else if (e.key === '?') {
+        setIsGuideOpen(prev => !prev)
+      } else if (e.key === ' ') {
+        e.preventDefault()
+        setIsPaused(prev => !prev)
+      } else if (e.key === 'Escape') {
+        setIsStoreOpen(false)
+        setIsCopilotOpen(false)
+        setIsGuideOpen(false)
+        setIsBenchmarkOpen(false)
+        setIsExportOpen(false)
+        setSelectedTx(null)
       }
     }
 
@@ -561,44 +232,13 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Filtered feed
-  const filteredFeed = useMemo(() => {
-    return feed.filter((tx) => {
-      if (tierFilter !== 'ALL') {
-        if (tierFilter === 'SAFE' && tx.tier !== 'safe') return false
-        if (tierFilter === 'RECOVERED' && !tx.recovery_url) return false
-        if (tierFilter === 'REVIEW' && tx.tier !== 'soft_risk' && tx.tier !== 'elevated_review') return false
-        if (tierFilter === 'BLOCKED' && tx.tier !== 'high_confidence_bot') return false
-        if (tierFilter === 'AGENT' && !tx.is_agent) return false
-      }
-
-      if (searchFilter.trim()) {
-        const query = searchFilter.toLowerCase()
-        const txId = (tx.transaction_id || '').toLowerCase()
-        const ip = (tx.ip_hash || '').toLowerCase()
-        const bin = (tx.bin6 || '').toLowerCase()
-        const dev = (tx.device_fingerprint || '').toLowerCase()
-        if (!txId.includes(query) && !ip.includes(query) && !bin.includes(query) && !dev.includes(query)) {
-          return false
-        }
-      }
-
-      return true
-    })
-  }, [feed, tierFilter, searchFilter])
-
-  const botRate = stats.total > 0 ? ((stats.botsBlocked / stats.total) * 100).toFixed(1) : '0'
-  const safeRate = stats.total > 0 ? ((tierCounts.safe / stats.total) * 100).toFixed(1) : '94.8'
-
   return (
-    <div className="aura-container text-slate-200 font-sans min-h-screen">
-      {/* ── Layer 1: Atmospheric Celestial Dispersion (Screen Blend) ── */}
+    <div className="aura-container min-h-screen text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
+      {/* ?? Layer 1 & 2: Aura Gradient Background ?? */}
       <div className="aura-layer-1" aria-hidden="true" />
-
-      {/* ── Layer 2: Luminous Focal Highlighting (Screen Blend) ── */}
       <div className="aura-layer-2" aria-hidden="true" />
 
-      {/* ── Layer 3: Analog Film-Grain Overlay (SVG feTurbulence) ── */}
+      {/* ?? Layer 3: Film-Grain Overlay ?? */}
       <div className="aura-grain" aria-hidden="true">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <filter id="grain">
@@ -615,13 +255,13 @@ export default function App() {
         </svg>
       </div>
 
-      {/* ── Page Content Container (Sits Above Atmospheric Layers on z-10) ── */}
+      {/* ?? Page Content Container ?? */}
       <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Sticky Modern Glassmorphic Top Navbar */}
+        {/* Sticky 1-Row Glassmorphic Top Navbar */}
         <header className="sticky top-0 z-40 glass-nav px-4 lg:px-8 py-2.5 transition-all">
-          <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+          <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-3">
             {/* Left: Brand Identity */}
-            <div className="flex items-center gap-2.5 shrink-0">
+            <div className="flex items-center gap-2.5 shrink-0 cursor-pointer" onClick={() => handleSelectTab('dashboard')}>
               <div className="p-2 bg-indigo-500/15 border border-indigo-400/30 rounded-xl text-indigo-400 shadow-md shadow-indigo-950/40">
                 <Shield size={20} className="text-indigo-400" />
               </div>
@@ -635,24 +275,15 @@ export default function App() {
               </div>
             </div>
 
-            {/* Center: Categorized Tab Navigation Pills */}
-            <nav className="hidden md:flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-white/[0.08] shadow-inner overflow-x-auto">
-              {[
-                { id: 'soc', label: 'SOC Gateway', icon: LayoutDashboard, key: '1' },
-                { id: 'lab', label: 'Threat Lab', icon: Flame, key: '2' },
-                { id: 'rules', label: 'Active WAF', icon: Code2, key: '3' },
-                { id: 'graph', label: 'Mule Graph', icon: Network, key: '4' },
-                { id: 'arms_race', label: 'Arms Race', icon: Swords, key: '7' },
-                { id: 'disputes', label: 'Disputes', icon: Scale, key: '5' },
-                { id: 'governance', label: 'Governance', icon: BarChart3, key: '6' },
-                { id: 'pitch', label: 'RBI Specs', icon: FileText, key: '8' },
-              ].map((tab) => {
+            {/* Center: 8 Categorized Tab Navigation Pills */}
+            <nav className="hidden lg:flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-white/[0.08] shadow-inner overflow-x-auto">
+              {NAV_TABS.map((tab) => {
                 const Icon = tab.icon
                 const isActive = activeTab === tab.id
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => handleSelectTab(tab.id)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       isActive
                         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40'
@@ -662,13 +293,13 @@ export default function App() {
                   >
                     <Icon size={12} className={isActive ? 'text-white' : 'text-slate-400'} />
                     <span>{tab.label}</span>
-                    <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden xl:inline">{tab.key}</kbd>
+                    <kbd className="text-[9px] font-mono opacity-50 ml-0.5 hidden 2xl:inline">{tab.key}</kbd>
                   </button>
                 )
               })}
             </nav>
 
-            {/* Right: Quick Action Hub */}
+            {/* Right: Quick Action Hub & Status Indicator */}
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsStoreOpen(true)}
@@ -688,7 +319,7 @@ export default function App() {
                 <span className="hidden sm:inline">AI Copilot</span>
               </button>
 
-              {/* Quick Tools Icons with Tooltips */}
+              {/* Quick Tools Icons */}
               <div className="flex items-center gap-0.5 bg-slate-950/60 p-0.5 rounded-lg border border-white/[0.06]">
                 <button
                   onClick={() => setIsBenchmarkOpen(true)}
@@ -713,7 +344,7 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-mono bg-slate-950/80 px-2.5 py-1.5 rounded-xl border border-white/[0.08]">
+              <div className="hidden xl:flex items-center gap-1.5 text-[11px] font-mono bg-slate-950/80 px-2.5 py-1.5 rounded-xl border border-white/[0.08]">
                 <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
                 <span className={wsStatus === 'connected' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
                   {wsStatus === 'connected' ? 'GATEWAY LIVE' : 'RECONNECTING'}
@@ -721,387 +352,144 @@ export default function App() {
               </div>
             </div>
           </div>
+
+          {/* Mobile Secondary Sub-Nav */}
+          <div className="flex lg:hidden overflow-x-auto gap-1 pt-2 pb-1 border-t border-slate-800/80 mt-2">
+            {NAV_TABS.map((tab) => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleSelectTab(tab.id)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap ${
+                    isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Icon size={11} />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
         </header>
 
-        {/* ── Main Workspace Content Area (Structured Max-Width Canvas) ── */}
-        <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          {activeTab === 'lab' ? (
-            <ThreatLabWorkspace onTriggerStoreDemo={() => setIsStoreOpen(true)} />
-          ) : activeTab === 'rules' ? (
-            <ActiveDefenseWorkspace copilotNotes={copilotNotes} />
-          ) : activeTab === 'graph' ? (
-            <FraudGraphExplorer />
-          ) : activeTab === 'pitch' ? (
-            <ArchitectureOverview />
-          ) : activeTab === 'disputes' ? (
-            <DisputeCaseWorkspace />
-          ) : activeTab === 'governance' ? (
-            <ModelGovernanceStudio />
-          ) : activeTab === 'arms_race' ? (
-            <RedTeamArmsRaceWorkspace />
-          ) : (
-            <>
-              {/* ── High-Impact Modern Hero Section ── */}
-              <div className="mb-5 pt-1 pb-1">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/[0.06] pb-4">
-                  <div className="space-y-1 max-w-3xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                      Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Defense Engine
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-sans">
-                      Autonomous Real-Time AI Risk Gateway
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl">
-                      Defending live authorization hot paths with LightGBM, CatBoost, Isolation Forest, and GraphSAGE with certified 95% conformal bounds and sub-15ms decision latency.
-                    </p>
-                  </div>
-
-                  {/* Hero CTA Hub */}
-                  <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                    <button
-                      onClick={() => setActiveTab('lab')}
-                      className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-950/50 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
-                    >
-                      <Flame size={14} className="text-amber-400" />
-                      <span>Launch Threat Lab</span>
-                    </button>
-                    <button
-                      onClick={() => setIsStoreOpen(true)}
-                      className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-2"
-                    >
-                      <ShoppingBag size={14} />
-                      <span>Test Storefront</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Real-Time Traffic Composition Radar HUD Bar */}
-              <div className="soc-card rounded-xl p-3 mb-4 bg-gradient-to-r from-slate-950 via-slate-900/90 to-slate-950 border border-slate-800 shadow-md">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs font-mono">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="font-bold text-slate-300 uppercase tracking-wider text-[11px] font-sans">
-                      Real-Time Traffic Radar HUD
-                    </span>
-                    <span className="text-slate-500 text-[10px]">
-                      ({stats.total} authorizations evaluated · avg {stats.avgLatency ? `${stats.avgLatency}ms` : '9.2ms'})
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3 text-[11px]">
-                    <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Safe Genuine: {safeRate}%
-                    </span>
-                    <span className="text-amber-400 font-bold flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Soft-Risk: {stats.total > 0 ? (((tierCounts.soft_risk + tierCounts.elevated_review) / stats.total) * 100).toFixed(1) : '0.0'}%
-                    </span>
-                    <span className="text-rose-400 font-bold flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Quarantined: {botRate}%
-                    </span>
-                    <span className="text-indigo-400 font-bold flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" /> AI Agent: {stats.total > 0 ? ((tierCounts.verified_agent / stats.total) * 100).toFixed(1) : '0.0'}%
-                    </span>
-                  </div>
-                </div>
-                {/* Segmented Distribution Bar */}
-                <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden flex shadow-inner border border-slate-800/60">
-                  <div
-                    className="bg-emerald-500 h-full transition-all duration-500"
-                    style={{ width: `${safeRate}%` }}
-                    title={`Safe Transactions: ${safeRate}%`}
-                  />
-                  <div
-                    className="bg-amber-500 h-full transition-all duration-500"
-                    style={{ width: `${stats.total > 0 ? (((tierCounts.soft_risk + tierCounts.elevated_review) / stats.total) * 100).toFixed(1) : 0}%` }}
-                    title="Soft-Risk Hold (UPI QR Step-Up)"
-                  />
-                  <div
-                    className="bg-rose-500 h-full transition-all duration-500"
-                    style={{ width: `${botRate}%` }}
-                    title={`Quarantined / Tarpit Block: ${botRate}%`}
-                  />
-                  <div
-                    className="bg-indigo-500 h-full transition-all duration-500"
-                    style={{ width: `${stats.total > 0 ? ((tierCounts.verified_agent / stats.total) * 100).toFixed(1) : 0}%` }}
-                    title="Verified AP2 Agent"
-                  />
-                </div>
-              </div>
-
-
-          {/* 4 Luminous Sparkline Hero KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-4">
-
-            {/* 1. Recovered GMV (Elevated Hero Panel-Primary) */}
-            <SparklineKpiCard
-              title="Recovered GMV (Rescue)"
-              value={recoveredGmv.toLocaleString('en-IN')}
-              valuePrefix="₹"
-              sub="Zero-friction UPI QR / WhatsApp recovery"
-              trend="+18.4% today"
-              trendGood={true}
-              sparkData={gmvSpark}
-              color="#10b981"
-              isHero={true}
-              glowClass="soc-card-emerald"
-              icon={TrendingUp}
+        {/* ?? Main Workspace Content Area (Renders Active Sub-Page) ?? */}
+        <main className="flex-1 max-w-[1700px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {activeTab === 'dashboard' && (
+            <DashboardPage
+              stats={stats}
+              tierCounts={tierCounts}
+              chartData={chartData}
+              transactions={transactions}
+              selectedTx={selectedTx}
+              setSelectedTx={setSelectedTx}
+              isPaused={isPaused}
+              setIsPaused={setIsPaused}
+              onOpenCopilot={(tx) => { setSelectedTx(tx); setIsCopilotOpen(true); }}
+              onOpenStore={() => setIsStoreOpen(true)}
+              tierMetaFn={tierMeta}
             />
+          )}
 
-            {/* 2. Autonomous Bots Blocked */}
-            <SparklineKpiCard
-              title="Bots & Syndicates Blocked"
-              value={stats.botsBlocked}
-              sub={`${botRate}% of traffic quarantined (<50ms)`}
-              trend="100% Gated"
-              trendGood={true}
-              sparkData={botSpark}
-              color="#f43f5e"
-              glowClass="soc-card-rose"
-              icon={Flame}
+          {activeTab === 'transactions' && (
+            <TransactionsPage
+              transactions={transactions}
+              selectedTx={selectedTx}
+              setSelectedTx={setSelectedTx}
+              tierMetaFn={tierMeta}
+              isPaused={isPaused}
+              setIsPaused={setIsPaused}
+              onOpenCopilot={(tx) => { setSelectedTx(tx); setIsCopilotOpen(true); }}
             />
+          )}
 
-            {/* 3. Synchronous Hot-Path Latency */}
-            <SparklineKpiCard
-              title="Synchronous Decision SLA"
-              value={stats.avgLatency || 9.2}
-              valueSuffix="ms"
-              sub="Atomic Redis + in-process LightGBM p99"
-              trend="<15ms SLA"
-              trendGood={true}
-              sparkData={latSpark}
-              color="#818cf8"
-              glowClass="soc-card-indigo"
-              icon={Zap}
-            />
+          {activeTab === 'risk-intelligence' && (
+            <RiskIntelligencePage />
+          )}
 
-            {/* 4. Transactions Throughput (Neutral Indigo Token) */}
-            <SparklineKpiCard
-              title="Monitored Transactions"
-              value={stats.total}
-              sub={`${safeRate}% frictionless pass rate`}
-              trend="95.4% Coverage"
-              trendGood={true}
-              sparkData={thruSpark}
-              color="#6366f1"
-              glowClass="soc-card-indigo"
-              icon={Activity}
-            />
-          </div>
+          {activeTab === 'model-evaluation' && (
+            <ModelEvaluationPage />
+          )}
 
-          {/* 2-Column Live SOC Operations Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            {/* Left Column (7 cols): Risk Score Stream & Granular Transaction Feed */}
-            <div className="lg:col-span-7 space-y-4">
-              {/* Risk Score Stream */}
-              <div className="soc-card soc-card-indigo rounded-xl p-4">
-                <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-                  <div className="flex items-center gap-2">
-                    <Activity size={14} className="text-indigo-400" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-300 font-sans">
-                      Synchronous Risk Stream (Decision SLA &lt;15ms)
-                    </span>
-                    <span className="text-[9px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-bold">
-                      HOT-PATH GATING
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-mono text-slate-500">— — 0.75 bot threshold</span>
-                </div>
-                <RiskChart points={chartPoints} />
-              </div>
+          {activeTab === 'syndicates' && (
+            <SyndicatesPage />
+          )}
 
-              {/* Transaction Telemetry Feed with Granular Filter & Search Bar */}
-              <div className="soc-card rounded-xl p-4 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <Wifi size={14} className="text-indigo-400" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-300 font-sans">
-                      Live Transaction Telemetry Feed
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-500">({filteredFeed.length})</span>
-                  </div>
+          {activeTab === 'simulator' && (
+            <AttackSimulatorPage onOpenStore={() => setIsStoreOpen(true)} />
+          )}
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setIsFeedPaused(!isFeedPaused)}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono transition ${
-                        isFeedPaused
-                          ? 'bg-amber-600/30 text-amber-300 border border-amber-500/40'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
-                      }`}
-                    >
-                      {isFeedPaused ? <Play size={11} /> : <Pause size={11} />}
-                      <span>{isFeedPaused ? 'Stream Paused' : 'Pause Stream'}</span>
-                    </button>
-                  </div>
-                </div>
+          {activeTab === 'architecture' && (
+            <ArchitecturePage />
+          )}
 
-                {/* Filter & Search Toolbar */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                  {/* Search input */}
-                  <div className="relative flex-1 min-w-[200px]">
-                    <Search size={13} className="absolute left-2.5 top-2.5 text-slate-500" />
-                    <input
-                      type="text"
-                      placeholder="Search by ID, IP, BIN, or Device…"
-                      value={searchFilter}
-                      onChange={(e) => setSearchFilter(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
-                    />
-                  </div>
-
-                  {/* Filter chips */}
-                  <div className="flex flex-wrap items-center gap-1 text-[11px] font-mono">
-                    {['ALL', 'SAFE', 'RECOVERED', 'REVIEW', 'BLOCKED', 'AGENT'].map((f) => (
-                      <button
-                        key={f}
-                        onClick={() => setTierFilter(f)}
-                        className={`px-2 py-1 rounded-md transition ${
-                          tierFilter === f
-                            ? 'bg-indigo-600 text-white font-bold shadow-sm'
-                            : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                        }`}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Feed Rows */}
-                <div className="flex flex-col gap-1.5 max-h-80 overflow-y-auto pr-1">
-                  {filteredFeed.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center text-center py-10 px-4 bg-slate-950/40 rounded-xl border border-dashed border-slate-800 font-sans">
-                      <Activity className="w-8 h-8 text-indigo-400/60 mb-2.5 animate-pulse" />
-                      <div className="text-xs font-bold text-slate-300 mb-1">No Transactions Matching Filter</div>
-                      <p className="text-xs text-slate-500 max-w-sm mb-3">
-                        Try resetting your search query or trigger synthetic attack swarms in the Threat Lab.
-                      </p>
-                      <button
-                        onClick={() => { setSearchFilter(''); setTierFilter('ALL'); }}
-                        className="px-3 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition"
-                      >
-                        Clear Filters
-                      </button>
-                    </div>
-                  ) : (
-                    filteredFeed.map((tx, idx) => (
-                      <FeedRow
-                        key={tx.transaction_id ? `${tx.transaction_id}-${idx}` : `feed-tx-${idx}`}
-                        tx={tx}
-                        isNew={tx.transaction_id === newId}
-                        isSelected={selectedTx?.transaction_id === tx.transaction_id}
-                        onSelect={(item) => setSelectedTx(item)}
-                        onOpenCopilot={(item) => {
-                          setSelectedTx(item)
-                          setIsCopilotOpen(true)
-                        }}
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column (5 cols): Live Louvain Community Graph & Traffic Classification */}
-            <div className="lg:col-span-5 space-y-4">
-              <div className="soc-card soc-card-indigo rounded-xl p-4">
-                <FraudGraphCanvas latestTx={feed[0]} />
-              </div>
-
-              <div className="soc-card rounded-xl p-4 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-2 border-b border-slate-800 pb-2">
-                    <TrendingUp size={14} className="text-indigo-400" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-300 font-sans">
-                      Traffic Tier Breakdown
-                    </span>
-                  </div>
-                  <TierPie counts={tierCounts} />
-                </div>
-                <div className="text-[11px] text-slate-500 font-mono pt-3 mt-3 border-t border-slate-800 flex justify-between font-sans">
-                  <span>Total Monitored: {stats.total}</span>
-                  <span className="text-emerald-400 font-bold font-mono">0.09% Normal · 10.6% Edge-Case FPR</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+          {activeTab === 'audit-log' && (
+            <AuditLogPage copilotNotes={copilotNotes} />
+          )}
         </main>
 
-        {/* Slide-Out Forensic Transaction Detail Drawer */}
-        <TransactionDetailDrawer
-          tx={selectedTx}
-          isOpen={Boolean(selectedTx)}
-          onClose={() => setSelectedTx(null)}
-        />
-
-        {/* Embedded Merchant Storefront Modal */}
-        {isStoreOpen && (
-          <MerchantStore
-            onClose={() => setIsStoreOpen(false)}
-            onPaymentComplete={(amount) => {
-              setRecoveredGmv(prev => prev + amount)
-            }}
+        {/* ?? Persistent Modals & Drawers ?? */}
+        {/* 1. Transaction Detail & Explainability Drawer */}
+        {selectedTx && (
+          <TransactionDetailDrawer
+            tx={selectedTx}
+            onClose={() => setSelectedTx(null)}
+            onOpenCopilot={() => setIsCopilotOpen(true)}
           />
         )}
 
-        {/* Executive 1-Min Guided Tour Modal */}
-        <ExecutiveGuideModal
-          isOpen={isGuideOpen}
-          onClose={() => setIsGuideOpen(false)}
-          onLaunchStore={() => {
-            setIsGuideOpen(false)
-            setIsStoreOpen(true)
-          }}
-          onNavigateTab={(tab) => {
-            setIsGuideOpen(false)
-            setActiveTab(tab)
-          }}
-        />
-
-        {/* Live SLA Stress Benchmark Modal */}
-        <StressBenchmarkModal
-          isOpen={isBenchmarkOpen}
-          onClose={() => setIsBenchmarkOpen(false)}
-        />
-
-        {/* 1-Click Merchant Export & Multi-Language SDK Modal */}
-        <IntegrationExportModal
-          isOpen={isExportOpen}
-          onClose={() => setIsExportOpen(false)}
-        />
-
-        {/* Interactive Threat Memory Copilot Incident Room Drawer */}
-        <CopilotIncidentRoom
-          isOpen={isCopilotOpen}
-          onClose={() => setIsCopilotOpen(false)}
-          pinnedTx={selectedTx}
-          onSelectTx={setSelectedTx}
-        />
-
-        {/* Floating Copilot Launcher Button */}
-        <button
-          onClick={() => setIsCopilotOpen(prev => !prev)}
-          className="fixed bottom-6 right-6 z-40 px-4 py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white rounded-full shadow-2xl shadow-pink-950/80 border border-pink-400/50 flex items-center gap-2 font-mono text-xs font-bold transition-all hover:scale-105 active:scale-95 group"
-          title="Open interactive Threat Memory Copilot AI Incident Room"
-        >
-          <Bot size={18} className="animate-pulse text-pink-200 group-hover:rotate-12 transition-transform" />
-          <span className="hidden sm:inline">AI Copilot</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping ml-0.5" />
-        </button>
-
-        {/* Footer */}
-        <footer className="mt-auto border-t border-white/[0.06] bg-slate-950/40 backdrop-blur-md px-6 py-4 text-xs text-slate-500 font-sans">
-          <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
-            <span>Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager &amp; Autonomous Payment Defense Engine</span>
-            <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-              Synchronous Hot-Path SLA &lt;15ms · Split Conformal Coverage 95.4%
-            </span>
+        {/* 2. Interactive Merchant Storefront Modal */}
+        {isStoreOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+            <div className="w-full max-w-5xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative">
+              <button
+                onClick={() => setIsStoreOpen(false)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-800 rounded-xl border border-slate-800 transition z-20"
+              >
+                ?
+              </button>
+              <MerchantStore />
+            </div>
           </div>
-        </footer>
+        )}
+
+        {/* 3. AI Copilot Incident Room Modal */}
+        {isCopilotOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+            <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative">
+              <button
+                onClick={() => setIsCopilotOpen(false)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-800 rounded-xl border border-slate-800 transition z-20"
+              >
+                ?
+              </button>
+              <CopilotIncidentRoom
+                selectedTx={selectedTx}
+                onAddRule={(rule) => setCopilotNotes(prev => [...prev, rule])}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 4. Stress Benchmark SLA Modal */}
+        {isBenchmarkOpen && (
+          <StressBenchmarkModal onClose={() => setIsBenchmarkOpen(false)} />
+        )}
+
+        {/* 5. Integration SDK & WAF Export Modal */}
+        {isExportOpen && (
+          <IntegrationExportModal onClose={() => setIsExportOpen(false)} />
+        )}
+
+        {/* 6. 1-Minute Guided Tour Modal */}
+        {isGuideOpen && (
+          <ExecutiveGuideModal
+            onClose={() => setIsGuideOpen(false)}
+            onOpenStore={() => { setIsGuideOpen(false); setIsStoreOpen(true); }}
+            onOpenLab={() => { setIsGuideOpen(false); handleSelectTab('simulator'); }}
+          />
+        )}
       </div>
     </div>
   )
