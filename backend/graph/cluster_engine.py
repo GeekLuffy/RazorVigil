@@ -319,13 +319,32 @@ class ClusterEngine:
             3: "Rotating SOCKS5 Proxy Farm",
         }
         for cid, count in cluster_counts.items():
+            c_nodes = [n for n in nodes_list if n["cluster_id"] == cid]
+            cards = [n["id"] for n in c_nodes if n["type"] == "card"]
+            devices = [n["id"] for n in c_nodes if n["type"] == "device"]
+            ips = [n["label"] for n in c_nodes if n["type"] == "ip"]
+            agents = [n["id"] for n in c_nodes if n["type"] == "agent"]
+
+            is_threat = cid in (1, 2) or len(cards) >= 3
+            est_gmv = (len(cards) * 45000 + len(devices) * 35000) if is_threat else (count * 4999)
+            waf_ips = " ".join([ip for ip in ips if "." in ip][:5])
+            waf_rule = f'(http.request.uri.path eq "/checkout" and ip.src in {{{waf_ips}}})' if waf_ips else '(http.request.uri.path eq "/checkout")'
+
             clusters_meta.append({
                 "cluster_id": cid,
                 "name": cluster_names.get(cid, f"Community Ring #{cid}"),
                 "node_count": count,
-                "threat_level": "CRITICAL" if cid in (1, 2) else ("MEDIUM" if cid == 3 else "SAFE"),
+                "threat_level": "CRITICAL" if cid in (1, 2) else ("HIGH" if is_threat else "SAFE"),
                 "is_quarantined": cid in self._quarantined_clusters,
+                "card_count": len(cards),
+                "device_count": len(devices),
+                "ip_count": len(ips),
+                "agent_count": len(agents),
+                "estimated_at_risk_gmv": est_gmv,
+                "velocity_qps": round(14.8 if is_threat else 0.9, 1),
+                "waf_rule": waf_rule,
             })
+
 
         return {
             "nodes": nodes_list,
