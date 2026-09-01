@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react'
 import {
   Search, Filter, Download, ChevronRight, RefreshCw,
   ShieldAlert, ShieldCheck, AlertTriangle, Bot, ArrowUpDown, Layers,
-  ExternalLink, Eye, Play, Pause, Zap, CheckCircle2, Shield
+  ExternalLink, Eye, Play, Pause, Zap, CheckCircle2, Shield, ShoppingBag,
+  CreditCard, MapPin, Globe, User, Radio
 } from 'lucide-react'
 
 function fmt(n) { return typeof n === 'number' ? n.toFixed(3) : '?' }
@@ -20,8 +21,7 @@ export default function TransactionsPage({
   const [filterTier, setFilterTier] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
   const [methodFilter, setMethodFilter] = useState('ALL')
-  const [sortField, setSortField] = useState('timestamp')
-  const [sortOrder, setSortOrder] = useState('desc')
+  const [merchantFilter, setMerchantFilter] = useState('ALL')
 
   // Calculate Quick Stats
   const totalCount = transactions.length
@@ -39,6 +39,7 @@ export default function TransactionsPage({
       }
 
       if (methodFilter !== 'ALL' && (tx.payment_method || 'CARD') !== methodFilter) return false
+      if (merchantFilter !== 'ALL' && tx.merchant_name !== merchantFilter) return false
 
       if (searchQuery) {
         const q = searchQuery.toLowerCase()
@@ -46,25 +47,37 @@ export default function TransactionsPage({
         const ip = (tx.ip_address || '').toLowerCase()
         const bin = (tx.bin6 || '').toLowerCase()
         const user = (tx.user_id || '').toLowerCase()
+        const cust = (tx.customer_name || '').toLowerCase()
+        const city = (tx.user_city || '').toLowerCase()
+        const merch = (tx.merchant_name || '').toLowerCase()
+        const bank = (tx.card_bank || '').toLowerCase()
         const exp = (tx.explanation || '').toLowerCase()
-        if (!id.includes(q) && !ip.includes(q) && !bin.includes(q) && !user.includes(q) && !exp.includes(q)) return false
+        if (
+          !id.includes(q) && !ip.includes(q) && !bin.includes(q) &&
+          !user.includes(q) && !cust.includes(q) && !city.includes(q) &&
+          !merch.includes(q) && !bank.includes(q) && !exp.includes(q)
+        ) return false
       }
       return true
     })
-  }, [transactions, filterTier, methodFilter, searchQuery])
+  }, [transactions, filterTier, methodFilter, merchantFilter, searchQuery])
 
   const handleExportCSV = () => {
     if (!filtered.length) return
-    const headers = ['TransactionID', 'LatencyMs', 'Tier', 'RiskScore', 'Amount', 'PaymentMethod', 'BIN', 'IP', 'Canary', 'Agent', 'Explanation']
+    const headers = ['TransactionID', 'LatencyMs', 'Tier', 'RiskScore', 'Amount', 'Merchant', 'Customer', 'City', 'BankInstrument', 'PaymentMethod', 'IP', 'ISPNetwork', 'Canary', 'Agent', 'Explanation']
     const rows = filtered.map(t => [
       t.transaction_id,
       t.latency_ms,
       t.tier,
       t.risk_score,
       t.amount || 0,
+      `"${t.merchant_name || 'Razorpay Merchant'}"`,
+      `"${t.customer_name || 'Customer'}"`,
+      `"${t.user_city || 'India'}"`,
+      `"${t.card_name || t.card_bank || 'Card'}"`,
       t.payment_method || 'CARD',
-      t.bin6 || '',
       t.ip_address || '',
+      `"${t.isp_network || 'ISP'}"`,
       t.is_canary ? 'YES' : 'NO',
       t.is_agent ? 'YES' : 'NO',
       `"${(t.explanation || '').replace(/"/g, '""')}"`
@@ -73,7 +86,7 @@ export default function TransactionsPage({
     const encodedUri = encodeURI(csvContent)
     const link = document.createElement('a')
     link.setAttribute('href', encodedUri)
-    link.setAttribute('download', `razorshield_transactions_${Date.now()}.csv`)
+    link.setAttribute('download', `razorshield_indian_fintech_transactions_${Date.now()}.csv`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -91,7 +104,7 @@ export default function TransactionsPage({
             </span>
           </h1>
           <p className="text-xs text-slate-400 font-sans mt-0.5">
-            Real-time immutable audit trail of payment checkouts evaluated by the 7-Layer Sentinel AI Hot Path
+            Real-time immutable audit trail of Indian FinTech &amp; Razorpay payment checkouts evaluated by Sentinel AI
           </p>
         </div>
 
@@ -215,7 +228,21 @@ export default function TransactionsPage({
             <option value="ALL">All Methods</option>
             <option value="CARD">Card (Tokenized)</option>
             <option value="UPI">UPI VPA</option>
-            <option value="NETBANKING">NetBanking</option>
+          </select>
+
+          <span className="text-slate-400 text-[11px] ml-2">Merchant:</span>
+          <select
+            value={merchantFilter}
+            onChange={e => setMerchantFilter(e.target.value)}
+            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
+          >
+            <option value="ALL">All Merchants</option>
+            <option value="Zomato Gold Delivery">Zomato Gold</option>
+            <option value="Blinkit 10-Min Quick">Blinkit Quick</option>
+            <option value="Apple Store BKC Mumbai">Apple Store BKC</option>
+            <option value="Nykaa Luxe Cosmetics">Nykaa Luxe</option>
+            <option value="MakeMyTrip Indigo Flights">MakeMyTrip Flights</option>
+            <option value="Tata Croma Retail">Croma Electronics</option>
           </select>
         </div>
 
@@ -224,7 +251,7 @@ export default function TransactionsPage({
           <Search size={13} className="absolute left-2.5 top-2.5 text-slate-500" />
           <input
             type="text"
-            placeholder="Search TxID, IP, BIN, User, Reason..."
+            placeholder="Search TxID, Merchant, Bank, City, Reason..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-slate-200 font-mono text-xs w-56 sm:w-72 focus:outline-none focus:border-indigo-500 transition-all"
@@ -239,13 +266,15 @@ export default function TransactionsPage({
             <thead className="bg-slate-950/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
               <tr>
                 <th className="py-3.5 px-4">Latency</th>
-                <th className="py-3.5 px-4">Decision Tier</th>
+                <th className="py-3.5 px-4">Decision</th>
                 <th className="py-3.5 px-4">Risk Score</th>
                 <th className="py-3.5 px-4">Transaction ID</th>
+                <th className="py-3.5 px-4">Merchant</th>
+                <th className="py-3.5 px-4">Customer &amp; City</th>
                 <th className="py-3.5 px-4">Amount</th>
-                <th className="py-3.5 px-4">Instrument / BIN</th>
-                <th className="py-3.5 px-4">Network &amp; IP</th>
-                <th className="py-3.5 px-4">Forensic Reason</th>
+                <th className="py-3.5 px-4">Bank / Instrument</th>
+                <th className="py-3.5 px-4">Network ISP</th>
+                <th className="py-3.5 px-4">Forensic Explainability</th>
                 <th className="py-3.5 px-4 text-right">Inspect</th>
               </tr>
             </thead>
@@ -275,7 +304,7 @@ export default function TransactionsPage({
                     <td className="py-3 px-4 font-bold" style={{ color: meta.color }}>
                       {fmt(tx.risk_score)}
                     </td>
-                    <td className="py-3 px-4 font-bold text-white max-w-[160px] truncate">
+                    <td className="py-3 px-4 font-bold text-white max-w-[140px] truncate">
                       {tx.transaction_id}
                       {tx.is_canary && (
                         <span className="ml-1.5 text-amber-400 text-[9px] bg-amber-500/20 px-1 py-0.5 rounded border border-amber-500/30">
@@ -288,13 +317,21 @@ export default function TransactionsPage({
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 font-bold text-white">?{tx.amount?.toLocaleString('en-IN') || '?'}</td>
-                    <td className="py-3 px-4 text-slate-400">
-                      {tx.bin6 ? `BIN ${tx.bin6}` : tx.card_hash ? tx.card_hash : tx.upi_vpa || 'Tokenized'}
+                    <td className="py-3 px-4 font-bold text-slate-200 truncate max-w-[130px]">
+                      {tx.merchant_name || 'Razorpay Merchant'}
                     </td>
-                    <td className="py-3 px-4 text-slate-400">{tx.ip_address || '103.21.244.x'}</td>
-                    <td className="py-3 px-4 text-slate-400 max-w-[240px] truncate font-sans text-[11px]">
-                      {tx.explanation || 'Verified transaction.'}
+                    <td className="py-3 px-4 text-slate-300 truncate max-w-[130px]">
+                      {tx.customer_name ? `${tx.customer_name} ? ${tx.user_city?.split(',')[0] || ''}` : tx.user_id || 'usr_ind'}
+                    </td>
+                    <td className="py-3 px-4 font-bold text-white">?{tx.amount?.toLocaleString('en-IN') || '?'}</td>
+                    <td className="py-3 px-4 text-slate-300 max-w-[140px] truncate">
+                      {tx.card_name || tx.card_bank || (tx.bin6 ? `BIN ${tx.bin6}` : tx.card_hash)}
+                    </td>
+                    <td className="py-3 px-4 text-slate-400 max-w-[130px] truncate">
+                      {tx.isp_network || tx.ip_address || '103.21.244.x'}
+                    </td>
+                    <td className="py-3 px-4 text-slate-400 max-w-[200px] truncate font-sans text-[11px]">
+                      {tx.explanation || 'Standard legitimate customer checkout.'}
                     </td>
                     <td className="py-3 px-4 text-right">
                       <button
@@ -315,7 +352,7 @@ export default function TransactionsPage({
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-500 font-mono text-xs">
+                  <td colSpan={11} className="py-12 text-center text-slate-500 font-mono text-xs">
                     No transactions matched the active filters.
                   </td>
                 </tr>

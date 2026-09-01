@@ -1,9 +1,10 @@
+from __future__ import annotations
 """
 RazorShield Sentinel — Autonomous Risk and Fraud Detection Engine.
 FastAPI Application Entry Point.
 """
 
-from __future__ import annotations
+from backend.simulator.indian_fintech_stream import generate_realistic_transaction, get_initial_seed_ledger
 
 import asyncio
 import json
@@ -83,81 +84,38 @@ _canary_triggers_count: int = 28
 
 ws_clients: list[WebSocket] = []
 
-# Real-time Pre-Seeded Transaction Store for Instant Forensic Inspection
-transaction_store: dict[str, dict] = {
-    "tx_live_98124": {
-        "transaction_id": "tx_live_98124", "timestamp": 1725232800, "amount": 3499.0, "latency_ms": 8.4,
-        "bin6": "453275", "card_hash": "c_hdfc_9918", "user_id": "usr_mumbai_99", "ip_address": "103.21.244.12",
-        "tier": "safe", "risk_score": 0.042, "payment_method": "CARD", "is_canary": False, "is_agent": False,
-        "explanation": "Standard legitimate customer checkout with normal velocity and valid browser biometrics.",
-        "signals": {"asn_type": "residential", "ja3_mismatch": False, "keystroke_entropy": 3.82, "mouse_jitter_score": 0.88, "cluster_risk_score": 0.02}
-    },
-    "tx_live_98125": {
-        "transaction_id": "tx_live_98125", "timestamp": 1725232790, "amount": 15.0, "latency_ms": 11.2,
-        "bin6": "522222", "card_hash": "c_stolen_4412", "user_id": "usr_bot_01", "ip_address": "185.220.101.5",
-        "tier": "high_confidence_bot", "risk_score": 0.892, "payment_method": "CARD", "is_canary": False, "is_agent": False,
-        "explanation": "High-velocity micro-testing burst on rotating datacenter proxy (12 requests/min). Quarantined by Layer 0 Tarpit.",
-        "signals": {"asn_type": "datacenter", "ja3_mismatch": True, "keystroke_entropy": 0.12, "mouse_jitter_score": 0.02, "cluster_risk_score": 0.89}
-    },
-    "tx_live_98126": {
-        "transaction_id": "tx_live_98126", "timestamp": 1725232780, "amount": 1.0, "latency_ms": 4.1,
-        "bin6": "400000", "card_hash": "canary_pan_002", "user_id": "usr_probe_77", "ip_address": "45.154.255.88",
-        "tier": "high_confidence_bot", "risk_score": 1.000, "payment_method": "CARD", "is_canary": True, "is_agent": False,
-        "explanation": "CRITICAL: Triggered Luhn-valid Canary Honeytoken card (4000000000000002). Mathematical Zero-FPR trap.",
-        "signals": {"asn_type": "tor", "ja3_mismatch": True, "keystroke_entropy": 0.00, "mouse_jitter_score": 0.00, "cluster_risk_score": 1.00}
-    },
-    "tx_live_98127": {
-        "transaction_id": "tx_live_98127", "timestamp": 1725232770, "amount": 28999.0, "latency_ms": 9.8,
-        "bin6": "411111", "card_hash": "c_traveler_102", "user_id": "usr_roaming_44", "ip_address": "146.70.180.22",
-        "tier": "soft_risk", "risk_score": 0.540, "payment_method": "CARD", "is_canary": False, "is_agent": False,
-        "explanation": "Geo-velocity anomaly (Mumbai -> London in 14 mins). Triggered 3DS2 Challenge Step-Up.",
-        "signals": {"asn_type": "commercial_vpn", "ja3_mismatch": False, "keystroke_entropy": 2.45, "mouse_jitter_score": 0.65, "cluster_risk_score": 0.42}
-    },
-    "tx_live_98128": {
-        "transaction_id": "tx_live_98128", "timestamp": 1725232760, "amount": 1299.0, "latency_ms": 7.6,
-        "bin6": "552140", "card_hash": "c_agent_vault_09", "user_id": "usr_agent_buyer", "ip_address": "35.200.18.90",
-        "tier": "verified_agent", "risk_score": 0.081, "payment_method": "CARD", "is_canary": False, "is_agent": True,
-        "explanation": "Cryptographically verified Autonomous AI Agent via AP2 attestation header (RSA-4096 signature).",
-        "signals": {"asn_type": "cloud_gcp", "ja3_mismatch": False, "keystroke_entropy": 0.00, "mouse_jitter_score": 0.00, "cluster_risk_score": 0.00}
-    },
-    "tx_live_98129": {
-        "transaction_id": "tx_live_98129", "timestamp": 1725232750, "amount": 25.0, "latency_ms": 12.4,
-        "bin6": "438628", "card_hash": "c_mule_ring_03", "user_id": "usr_mule_08", "ip_address": "194.26.29.13",
-        "tier": "high_confidence_bot", "risk_score": 0.915, "payment_method": "CARD", "is_canary": False, "is_agent": False,
-        "explanation": "Louvain Community Cluster Ring #3 member. CVV cycling fanout across 8 distinct BINs on same device fingerprint.",
-        "signals": {"asn_type": "datacenter", "ja3_mismatch": True, "keystroke_entropy": 0.08, "mouse_jitter_score": 0.01, "cluster_risk_score": 0.94}
-    },
-    "tx_live_98130": {
-        "transaction_id": "tx_live_98130", "timestamp": 1725232740, "amount": 8499.0, "latency_ms": 8.9,
-        "bin6": "607189", "card_hash": "vpa_rahul_okhdfc", "user_id": "usr_pune_88", "ip_address": "115.112.45.9",
-        "tier": "safe", "risk_score": 0.035, "payment_method": "UPI", "is_canary": False, "is_agent": False,
-        "explanation": "Verified UPI intent checkout. Fast-path clearance under 9ms.",
-        "signals": {"asn_type": "mobile_airtel", "ja3_mismatch": False, "keystroke_entropy": 4.10, "mouse_jitter_score": 0.92, "cluster_risk_score": 0.01}
-    },
-    "tx_live_98131": {
-        "transaction_id": "tx_live_98131", "timestamp": 1725232730, "amount": 10.0, "latency_ms": 13.1,
-        "bin6": "510510", "card_hash": "c_bot_tg_44", "user_id": "usr_tg_scraper", "ip_address": "91.240.118.42",
-        "tier": "high_confidence_bot", "risk_score": 0.942, "payment_method": "CARD", "is_canary": False, "is_agent": False,
-        "explanation": "Automated headless Puppeteer runner detected. Keystroke entropy 0.08 and 0ms focus delay.",
-        "signals": {"asn_type": "datacenter", "ja3_mismatch": True, "keystroke_entropy": 0.08, "mouse_jitter_score": 0.00, "cluster_risk_score": 0.91}
-    },
-    "tx_live_98132": {
-        "transaction_id": "tx_live_98132", "timestamp": 1725232720, "amount": 45000.0, "latency_ms": 10.2,
-        "bin6": "471638", "card_hash": "c_luxury_992", "user_id": "usr_bangalore_12", "ip_address": "122.179.32.18",
-        "tier": "soft_risk", "risk_score": 0.580, "payment_method": "CARD", "is_canary": False, "is_agent": False,
-        "explanation": "High-value luxury purchase outside customer 30-day baseline. Soft challenge 3DS step-up routed.",
-        "signals": {"asn_type": "residential_jio", "ja3_mismatch": False, "keystroke_entropy": 3.12, "mouse_jitter_score": 0.74, "cluster_risk_score": 0.35}
-    },
-    "tx_live_98133": {
-        "transaction_id": "tx_live_98133", "timestamp": 1725232710, "amount": 1999.0, "latency_ms": 6.8,
-        "bin6": "512345", "card_hash": "c_sbi_master_77", "user_id": "usr_delhi_33", "ip_address": "182.73.19.4",
-        "tier": "safe", "risk_score": 0.021, "payment_method": "CARD", "is_canary": False, "is_agent": False,
-        "explanation": "SBI Global International Debit Card with high trust kinetic curve.",
-        "signals": {"asn_type": "residential_airtel", "ja3_mismatch": False, "keystroke_entropy": 3.95, "mouse_jitter_score": 0.95, "cluster_risk_score": 0.01}
-    }
-}
+# Real-time Pre-Seeded Transaction Store with Authentic Indian FinTech Telemetry
+_initial_ledger = get_initial_seed_ledger(45)
+transaction_store: dict[str, dict] = {tx["transaction_id"]: tx for tx in _initial_ledger}
 
 
+
+
+async def _live_stream_generator_loop():
+    """Continuously generates and broadcasts realistic Indian FinTech transactions every 3 seconds."""
+    import asyncio
+    while True:
+        try:
+            await asyncio.sleep(3.5)
+            if ws_clients:
+                tx = generate_realistic_transaction()
+                transaction_store[tx["transaction_id"]] = tx
+                # Maintain bounded memory
+                if len(transaction_store) > 300:
+                    oldest_keys = list(transaction_store.keys())[:-200]
+                    for k in oldest_keys:
+                        del transaction_store[k]
+                
+                # Update eval counts
+                tier = tx.get("tier", "safe")
+                _eval_counts[tier] = _eval_counts.get(tier, 0) + 1
+                
+                await _broadcast({
+                    "type": "transaction",
+                    "payload": tx
+                })
+        except Exception:
+            await asyncio.sleep(4.0)
 
 
 @asynccontextmanager
@@ -170,6 +128,7 @@ async def lifespan(app: FastAPI):
 
     cluster_engine = ClusterEngine(velocity_tracker.redis)
     cluster_task = asyncio.create_task(cluster_engine.run_forever())
+    stream_task = asyncio.create_task(_live_stream_generator_loop())
 
     risk_scorer = RiskScorer()
     # Warm up ML models to eliminate cold-start latency spike
