@@ -52,35 +52,35 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 
 ```mermaid
 flowchart TD
-    REQ([🛒 Checkout Request]) --> L0
+    REQ([Checkout Request]) --> L0
 
-    subgraph HOT["⚡ Synchronous Hot Path  ·  P99 < 15 ms"]
-        L0["🚫 Layer 0 · Anti-Checker Tarpit\nLuhn check · micro-auth detection · 8s poison delay"]
-        L1["🍯 Layer 1 · 50 Armed Canary Honeytokens\nCryptographic BIN traps · 0% FPR escape hatch"]
-        L2["📊 Layer 2 · Sliding-Window Velocity\nRedis 10s / 1m / 10m / 1h · CVV cycling detector"]
-        L3["🌐 Layer 3 · ASN & WebRTC Classifier\nTLS JA3 mismatch · datacenter / Tor subnet block"]
-        L4["⌨️  Layer 4 · Kinetic Biometric Gate\nShannon entropy H(Δt) · bots H < 0.60 bits"]
-        L5["🤖 Layer 5 · Quad-Ensemble ML\nLightGBM + CatBoost + Isolation Forest + GraphSAGE"]
-        L6["🔐 Layer 6 · Zero-Trust 3DS2 Defense\nEd25519 nonces · CAVV/AAV · OTP relay rejection"]
-        L7["🕸️  Layer 7 · Louvain Graph Engine\nBipartite partitioning · Q = 0.8994 · 30-min decay"]
-        CF["📐 Split Conformal Calibration\n95% certified coverage · P(Y∈C(X)) ≥ 1−α"]
-        MEL["⚖️  Bayesian MEL Action Tiering\narg min E[Loss|a]  across Pass / Hold / Block"]
+    subgraph HOT["Synchronous Hot Path — P99 under 15 ms"]
+        L0["Layer 0 · Anti-Checker Tarpit — Luhn + micro-auth + 8s poison delay"]
+        L1["Layer 1 · 50 Armed Canary Honeytokens — cryptographic BIN traps"]
+        L2["Layer 2 · Sliding-Window Velocity — Redis 10s/1m/10m/1h windows"]
+        L3["Layer 3 · ASN and WebRTC Classifier — JA3 mismatch + Tor/DC block"]
+        L4["Layer 4 · Kinetic Biometric Gate — Shannon entropy H(Δt), bots H < 0.60 bits"]
+        L5["Layer 5 · Quad-Ensemble ML — LightGBM + CatBoost + Isolation Forest + GraphSAGE"]
+        L6["Layer 6 · Zero-Trust 3DS2 — Ed25519 nonces + CAVV/AAV + OTP relay rejection"]
+        L7["Layer 7 · Louvain Graph Engine — bipartite partitioning Q = 0.8994, 30-min decay"]
+        CF["Split Conformal Calibration — 95% certified coverage P(Y∈C(X)) ≥ 1−α"]
+        MEL["Bayesian MEL Action Tiering — argmin E[Loss|a] across Pass / Hold / Block"]
 
         L0 --> L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> CF --> MEL
     end
 
     MEL --> T1 & T2 & T3
 
-    T1(["✅ Tier 1 · Instant Approval\nClean genuine · < 12 ms"])
-    T2(["🔄 Tier 2 · UPI QR Hold\nSoft-risk · 5-min step-up"])
-    T3(["🚨 Tier 3 · Tarpit + Block\nHigh-confidence bot"])
+    T1(["✅ Tier 1 — Instant Approval — Clean genuine, under 12 ms"])
+    T2(["🔄 Tier 2 — UPI QR Hold — Soft-risk, 5-min step-up"])
+    T3(["🚨 Tier 3 — Tarpit and Block — High-confidence bot"])
 
-    subgraph ASYNC["🧠 Asynchronous Intelligence Plane  ·  Background"]
-        A1["🕸️  Louvain Mule Ring Explorer\nCommunity modularity Q = 0.8994"]
-        A2["💬 Threat Memory Copilot RAG\n8D cosine similarity · RBI citations"]
-        A3["⚔️  Red-Team Arms Race Simulator\n5-round adversarial coevolution"]
-        A4["📄 Dispute Evidence Package\nReportLab PDF · SHA-256 sealed"]
-        A5["📈 PSI Drift Monitor\nOff-policy doubly robust eval · ₹266.58 lift"]
+    subgraph ASYNC["Asynchronous Intelligence Plane — Background"]
+        A1["Louvain Mule Ring Explorer — community modularity Q = 0.8994"]
+        A2["Threat Memory Copilot RAG — 8D cosine similarity + RBI citations"]
+        A3["Red-Team Arms Race Simulator — 5-round adversarial coevolution"]
+        A4["Dispute Evidence Package — ReportLab PDF, SHA-256 sealed"]
+        A5["PSI Drift Monitor — off-policy doubly robust eval, ₹266.58 lift"]
     end
 
     T1 & T2 & T3 -.->|enrichment| ASYNC
@@ -92,25 +92,21 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    SCORE["ML Risk Score\nP̂(fraud | X)"]
+    SCORE["ML Risk Score — P-hat of fraud given X"]
 
-    SCORE -->|"P̂ < 1 − q̂"| GENUINE["✅ Prediction Set\n{genuine}\n→ Instant Approval"]
-    SCORE -->|"1−q̂ ≤ P̂ ≤ q̂"| UNCERTAIN["🔄 Prediction Set\n{genuine, fraud}\n→ UPI QR Step-Up"]
-    SCORE -->|"P̂ > q̂"| FRAUD["🚨 Prediction Set\n{fraud}\n→ Honeypot Block"]
-
-    style GENUINE fill:#14532d,color:#bbf7d0
-    style UNCERTAIN fill:#78350f,color:#fef3c7
-    style FRAUD fill:#450a0a,color:#fecaca
+    SCORE -->|"P-hat less than 1 minus q-hat"| GENUINE["Prediction Set = genuine — Instant Approval"]
+    SCORE -->|"1 minus q-hat to q-hat"| UNCERTAIN["Prediction Set = genuine or fraud — UPI QR Step-Up"]
+    SCORE -->|"P-hat greater than q-hat"| FRAUD["Prediction Set = fraud — Honeypot Block"]
 ```
 
 ---
 
-### Zero-Day CVV Cycling — Component Recall Breakdown
+### Zero-Day CVV Cycling — Component Recall (N = 500 held-out)
 
 ```mermaid
-xychart-beta horizontal
-    title "Leave-One-Attack-Out CVV Cycling Recall (N=500 held-out)"
-    x-axis ["Persistence-Gated P2", "Isolation Forest", "GNN / Cluster", "LightGBM", "CatBoost", "GBDT Blend"]
+xychart-beta
+    title "Leave-One-Attack-Out CVV Cycling Recall (%)"
+    x-axis ["P2 Gated", "Isolation Forest", "GNN/Cluster", "LightGBM", "CatBoost", "GBDT Blend"]
     y-axis "Recall (%)" 0 --> 100
     bar [76.8, 75.2, 29.8, 9.0, 6.6, 8.2]
 ```
@@ -120,10 +116,10 @@ xychart-beta horizontal
 ## 🔬 Mathematical Foundations
 
 ### 1. Split Conformal Prediction  *(Distribution-Free Guarantee)*
-$$P\!\left(Y \in C(X)\right) \ge 1 - \alpha \qquad (\alpha = 0.05 \implies 95\%\text{ certified coverage})$$
+$$P(Y \in C(X)) \ge 1 - \alpha \qquad (\alpha = 0.05 \implies 95\%\text{ certified coverage})$$
 
 Non-conformity scores $s_i = 1 - \hat{P}(Y = y_i \mid X_i)$ over calibration set $n = 2{,}000$:
-$$\hat{q} = \operatorname{Quantile}_{\lceil(n+1)(1-\alpha)\rceil/n}(s_1,\dots,s_n)$$
+$$\hat{q} = \text{Quantile}_{\lceil(n+1)(1-\alpha)\rceil/n}(s_1,\dots,s_n)$$
 
 ### 2. Kinetic Keystroke Shannon Entropy  *(USENIX Security Literature)*
 $$H(\Delta t) = -\sum_{k=1}^{K} p_k \log_2 p_k$$
@@ -136,7 +132,7 @@ $$W(e,\,\Delta t) = \max\!\left(0.05,\; e^{-\Delta t / 1800}\right) \qquad Q = 0
 $$a^* = \arg\min_{a \in \{\text{Pass},\,\text{Hold},\,\text{Block}\}} \mathbb{E}[\text{Loss} \mid a]$$
 
 ### 5. Off-Policy Doubly Robust Policy Evaluation
-$$\hat{V}_{\mathrm{DR}}(\pi) = \frac{1}{N}\sum_{i=1}^{N}\!\left[\hat{Q}(x_i,\pi(x_i)) + \frac{\mathbb{I}(a_i = \pi(x_i))}{p(a_i \mid x_i)}\left(r_i - \hat{Q}(x_i,a_i)\right)\right]$$
+$$\hat{V}_{\mathrm{DR}}(\pi) = \frac{1}{N}\sum_{i=1}^{N}\left[\hat{Q}(x_i,\pi(x_i)) + \frac{\mathbb{I}(a_i = \pi(x_i))}{p(a_i \mid x_i)}\left(r_i - \hat{Q}(x_i,a_i)\right)\right]$$
 Policy value: **₹194.29** vs. static baseline **−₹72.29** → net lift **₹266.58 per 1,000 transactions**.
 
 ---
