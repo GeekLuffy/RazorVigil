@@ -15,7 +15,9 @@ import ActiveDefenseWorkspace from './components/ActiveDefenseWorkspace'
 import MerchantStore from './components/MerchantStore'
 import ArchitectureOverview from './components/ArchitectureOverview'
 import FraudGraphCanvas from './components/FraudGraphCanvas'
+import FraudGraphExplorer from './components/FraudGraphExplorer'
 import DisputeCaseWorkspace from './components/DisputeCaseWorkspace'
+
 import ModelGovernanceStudio from './components/ModelGovernanceStudio'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer'
 import AttackLaunchpad from './components/AttackLaunchpad'
@@ -566,6 +568,16 @@ export default function App() {
           </button>
 
           <button
+            onClick={() => setActiveTab('graph')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold font-sans transition-all ${
+              activeTab === 'graph' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <Network size={13} />
+            Mule Ring Graph
+          </button>
+
+          <button
             onClick={() => setActiveTab('disputes')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold font-sans transition-all ${
               activeTab === 'disputes' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/40 border border-indigo-400/40' : 'text-slate-400 hover:text-white hover:bg-slate-900'
@@ -574,6 +586,7 @@ export default function App() {
             <Scale size={13} />
             Disputes &amp; Evidence
           </button>
+
 
           <button
             onClick={() => setActiveTab('governance')}
@@ -632,6 +645,8 @@ export default function App() {
         <ThreatLabWorkspace onTriggerStoreDemo={() => setIsStoreOpen(true)} />
       ) : activeTab === 'rules' ? (
         <ActiveDefenseWorkspace copilotNotes={copilotNotes} />
+      ) : activeTab === 'graph' ? (
+        <FraudGraphExplorer />
       ) : activeTab === 'pitch' ? (
         <ArchitectureOverview />
       ) : activeTab === 'disputes' ? (
@@ -639,6 +654,7 @@ export default function App() {
       ) : activeTab === 'governance' ? (
         <ModelGovernanceStudio />
       ) : (
+
         <>
           {/* Interactive Threat Attack Launchpad */}
           <AttackLaunchpad onTriggerStoreDemo={() => setIsStoreOpen(true)} />

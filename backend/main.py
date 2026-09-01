@@ -735,7 +735,48 @@ async def get_cluster_risk_score_endpoint(req: ClusterScoreRequest):
     }
 
 
+@app.get("/cluster/graph")
+async def get_cluster_graph_endpoint():
+    """Returns real-time NetworkX graph topology and Louvain community partitions."""
+    if not cluster_engine:
+        return {"nodes": [], "edges": [], "clusters": [], "modularity": 0.0}
+    return cluster_engine.get_graph_topology()
+
+
+@app.post("/cluster/quarantine/{cluster_id}")
+async def quarantine_cluster_endpoint(cluster_id: int):
+    """Isolate and quarantine an entire Louvain community ring across all entities."""
+    if not cluster_engine:
+        return {"status": "error", "message": "Cluster engine not active"}
+    res = cluster_engine.quarantine_cluster(cluster_id)
+    await _broadcast({
+        "type": "cluster_quarantined",
+        "cluster_id": cluster_id,
+        "isolated_nodes_count": res.get("nodes_isolated_count", 0),
+        "timestamp": time.time(),
+        "message": f"Louvain Community Ring #{cluster_id} quarantined. Isolated {res.get('nodes_isolated_count', 0)} connected entities.",
+    })
+    return res
+
+
+@app.post("/cluster/inject-ring")
+async def inject_cluster_ring_endpoint(ring_type: str = "carding_swarm"):
+    """Inject an attack ring into the live graph for interactive analysis."""
+    if not cluster_engine:
+        return {"status": "error", "message": "Cluster engine not active"}
+    res = cluster_engine.inject_demo_ring(ring_type)
+    await _broadcast({
+        "type": "attack_ring_injected",
+        "ring_type": ring_type,
+        "anchor": res.get("anchor"),
+        "timestamp": time.time(),
+        "message": f"Adversarial ring injected: {ring_type}. Graph topology updated.",
+    })
+    return res
+
+
 @app.get("/investigate/{transaction_id}")
+
 async def investigate_transaction_endpoint(transaction_id: str):
     """Full 8-layer forensic investigation endpoint for Agent Studio delegation."""
     tx = transaction_store.get(transaction_id)
