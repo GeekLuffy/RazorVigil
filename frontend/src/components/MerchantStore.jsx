@@ -307,6 +307,12 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
 
   const autofillPreset = (type) => {
     setActivePreset(type)
+    setPaymentVerified(null)
+    setCheckoutResult(null)
+    setRecoveryModal(null)
+    setThreeDsModal(null)
+    setRecoverySuccess(false)
+
     if (type === 'human') {
       setCardName('Rahul Sharma')
       setCardNumber('4111 1111 1111 1111')
@@ -961,141 +967,194 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
               </button>
             </div>
 
-            <form onSubmit={handleCheckout} className="space-y-3">
-              <div>
-                <label className="block text-[11px] text-slate-400 font-medium mb-1">Cardholder Name</label>
-                <input
-                  type="text"
-                  value={cardName}
-                  onChange={e => setCardName(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] text-slate-400 font-medium mb-1">Card Number (Type to measure live entropy)</label>
-                <input
-                  type="text"
-                  placeholder="4242 4242 4242 4242"
-                  value={cardNumber}
-                  onChange={e => setCardNumber(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] text-slate-400 font-medium mb-1">Expiry</label>
-                  <input
-                    type="text"
-                    value={expiry}
-                    onChange={e => setExpiry(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
-                    required
-                  />
+            {/* Payment Flow: Show Verified Receipt when Paid, or Payment Form */}
+            {paymentVerified ? (
+              <div className="p-6 bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 border border-emerald-500/40 rounded-2xl shadow-xl text-center space-y-4 animate-scale-up">
+                <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/40 mx-auto flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-950/50">
+                  <CheckCircle2 size={32} />
                 </div>
+
                 <div>
-                  <label className="block text-[11px] text-slate-400 font-medium mb-1">CVV</label>
-                  <input
-                    type="text"
-                    value={cvv}
-                    onChange={e => setCvv(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
-                    required
-                  />
+                  <h3 className="text-lg font-bold text-white font-sans">Payment Verified &amp; Captured</h3>
+                  <p className="text-xs text-emerald-400 font-mono mt-0.5">
+                    Cleared by RazorShield Sentinel AI Hot Path (&lt;15ms SLA)
+                  </p>
                 </div>
-              </div>
 
-              <div className="pt-1 flex items-center justify-between">
-                <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={vpnMode}
-                    onChange={e => setVpnMode(e.target.checked)}
-                    className="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-0"
-                  />
-                  <span>Simulate Datacenter IP / VPN Network</span>
-                </label>
-              </div>
-
-              {/* Dual Action Buttons: RazorShield Direct & Razorpay Native Checkout */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || isRzpNativeLoading}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-600/30 transition disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <RefreshCw size={14} className="animate-spin" />
-                      <span>Screening Hot Path…</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShieldCheck size={14} />
-                      <span>Pay ₹{selectedProduct.price.toLocaleString('en-IN')} (Shield)</span>
-                    </>
-                  )}
-                </button>
+                <div className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-4 text-xs font-mono text-left space-y-2">
+                  <div className="flex justify-between text-slate-400">
+                    <span>Product:</span>
+                    <span className="text-white font-bold">{selectedProduct.name}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Amount Paid:</span>
+                    <span className="text-emerald-400 font-bold font-mono">₹{selectedProduct.price.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Payment ID:</span>
+                    <span className="text-slate-200 font-mono text-[11px]">{paymentVerified.paymentId}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Order ID:</span>
+                    <span className="text-slate-200 font-mono text-[11px]">{paymentVerified.orderId}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Method:</span>
+                    <span className="text-slate-200 font-mono">{cardNumber.startsWith('5') ? 'Mastercard' : cardNumber.startsWith('4') ? 'VISA' : 'RuPay'} •••• {cardNumber.replace(/\s+/g, '').slice(-4) || '4242'}</span>
+                  </div>
+                </div>
 
                 <button
                   type="button"
-                  onClick={handleNativeRazorpayCheckout}
-                  disabled={isSubmitting || isRzpNativeLoading}
-                  className="w-full bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition disabled:opacity-50"
-                  title="Launch official Razorpay Test Mode checkout popup"
+                  onClick={() => {
+                    setPaymentVerified(null)
+                    setCheckoutResult(null)
+                    autofillPreset('human')
+                  }}
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2"
                 >
-                  {isRzpNativeLoading ? (
-                    <>
-                      <RefreshCw size={14} className="animate-spin" />
-                      <span>Opening Razorpay…</span>
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard size={14} className="text-blue-400" />
-                      <span>Razorpay Test Popup</span>
-                    </>
-                  )}
+                  <span>✨</span>
+                  <span>Place Another Test Order</span>
                 </button>
               </div>
-            </form>
+            ) : (
+              <>
+                <form onSubmit={handleCheckout} className="space-y-3">
+                  <div>
+                    <label className="block text-[11px] text-slate-400 font-medium mb-1">Cardholder Name</label>
+                    <input
+                      type="text"
+                      value={cardName}
+                      onChange={e => setCardName(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                      required
+                    />
+                  </div>
 
-            {/* Payment Verified Success Box */}
-            {paymentVerified && (
-              <div className="mt-3 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs">
-                <div className="flex items-center gap-1.5 font-bold mb-1">
-                  <CheckCircle2 size={14} className="text-emerald-400" />
-                  Razorpay Payment Verified &amp; Captured
-                </div>
-                <div className="font-mono text-[10px] space-y-0.5 text-slate-400">
-                  <div>Payment ID: {paymentVerified.paymentId}</div>
-                  <div>Order ID: {paymentVerified.orderId}</div>
-                </div>
-              </div>
-            )}
+                  <div>
+                    <label className="block text-[11px] text-slate-400 font-medium mb-1">Card Number (Type to measure live entropy)</label>
+                    <input
+                      type="text"
+                      placeholder="4242 4242 4242 4242"
+                      value={cardNumber}
+                      onChange={e => setCardNumber(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                      required
+                    />
+                  </div>
 
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] text-slate-400 font-medium mb-1">Expiry</label>
+                      <input
+                        type="text"
+                        value={expiry}
+                        onChange={e => setExpiry(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 font-medium mb-1">CVV</label>
+                      <input
+                        type="text"
+                        value={cvv}
+                        onChange={e => setCvv(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
 
-            {/* Risk Decision Box */}
-            {checkoutResult && !paymentVerified && (
-              <div className="mt-3 p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono space-y-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 font-sans font-semibold">Risk Engine Decision:</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                    checkoutResult.tier === 'safe' ? 'bg-emerald-500/20 text-emerald-400' :
-                    checkoutResult.tier === 'soft_risk' ? 'bg-amber-500/20 text-amber-400' :
-                    'bg-red-500/20 text-red-400'
-                  }`}>
-                    {checkoutResult.tier.toUpperCase()} ({checkoutResult.risk_score ? (checkoutResult.risk_score * 100).toFixed(1) : 0}%)
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-300 pt-1 border-t border-slate-800/80">{checkoutResult.explanation}</p>
-              </div>
+                  <div className="pt-1 flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={vpnMode}
+                        onChange={e => setVpnMode(e.target.checked)}
+                        className="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-0"
+                      />
+                      <span>Simulate Datacenter IP / VPN Network</span>
+                    </label>
+                  </div>
+
+                  {/* Dual Action Buttons: RazorShield Direct & Razorpay Native Checkout */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || isRzpNativeLoading}
+                      className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-600/30 transition disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <RefreshCw size={14} className="animate-spin" />
+                          <span>Screening Hot Path…</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck size={14} />
+                          <span>Pay ₹{selectedProduct.price.toLocaleString('en-IN')} (Shield)</span>
+                        </>
+                      )}
+                    </button>
+
+                    {(() => {
+                      const isBot = activePreset === 'bot' || activePreset === 'telegram' || activePreset === 'canary' || checkoutResult?.tier === 'high_confidence_bot'
+                      return (
+                        <button
+                          type="button"
+                          onClick={handleNativeRazorpayCheckout}
+                          disabled={isSubmitting || isRzpNativeLoading || isBot}
+                          className={`w-full font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition ${
+                            isBot
+                              ? 'bg-slate-900/50 text-slate-500 border border-slate-800/60 cursor-not-allowed opacity-60'
+                              : 'bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 shadow-sm'
+                          }`}
+                          title={isBot ? 'Direct Gateway Access Blocked for Bot / Honeypot Traffic' : 'Launch official Razorpay Test Mode checkout popup'}
+                        >
+                          {isRzpNativeLoading ? (
+                            <>
+                              <RefreshCw size={14} className="animate-spin" />
+                              <span>Opening Razorpay…</span>
+                            </>
+                          ) : isBot ? (
+                            <>
+                              <Lock size={13} className="text-rose-400" />
+                              <span className="text-rose-300">Gateway Blocked (Bot)</span>
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard size={14} className="text-blue-400" />
+                              <span>Razorpay Test Popup</span>
+                            </>
+                          )}
+                        </button>
+                      )
+                    })()}
+                  </div>
+                </form>
+
+                {/* Risk Decision Box */}
+                {checkoutResult && (
+                  <div className="mt-3 p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400 font-sans font-semibold">Risk Engine Decision:</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        checkoutResult.tier === 'safe' ? 'bg-emerald-500/20 text-emerald-400' :
+                        checkoutResult.tier === 'soft_risk' ? 'bg-amber-500/20 text-amber-400' :
+                        'bg-red-500/20 text-red-400'
+                      }`}>
+                        {checkoutResult.tier.toUpperCase()} ({checkoutResult.risk_score ? (checkoutResult.risk_score * 100).toFixed(1) : 0}%)
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 pt-1 border-t border-slate-800/80">{checkoutResult.explanation}</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
