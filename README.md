@@ -49,70 +49,72 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 ## 🏗️ Defense Architecture
 
 ```
-                                  INCOMING CHECKOUT REQUEST (Hot Path)
-                                                   │
-                                                   ▼
- ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
- │  [Layer 0] Anti-Checker Tarpit: Deterministic Luhn & Micro-Auth Attack Traps (< 1.2ms)           │
- │  [Layer 1] Armed Canary Honeytokens: 50 Cryptographic Synthetic BIN Traps (< 2.5ms)              │
- │  [Layer 2] Sliding-Window Atomic Velocity: Redis 10s / 1m / 10m / 1h Windows (< 3.0ms)           │
- │  [Layer 3] ASN & WebRTC Classifier: TLS JA3 Mismatch & Proxy Subnet Interception (< 3.5ms)       │
- │  [Layer 4] Kinetic Biometric Entropy Gate: Keystroke Shannon Entropy Filter (< 4.0ms)            │
- │  [Layer 5] Quad-Ensemble ML Scoring: LightGBM + CatBoost + Isolation Forest + GraphSAGE (< 8.5ms)│
- │  [Layer 6] Zero-Trust 3DS2 Defense: Ed25519 Nonces & Cryptographic CAVV Validation (< 2.1ms)     │
- │  [Layer 7] Louvain Graph Engine: Temporal Graph Partitioning Q=0.8994 (< 4.2ms)                  │
- │  [Conformal] Split Conformal Calibrator: Distribution-Free 95% Error Bounds                      │
- │  [Bayesian] Minimum Expected Loss: Optimal Financial Action Routing                              │
- └─────────────────────────────────────────────────┬────────────────────────────────────────────────┘
-                                                   │
-                 ┌─────────────────────────────────┼─────────────────────────────────┐
-                 ▼                                 ▼                                 ▼
-       [TIER 1: PASS]                    [TIER 2: SOFT-RISK]                [TIER 3: BLOCKED]
-     • Clean Genuine Order             • Dynamic UPI QR Step-Up           • Deterministic Tarpit
-     • Instant Gating (<12ms)          • 5-Minute Inventory Hold          • 8s Poison Latency Delay
+                            INCOMING CHECKOUT AUTHORIZATION (Hot Path: < 50ms SLA)
+                                                      │
+                                                      ▼
+ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+ │  LAYER 0: Anti-Checker Tarpit           │ Deterministic Luhn & Micro-Auth (₹1-₹2) Traps        (<1.2ms)│
+ │  LAYER 1: 50 Armed Canary Honeytokens   │ Cryptographic Synthetic BIN Traps (0% Escape FPR)    (<2.5ms)│
+ │  LAYER 2: Sliding-Window Velocity       │ Redis Atomic Multi-Horizon (10s / 1m / 10m / 1h)     (<3.0ms)│
+ │  LAYER 3: ASN & WebRTC Classifier       │ TLS JA3 Fingerprint Mismatch & Datacenter Subnets    (<3.5ms)│
+ │  LAYER 4: Kinetic Biometric Gate        │ Keystroke Inter-Arrival Shannon Entropy H(Δt)        (<4.0ms)│
+ │  LAYER 5: Quad-Ensemble ML Scoring      │ LightGBM + CatBoost + Isolation Forest + GraphSAGE   (<8.5ms)│
+ │  LAYER 6: Zero-Trust 3DS2 Defense       │ Ed25519 Token Nonces & Cryptographic CAVV            (<2.1ms)│
+ │  LAYER 7: Temporal Louvain Modularity   │ Dynamic Graph Community Partitioning (Q=0.8994)      (<4.2ms)│
+ └────────────────────────────────────────────────────┬───────────────────────────────────────────────────┘
+                                                      │
+                      ┌───────────────────────────────┴───────────────────────────────┐
+                      ▼                                                               ▼
+        [SPLIT CONFORMAL CALIBRATION]                                    [BAYESIAN MEL ACTION TIERING]
+    Distribution-Free 95% Coverage Bound                              argmin E[Loss | Action] Optimization
+    P(Y ∈ C(X)) ≥ 1 - α (α = 0.05)                                    Pass vs. UPI Hold vs. Tarpit Block
+                      │                                                               │
+         ┌────────────┴───────────────────────────────┬───────────────────────────────┴────────────┐
+         ▼                                            ▼                                            ▼
+   [TIER 1: PASS]                           [TIER 2: SOFT-RISK HOLD]                     [TIER 3: BLOCKED]
+  • Instant Approval (< 12ms)              • Dynamic Out-of-Band UPI QR                 • 8-Second Poison Latency
+  • Clean Genuine Traffic                  • 5-Minute Inventory Reservation             • Telegram Botnet Intercept
 ```
 
-### Defense Pipeline Flowchart
+### 🧠 Asynchronous Deep Intelligence Plane (Background)
 
-```mermaid
-flowchart TD
-    REQ[Incoming Checkout Request] --> L0[Layer 0 - Anti-Checker Tarpit]
-    L0 --> L1[Layer 1 - 50 Canary Honeytokens]
-    L1 --> L2[Layer 2 - Sliding Window Velocity]
-    L2 --> L3[Layer 3 - ASN and WebRTC Defense]
-    L3 --> L4[Layer 4 - Kinetic Biometric Gate]
-    L4 --> L5[Layer 5 - Quad-Ensemble ML Scoring]
-    L5 --> L6[Layer 6 - Zero-Trust 3DS2 Verification]
-    L6 --> L7[Layer 7 - Louvain Graph Engine]
-    L7 --> CF[Split Conformal Calibration]
-    CF --> MEL[Bayesian Action Tiering]
-
-    MEL --> T1[Tier 1 - Instant Approval Under 12ms]
-    MEL --> T2[Tier 2 - Soft-Risk Dynamic UPI QR]
-    MEL --> T3[Tier 3 - Tarpit Poison Delay 8s]
-
-    T1 --> A1[Louvain Mule Ring Explorer]
-    T2 --> A2[Threat Memory Copilot RAG]
-    T3 --> A3[Red-Team Arms Race Simulator]
-    A1 --> A4[Dispute Evidence Dossier PDF]
-    A2 --> A5[PSI Drift Monitor]
+```
+                    ┌──────────────────────────────────────────────────────────────┐
+                    │            ASYNCHRONOUS DEEP INTELLIGENCE ENGINE             │
+                    ├──────────────────────────────────────────────────────────────┤
+                    │ • NetworkX Louvain Mule Ring Graph Explorer (Q = 0.8994)     │
+                    │ • Threat Memory Copilot RAG (8D Cosine Similarity)           │
+                    │ • Autonomous Red-Team Adversary Coevolution Simulator        │
+                    │ • 5-Domain Verifiable Dispute Evidence PDF (ReportLab Engine)│
+                    │ • PSI Temporal Drift Monitor & Doubly Robust Policy Engine   │
+                    └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Split Conformal Decision Routing
+### 📐 Split Conformal Decision Routing
 
-```mermaid
-flowchart LR
-    SCORE[ML Risk Score] -->|Low Risk| GENUINE[Decision - Instant Approval]
-    SCORE -->|Uncertain| UNCERTAIN[Decision - Step-Up to UPI QR]
-    SCORE -->|High Risk| FRAUD[Decision - Honeypot Block]
+```
+                      ┌──────────────────────────────────────────────┐
+                      │    ML GATING ENSEMBLE RISK SCORE: P(Fraud)   │
+                      └──────────────────────┬───────────────────────┘
+                                             │
+               ┌─────────────────────────────┼─────────────────────────────┐
+               │                             │                             │
+               ▼                             ▼                             ▼
+       [ P < 1 - q̂ ]               [ 1 - q̂ ≤ P ≤ q̂ ]                 [ P > q̂ ]
+     Certified Genuine             Uncertain Prediction             Certified Fraud
+    Set: {"genuine"}              Set: {"genuine", "fraud"}         Set: {"fraud"}
+               │                             │                             │
+               ▼                             ▼                             ▼
+     ┌──────────────────┐          ┌───────────────────┐         ┌───────────────────┐
+     │ TIER 1: APPROVAL │          │  TIER 2: UPI QR   │         │ TIER 3: TARPIT    │
+     │ Instant Checkout │          │ Step-Up Recovery  │         │ 8s Poison Delay   │
+     └──────────────────┘          └───────────────────┘         └───────────────────┘
 ```
 
-
-
-
 ---
+
 
 ### Zero-Day CVV Cycling — Generalization Benchmark (N = 500 Held-Out)
 
