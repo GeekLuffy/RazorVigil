@@ -1,0 +1,8 @@
+{
+  "status": "success",
+  "ft_transformer_val_pr_auc": 0.999274,
+  "conformal_q_hat": 0.1697,
+  "calibration_samples": 10000,
+  "gpu_count": 0,
+  "timestamp": 1788216417.39224
+}
