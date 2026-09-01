@@ -54,6 +54,69 @@ const NAV_TABS = [
   { id: 'audit-log',         label: 'Audit & Disputes',  icon: Scale,           key: '8' },
 ]
 
+const INITIAL_SEED_TRANSACTIONS = [
+  {
+    transaction_id: "tx_live_98124", timestamp: Date.now() - 12000, amount: 3499.0, latency_ms: 8.4,
+    bin6: "453275", card_hash: "c_hdfc_9918", user_id: "usr_mumbai_99", ip_address: "103.21.244.12",
+    tier: "safe", risk_score: 0.042, payment_method: "CARD", is_canary: false, is_agent: false,
+    explanation: "Standard legitimate customer checkout with normal velocity and valid browser biometrics."
+  },
+  {
+    transaction_id: "tx_live_98125", timestamp: Date.now() - 25000, amount: 15.0, latency_ms: 11.2,
+    bin6: "522222", card_hash: "c_stolen_4412", user_id: "usr_bot_01", ip_address: "185.220.101.5",
+    tier: "high_confidence_bot", risk_score: 0.892, payment_method: "CARD", is_canary: false, is_agent: false,
+    explanation: "High-velocity micro-testing burst on rotating datacenter proxy (12 requests/min). Quarantined by Layer 0 Tarpit."
+  },
+  {
+    transaction_id: "tx_live_98126", timestamp: Date.now() - 42000, amount: 1.0, latency_ms: 4.1,
+    bin6: "400000", card_hash: "canary_pan_002", user_id: "usr_probe_77", ip_address: "45.154.255.88",
+    tier: "high_confidence_bot", risk_score: 1.000, payment_method: "CARD", is_canary: true, is_agent: false,
+    explanation: "CRITICAL: Triggered Luhn-valid Canary Honeytoken card (4000000000000002). Mathematical Zero-FPR trap."
+  },
+  {
+    transaction_id: "tx_live_98127", timestamp: Date.now() - 65000, amount: 28999.0, latency_ms: 9.8,
+    bin6: "411111", card_hash: "c_traveler_102", user_id: "usr_roaming_44", ip_address: "146.70.180.22",
+    tier: "soft_risk", risk_score: 0.540, payment_method: "CARD", is_canary: false, is_agent: false,
+    explanation: "Geo-velocity anomaly (Mumbai -> London in 14 mins). Triggered 3DS2 Challenge Step-Up."
+  },
+  {
+    transaction_id: "tx_live_98128", timestamp: Date.now() - 88000, amount: 1299.0, latency_ms: 7.6,
+    bin6: "552140", card_hash: "c_agent_vault_09", user_id: "usr_agent_buyer", ip_address: "35.200.18.90",
+    tier: "verified_agent", risk_score: 0.081, payment_method: "CARD", is_canary: false, is_agent: true,
+    explanation: "Cryptographically verified Autonomous AI Agent via AP2 attestation header (RSA-4096 signature)."
+  },
+  {
+    transaction_id: "tx_live_98129", timestamp: Date.now() - 110000, amount: 25.0, latency_ms: 12.4,
+    bin6: "438628", card_hash: "c_mule_ring_03", user_id: "usr_mule_08", ip_address: "194.26.29.13",
+    tier: "high_confidence_bot", risk_score: 0.915, payment_method: "CARD", is_canary: false, is_agent: false,
+    explanation: "Louvain Community Cluster Ring #3 member. CVV cycling fanout across 8 distinct BINs on same device fingerprint."
+  },
+  {
+    transaction_id: "tx_live_98130", timestamp: Date.now() - 145000, amount: 8499.0, latency_ms: 8.9,
+    bin6: "607189", card_hash: "vpa_rahul_okhdfc", user_id: "usr_pune_88", ip_address: "115.112.45.9",
+    tier: "safe", risk_score: 0.035, payment_method: "UPI", is_canary: false, is_agent: false,
+    explanation: "Verified UPI intent checkout. Fast-path clearance under 9ms."
+  },
+  {
+    transaction_id: "tx_live_98131", timestamp: Date.now() - 170000, amount: 10.0, latency_ms: 13.1,
+    bin6: "510510", card_hash: "c_bot_tg_44", user_id: "usr_tg_scraper", ip_address: "91.240.118.42",
+    tier: "high_confidence_bot", risk_score: 0.942, payment_method: "CARD", is_canary: false, is_agent: false,
+    explanation: "Automated headless Puppeteer runner detected. Keystroke entropy 0.08 and 0ms focus delay."
+  },
+  {
+    transaction_id: "tx_live_98132", timestamp: Date.now() - 210000, amount: 45000.0, latency_ms: 10.2,
+    bin6: "471638", card_hash: "c_luxury_992", user_id: "usr_bangalore_12", ip_address: "122.179.32.18",
+    tier: "soft_risk", risk_score: 0.580, payment_method: "CARD", is_canary: false, is_agent: false,
+    explanation: "High-value luxury purchase outside customer 30-day baseline. Soft challenge 3DS step-up routed."
+  },
+  {
+    transaction_id: "tx_live_98133", timestamp: Date.now() - 260000, amount: 1999.0, latency_ms: 6.8,
+    bin6: "512345", card_hash: "c_sbi_master_77", user_id: "usr_delhi_33", ip_address: "182.73.19.4",
+    tier: "safe", risk_score: 0.021, payment_method: "CARD", is_canary: false, is_agent: false,
+    explanation: "SBI Global International Debit Card with high trust kinetic curve."
+  }
+]
+
 export default function App() {
   // ?? URL Hash Routing ??????????????????????????????????????????????????????????
   const getInitialRoute = () => {
