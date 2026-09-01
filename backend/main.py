@@ -1378,68 +1378,95 @@ async def get_multi_language_sdk_snippets():
     snippets = {
         "nodejs": {
             "language": "Node.js / Express / TypeScript",
-            "package": "npm install @razorpay/razorshield-node",
-            "code": """import { RazorShield } from '@razorpay/razorshield-node'
+            "package": "npm install @geekluffy/razorshield-sentinel",
+            "code": """import express from 'express'
+import { RazorShieldSentinel } from '@geekluffy/razorshield-sentinel'
 
-const sentinel = new RazorShield({ apiKey: process.env.RAZORSHIELD_API_KEY })
+const app = express()
+const sentinel = new RazorShieldSentinel({ apiKey: process.env.RAZORSHIELD_API_KEY })
 
 app.post('/api/checkout', async (req, res) => {
   const decision = await sentinel.evaluate(req.body)
-  if (decision.tier === 'high_confidence_bot') return res.status(403).json(decision.honeypot)
+  if (decision.tier === 'high_confidence_bot') {
+    return res.status(403).json(decision.honeypot)
+  }
   // Proceed with standard Razorpay order creation
 })"""
         },
         "python": {
             "language": "Python / FastAPI / Django",
-            "package": "pip install razorshield-python",
-            "code": """from razorshield import RazorShieldClient
+            "package": "pip install git+https://github.com/GeekLuffy/razorshield-sentinel.git#subdirectory=sdk/python",
+            "code": """from fastapi import FastAPI, Response, status
+from razorshield_sentinel import RazorShieldClient, CheckoutPayload
 
+app = FastAPI()
 sentinel = RazorShieldClient(api_key=os.getenv("RAZORSHIELD_API_KEY"))
 
 @app.post("/checkout")
-async def checkout(request: CheckoutRequest):
-    decision = await sentinel.evaluate_async(request)
+async def checkout(payload: CheckoutPayload):
+    decision = await sentinel.evaluate_async(payload)
     if decision.tier == "high_confidence_bot":
-        return decision.tarpit_response()
-    # Proceed to Razorpay checkout
+        return Response(content=decision.honeypot_json, status_code=status.HTTP_403_FORBIDDEN)
+    # Proceed to standard Razorpay checkout
 """
         },
         "go": {
             "language": "Go (Golang)",
-            "package": "go get github.com/razorpay/razorshield-go",
-            "code": """import "github.com/razorpay/razorshield-go/sentinel"
+            "package": "go get github.com/GeekLuffy/razorshield-sentinel/sdk/go",
+            "code": """package main
 
-client := sentinel.NewClient(os.Getenv("RAZORSHIELD_API_KEY"))
+import (
+    "net/http"
+    "os"
+    sentinel "github.com/GeekLuffy/razorshield-sentinel/sdk/go"
+)
+
+var shield = sentinel.NewClient(os.Getenv("RAZORSHIELD_API_KEY"))
 
 func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
-    decision, _ := client.Evaluate(r.Context(), reqPayload)
-    if decision.IsBot() {
+    decision, err := shield.Evaluate(r.Context(), sentinel.CheckoutPayload{
+        Amount: 2499.0, Currency: "INR", CardHash: "c_9981", DeviceFingerprint: "dev_41", KeystrokeEntropy: 2.85,
+    })
+    if err == nil && decision.Tier == "high_confidence_bot" {
         w.WriteHeader(http.StatusForbidden)
+        w.Write(decision.HoneypotJSON())
         return
     }
+    // Proceed to Razorpay Payment Gateway
 }"""
         },
         "java": {
             "language": "Java / Spring Boot",
-            "package": "<dependency><groupId>com.razorpay</groupId><artifactId>razorshield-client</artifactId></dependency>",
-            "code": """@Autowired
-private RazorShieldClient sentinel;
+            "package": "<dependency><groupId>com.github.geekluffy</groupId><artifactId>razorshield-sentinel</artifactId><version>1.0.0</version></dependency>",
+            "code": """package com.merchant.controller;
 
-@PostMapping("/checkout")
-public ResponseEntity<?> handleCheckout(@RequestBody CheckoutPayload payload) {
-    Decision decision = sentinel.evaluate(payload);
-    if (decision.isQuarantined()) return ResponseEntity.status(403).body(decision.getHoneypot());
-    return ResponseEntity.ok(paymentService.process(payload));
+import com.github.geekluffy.razorshield.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+
+@RestController
+public class CheckoutController {
+    private final RazorShieldClient sentinel = new RazorShieldClient(System.getenv("RAZORSHIELD_API_KEY"));
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> handleCheckout(@RequestBody CheckoutPayload payload) {
+        Decision decision = sentinel.evaluate(payload);
+        if (decision.isQuarantined()) return ResponseEntity.status(403).body(decision.getHoneypot());
+        return ResponseEntity.ok(paymentService.process(payload));
+    }
 }"""
         },
         "curl": {
             "language": "cURL / HTTP Standard",
-            "package": "Standard HTTP POST Request",
-            "code": """curl -X POST https://api.razorshield.sentinel/v1/checkout \\
+            "package": "Standard HTTP/JSON POST Request",
+            "code": """curl -X POST http://localhost:8000/checkout \\
   -H "Authorization: Bearer rzp_live_key_99" \\
   -H "Content-Type: application/json" \\
   -d '{
+    "transaction_id": "tx_live_8831",
     "amount": 2499.0,
+    "currency": "INR",
+    "merchant_id": "rzp_merch_01",
     "card_hash": "c_9981",
     "device_fingerprint": "dev_41",
     "keystroke_entropy": 2.85
@@ -1447,6 +1474,7 @@ public ResponseEntity<?> handleCheckout(@RequestBody CheckoutPayload payload) {
         }
     }
     return {"status": "SUCCESS", "snippets": snippets}
+
 
 
 class CaseActionRequest(BaseModel):
