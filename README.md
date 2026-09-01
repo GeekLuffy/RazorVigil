@@ -20,9 +20,9 @@
 
 ## 🎯 What Is RazorShield Sentinel?
 
-RazorShield Sentinel is an **eight-layer, synchronous AI risk gateway** that sits on the live checkout authorization path. Every transaction is evaluated by a persistence-gated quad-ensemble ML engine — LightGBM + CatBoost + Isolation Forest + GraphSAGE — and a Split Conformal Prediction calibrator, producing a certified fraud decision in **under 15 ms** with a 95% statistical coverage guarantee.
+RazorShield Sentinel is an **eight-layer, synchronous AI risk gateway** that sits directly on the live checkout authorization path. Every transaction is evaluated by a persistence-gated quad-ensemble ML engine — LightGBM + CatBoost + Isolation Forest + GraphSAGE — and a Split Conformal Prediction calibrator, producing a certified fraud decision in **under 15 ms** with a 95% statistical coverage guarantee.
 
-Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph partitioning, adversarial coevolution simulation, and automated RBI-compliant dispute evidence packaging in the background — without touching the synchronous SLA.
+Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph partitioning, adversarial coevolution simulation, and automated RBI-compliant dispute evidence packaging in the background — without adding a single millisecond to the checkout latency budget.
 
 ---
 
@@ -32,15 +32,15 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 
 | Metric | Tabular GBDT Blend | Static 4-Way Blend | **Persistence-Gated P2** ✅ |
 | :--- | :---: | :---: | :---: |
-| PR-AUC | 0.9997 `[0.9995, 0.9999]` | 0.9991 `[0.9983, 0.9997]` | **0.9963** `[0.9944, 0.9979]` |
-| ROC-AUC | 0.9999 `[0.9998, 0.9999]` | 0.9996 `[0.9991, 0.9999]` | **0.9986** `[0.9980, 0.9992]` |
-| Full-Funnel Fraud Catch Rate | 99.60% `[99.36%, 99.80%]` | 99.57% `[99.33%, 99.80%]` | **99.57%** `[99.33%, 99.80%]` |
-| Adversarial Bot Recall | 97.60% `[96.20%, 98.80%]` | 97.00% `[95.60%, 98.40%]` | **97.00%** `[95.60%, 98.40%]` |
-| Zero-Day CVV Cycling Recall | 8.20% *(supervised failure)* | 8.20% *(supervised failure)* | **76.80%** `[73.40%, 80.40%]` |
-| Split Conformal Coverage (α=0.05) | — | — | **95.40%** `[94.90%, 95.80%]` |
-| Normal Genuine FPR | 0.00% | 0.00% | **0.09%** `[0.00%, 0.27%]` |
-| Edge-Case Genuine FPR (VPN/travelers) | 6.00% | 5.60% | **10.60%** *(validated trade-off)* |
-| Sequential P99 Latency | 13.86 ms | 14.10 ms | **14.20 ms** |
+| **Held-Out Test PR-AUC** | 0.9997 `[0.9995, 0.9999]` | 0.9991 `[0.9983, 0.9997]` | **0.9963** `[0.9944, 0.9979]` |
+| **Held-Out Test ROC-AUC** | 0.9999 `[0.9998, 0.9999]` | 0.9996 `[0.9991, 0.9999]` | **0.9986** `[0.9980, 0.9992]` |
+| **Full-Funnel Fraud Catch Rate** | 99.60% `[99.36%, 99.80%]` | 99.57% `[99.33%, 99.80%]` | **99.57%** `[99.33%, 99.80%]` |
+| **Adversarial Bot Recall** | 97.60% `[96.20%, 98.80%]` | 97.00% `[95.60%, 98.40%]` | **97.00%** `[95.60%, 98.40%]` |
+| **Zero-Day CVV Cycling Recall** | 8.20% *(supervised failure)* | 8.20% *(supervised failure)* | **76.80%** `[73.40%, 80.40%]` |
+| **Split Conformal Coverage (α=0.05)** | — | — | **95.40%** `[94.90%, 95.80%]` |
+| **Normal Genuine FPR** | 0.00% | 0.00% | **0.09%** `[0.00%, 0.27%]` |
+| **Edge-Case Genuine FPR (VPN/travelers)** | 6.00% | 5.60% | **10.60%** *(validated trade-off)* |
+| **Sequential P99 Latency** | 13.86 ms | 14.10 ms | **14.20 ms** |
 
 > The **10.60% Edge-Case FPR** at P2 is the explicit price of 76.8% zero-day CVV recall — a hard-won Pareto trade-off tuned across 2,187 configurations on the validation partition.
 
@@ -52,38 +52,48 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 
 ```mermaid
 flowchart TD
-    REQ([Checkout Request]) --> L0
+    REQ([Incoming Checkout Request]) --> L0
 
-    subgraph HOT["Synchronous Hot Path — P99 under 15 ms"]
-        L0["Layer 0 · Anti-Checker Tarpit — Luhn + micro-auth + 8s poison delay"]
-        L1["Layer 1 · 50 Armed Canary Honeytokens — cryptographic BIN traps"]
-        L2["Layer 2 · Sliding-Window Velocity — Redis 10s/1m/10m/1h windows"]
-        L3["Layer 3 · ASN and WebRTC Classifier — JA3 mismatch + Tor/DC block"]
-        L4["Layer 4 · Kinetic Biometric Gate — Shannon entropy H(Δt), bots H < 0.60 bits"]
-        L5["Layer 5 · Quad-Ensemble ML — LightGBM + CatBoost + Isolation Forest + GraphSAGE"]
-        L6["Layer 6 · Zero-Trust 3DS2 — Ed25519 nonces + CAVV/AAV + OTP relay rejection"]
-        L7["Layer 7 · Louvain Graph Engine — bipartite partitioning Q = 0.8994, 30-min decay"]
-        CF["Split Conformal Calibration — 95% certified coverage P(Y∈C(X)) ≥ 1−α"]
-        MEL["Bayesian MEL Action Tiering — argmin E[Loss|a] across Pass / Hold / Block"]
+    subgraph HOT [Synchronous Hot Path - Under 15ms SLA]
+        direction TB
+        L0["Layer 0: Anti-Checker Tarpit (Luhn + Micro-Auth Trap)"]
+        L1["Layer 1: 50 Armed Canary Honeytokens (Zero FPR Escape)"]
+        L2["Layer 2: Sliding-Window Velocity (Redis 10s / 1m / 10m / 1h)"]
+        L3["Layer 3: ASN and WebRTC Classifier (JA3 + Subnet Defense)"]
+        L4["Layer 4: Kinetic Biometric Gate (Keystroke Shannon Entropy)"]
+        L5["Layer 5: Quad-Ensemble ML (LGBM + CatBoost + IF + GraphSAGE)"]
+        L6["Layer 6: Zero-Trust 3DS2 (Ed25519 Nonces + CAVV Validation)"]
+        L7["Layer 7: Louvain Graph Engine (Temporal Modularity Q=0.8994)"]
+        CF["Split Conformal Calibration (95% Certified Coverage)"]
+        MEL["Bayesian Minimum Expected Loss Action Tiering"]
 
-        L0 --> L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> CF --> MEL
+        L0 --> L1
+        L1 --> L2
+        L2 --> L3
+        L3 --> L4
+        L4 --> L5
+        L5 --> L6
+        L6 --> L7
+        L7 --> CF
+        CF --> MEL
     end
 
-    MEL --> T1 & T2 & T3
+    MEL --> T1["Tier 1: Instant Approval (Clean Genuine - Under 12ms)"]
+    MEL --> T2["Tier 2: Soft-Risk Hold (Dynamic UPI QR Step-Up)"]
+    MEL --> T3["Tier 3: Tarpit and Block (High-Confidence Botnet)"]
 
-    T1(["✅ Tier 1 — Instant Approval — Clean genuine, under 12 ms"])
-    T2(["🔄 Tier 2 — UPI QR Hold — Soft-risk, 5-min step-up"])
-    T3(["🚨 Tier 3 — Tarpit and Block — High-confidence bot"])
-
-    subgraph ASYNC["Asynchronous Intelligence Plane — Background"]
-        A1["Louvain Mule Ring Explorer — community modularity Q = 0.8994"]
-        A2["Threat Memory Copilot RAG — 8D cosine similarity + RBI citations"]
-        A3["Red-Team Arms Race Simulator — 5-round adversarial coevolution"]
-        A4["Dispute Evidence Package — ReportLab PDF, SHA-256 sealed"]
-        A5["PSI Drift Monitor — off-policy doubly robust eval, ₹266.58 lift"]
+    subgraph ASYNC [Asynchronous Intelligence Plane - Background Engine]
+        direction TB
+        A1["Louvain Mule Ring Explorer (Q=0.8994 Modularity)"]
+        A2["Threat Memory Copilot RAG (8D Cosine Similarity)"]
+        A3["Red-Team Arms Race Simulator (5-Round Coevolution)"]
+        A4["Dispute Evidence Dossier (ReportLab PDF + SHA-256)"]
+        A5["PSI Drift Monitor (Doubly Robust Evaluation)"]
     end
 
-    T1 & T2 & T3 -.->|enrichment| ASYNC
+    T1 -.-> A1
+    T2 -.-> A2
+    T3 -.-> A3
 ```
 
 ---
@@ -92,48 +102,78 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    SCORE["ML Risk Score — P-hat of fraud given X"]
-
-    SCORE -->|"P-hat less than 1 minus q-hat"| GENUINE["Prediction Set = genuine — Instant Approval"]
-    SCORE -->|"1 minus q-hat to q-hat"| UNCERTAIN["Prediction Set = genuine or fraud — UPI QR Step-Up"]
-    SCORE -->|"P-hat greater than q-hat"| FRAUD["Prediction Set = fraud — Honeypot Block"]
+    SCORE["ML Risk Score P(Fraud|X)"]
+    
+    SCORE -->|P less than 1-q| GENUINE["Prediction Set: {genuine} -> Instant Approval"]
+    SCORE -->|1-q to q| UNCERTAIN["Prediction Set: {genuine, fraud} -> Dynamic UPI QR Step-Up"]
+    SCORE -->|P greater than q| FRAUD["Prediction Set: {fraud} -> Honeypot Block"]
 ```
 
 ---
 
-### Zero-Day CVV Cycling — Component Recall (N = 500 held-out)
+### Zero-Day CVV Cycling — Generalization Benchmark (N = 500 Held-Out)
 
-```mermaid
-xychart-beta
-    title "Leave-One-Attack-Out CVV Cycling Recall (%)"
-    x-axis ["P2 Gated", "Isolation Forest", "GNN/Cluster", "LightGBM", "CatBoost", "GBDT Blend"]
-    y-axis "Recall (%)" 0 --> 100
-    bar [76.8, 75.2, 29.8, 9.0, 6.6, 8.2]
-```
+| Defense Component | Detection Mechanism | Zero-Day CVV Recall | 95% Confidence Interval | Generalization Status |
+| :--- | :--- | :---: | :---: | :---: |
+| **Persistence-Gated P2** ✅ | Dynamic Disagreement Gate | `████████████████░░░░` **76.80%** | `[73.40%, 80.40%]` | **State-of-the-Art** |
+| **Isolation Forest (Standalone)** | Unsupervised Anomaly Boundary | `███████████████░░░░░` **75.20%** | `[71.60%, 78.80%]` | **Robust** |
+| **Heterogeneous GraphSAGE** | Entity Relational Clustering | `██████░░░░░░░░░░░░░░` **29.80%** | `[25.60%, 33.60%]` | Partial |
+| **LightGBM (Standalone)** | Supervised Tree Partitioning | `██░░░░░░░░░░░░░░░░░░` **9.00%** | `[6.40%, 11.40%]` | Fails on unseen geometry |
+| **Tabular GBDT Blend** | Supervised Weighted Average | `██░░░░░░░░░░░░░░░░░░` **8.20%** | `[5.80%, 10.60%]` | Fails on unseen geometry |
+| **CatBoost (Standalone)** | Supervised Tree Partitioning | `█░░░░░░░░░░░░░░░░░░░` **6.60%** | `[4.60%, 8.80%]` | Fails on unseen geometry |
 
 ---
 
 ## 🔬 Mathematical Foundations
 
-### 1. Split Conformal Prediction  *(Distribution-Free Guarantee)*
-$$P(Y \in C(X)) \ge 1 - \alpha \qquad (\alpha = 0.05 \implies 95\%\text{ certified coverage})$$
+### 1. Split Conformal Prediction *(Distribution-Free Guarantee)*
+
+$$
+P(Y \in C(X)) \ge 1 - \alpha \qquad (\alpha = 0.05 \implies 95\%\text{ certified coverage})
+$$
 
 Non-conformity scores $s_i = 1 - \hat{P}(Y = y_i \mid X_i)$ over calibration set $n = 2{,}000$:
-$$\hat{q} = \text{Quantile}_{\lceil(n+1)(1-\alpha)\rceil/n}(s_1,\dots,s_n)$$
 
-### 2. Kinetic Keystroke Shannon Entropy  *(USENIX Security Literature)*
-$$H(\Delta t) = -\sum_{k=1}^{K} p_k \log_2 p_k$$
-Human baseline: $H \in [2.20,\,3.50]$ bits. Robotic replay: $H < 0.60$ bits ($> 5.9\sigma$ anomaly).
+$$
+\hat{q} = \text{Quantile}_{\lceil(n+1)(1-\alpha)\rceil/n}(s_1,\dots,s_n)
+$$
 
-### 3. Temporal Louvain Graph Modularity  *(30-min Exponential Decay)*
-$$W(e,\,\Delta t) = \max\!\left(0.05,\; e^{-\Delta t / 1800}\right) \qquad Q = 0.8994$$
+---
 
-### 4. Bayesian Minimum Expected Loss  *(MEL Action Optimizer)*
-$$a^* = \arg\min_{a \in \{\text{Pass},\,\text{Hold},\,\text{Block}\}} \mathbb{E}[\text{Loss} \mid a]$$
+### 2. Kinetic Keystroke Shannon Entropy *(USENIX Security Literature)*
+
+$$
+H(\Delta t) = -\sum_{k=1}^{K} p_k \log_2(p_k)
+$$
+
+Human baseline: $H \in [2.20, 3.50]\text{ bits}$. Robotic replay: $H < 0.60\text{ bits}$ ($> 5.9\sigma$ anomaly).
+
+---
+
+### 3. Temporal Louvain Graph Modularity *(30-min Exponential Decay)*
+
+$$
+W(e, \Delta t) = \max\left(0.05, e^{-\Delta t / 1800}\right) \qquad Q = 0.8994
+$$
+
+---
+
+### 4. Bayesian Minimum Expected Loss *(MEL Action Optimizer)*
+
+$$
+a^* = \arg\min_{a \in \{\text{Pass}, \text{Hold}, \text{Block}\}} \mathbb{E}[\text{Loss} \mid a]
+$$
+
+---
 
 ### 5. Off-Policy Doubly Robust Policy Evaluation
-$$\hat{V}_{\mathrm{DR}}(\pi) = \frac{1}{N}\sum_{i=1}^{N}\left[\hat{Q}(x_i,\pi(x_i)) + \frac{\mathbb{I}(a_i = \pi(x_i))}{p(a_i \mid x_i)}\left(r_i - \hat{Q}(x_i,a_i)\right)\right]$$
-Policy value: **₹194.29** vs. static baseline **−₹72.29** → net lift **₹266.58 per 1,000 transactions**.
+
+$$
+\hat{V}_{\text{DR}}(\pi) = \frac{1}{N}\sum_{i=1}^{N}\left[\hat{Q}(x_i,\pi(x_i)) + \frac{\mathbb{I}(a_i = \pi(x_i))}{p(a_i \mid x_i)}\left(r_i - \hat{Q}(x_i,a_i)\right)\right]
+$$
+
+- Policy value: **₹194.29** vs. static baseline **−₹72.29**
+- Net economic lift: **₹266.58 per 1,000 transactions**
 
 ---
 
@@ -151,12 +191,12 @@ cd razorshield-sentinel
 pip install -r requirements.txt
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 
-# 3. Frontend  (new terminal)
+# 3. Frontend (in a new terminal)
 cd frontend && npm install && npm run dev
 
 # 4. Open
-#    SOC Command Center  →  http://localhost:5173/
-#    OpenAPI / Swagger   →  http://127.0.0.1:8000/docs
+#    SOC Command Center  ->  http://localhost:5173/
+#    OpenAPI / Swagger   ->  http://127.0.0.1:8000/docs
 ```
 
 ### Run the Full Test Suite
@@ -186,7 +226,7 @@ python -m pytest tests/ -v
 
 Full documentation follows the [Diataxis framework](https://diataxis.fr):
 
-| | Document | Purpose |
+| Quadrant | Document | Purpose |
 | :--- | :--- | :--- |
 | 🎓 | [Getting Started Tutorial](docs/tutorial-quickstart.md) | Zero → live defense in 3 steps |
 | 🛠️ | [SDK Integration Guide](docs/howto-merchant-integration.md) | Drop-in in 4 languages, < 5 lines |
