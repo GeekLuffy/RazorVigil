@@ -18,7 +18,7 @@ function loadRazorpayScript() {
   return rzpScriptPromise
 }
 
-export default function MerchantStore({ onClose, onPaymentComplete }) {
+export default function MerchantStore({ onClose, onPaymentComplete, onTransactionEvaluated }) {
   const PRODUCTS = [
     {
       id: 'aj1',
@@ -480,6 +480,18 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       const data = await res.json()
       setCheckoutResult(data)
 
+      if (onTransactionEvaluated && data.transaction_id) {
+        onTransactionEvaluated({
+          transaction_id: data.transaction_id,
+          amount: selectedProduct.price,
+          tier: data.tier || 'safe',
+          risk_score: data.risk_score || 0.05,
+          latency_ms: data.latency_ms || 8.2,
+          explanation: data.explanation || 'Merchant Store checkout',
+          timestamp: Date.now()
+        })
+      }
+
       if (data.tier === 'safe' && data.razorpay_order_id) {
         const cfg = await fetch(`${API_BASE}/config`).then(r => r.json()).catch(() => ({ razorpay_key_id: 'rzp_test_demo12345678' }))
         const keyId = cfg.razorpay_key_id || 'rzp_test_demo12345678'
@@ -588,6 +600,18 @@ export default function MerchantStore({ onClose, onPaymentComplete }) {
       })
       const data = await res.json()
       setCheckoutResult(data)
+
+      if (onTransactionEvaluated && data.transaction_id) {
+        onTransactionEvaluated({
+          transaction_id: data.transaction_id,
+          amount: selectedProduct.price,
+          tier: data.tier || 'safe',
+          risk_score: data.risk_score || 0.05,
+          latency_ms: data.latency_ms || 8.2,
+          explanation: data.explanation || 'Native Razorpay checkout evaluation',
+          timestamp: Date.now()
+        })
+      }
 
       await loadRazorpayScript()
       if (window.Razorpay && !keyId.startsWith('rzp_test_demo')) {

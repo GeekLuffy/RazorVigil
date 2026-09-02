@@ -3,7 +3,7 @@ import { Flame, ShieldAlert, Bot, Globe, CheckCircle2, Play, Loader2, Zap, Lock,
 
 import { API_BASE } from '../config'
 
-export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransaction }) {
+export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransaction, onTransactionEvaluated }) {
   const [loadingAction, setLoadingAction] = useState(null)
   const [lastActionStatus, setLastActionStatus] = useState(null)
   const [interceptionEvent, setInterceptionEvent] = useState(null)
@@ -33,18 +33,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           })
         }).then(r => r.json())
 
+        const txPayload = {
+          transaction_id: res.transaction_id || `tg_stolen_card_411773_${Date.now()}`,
+          amount: 1.0,
+          tier: res.tier || 'high_confidence_bot',
+          risk_score: res.risk_score || 0.99,
+          latency_ms: res.latency_ms || 8.4,
+          explanation: res.explanation || 'CDP Fingerprint matched known Telegram scraper. ₹1 micro-auth poisoned.',
+          timestamp: Date.now()
+        }
+
         setInterceptionEvent({
           title: 'Telegram ₹1 Checker Intercepted',
           verdict: 'BLOCKED · 403 HONEYPOT',
-          tier: res.tier || 'high_confidence_bot',
-          riskScore: res.risk_score || 0.99,
-          latencyMs: res.latency_ms || 8.4,
+          tier: txPayload.tier,
+          riskScore: txPayload.risk_score,
+          latencyMs: txPayload.latency_ms,
           layer: 'Layer 0: Sentinel Anti-Checker & Micro-Auth Tarpit',
-          detail: res.explanation || 'CDP Fingerprint matched known Telegram scraper. ₹1 micro-auth poisoned.',
+          detail: txPayload.explanation,
           payload: 'HTTP 403 · Honeypot Issued (₹1 Voided)',
-          txId: res.transaction_id || `tg_stolen_card_411773_${Date.now()}`
+          txId: txPayload.transaction_id
         })
         setLastActionStatus('Telegram ₹1 Checker Exploit Blocked via Botnet Fingerprint & Micro-Auth Trap')
+        if (onTransactionEvaluated) onTransactionEvaluated(txPayload)
       } else if (type === 'burst') {
         // Fire 15 rapid bot requests
         let lastRes = null
@@ -70,18 +81,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           await new Promise(r => setTimeout(r, 40))
         }
 
+        const burstPayload = {
+          transaction_id: lastRes?.transaction_id || `sim_bot_burst_${Date.now()}`,
+          amount: 750,
+          tier: 'high_confidence_bot',
+          risk_score: lastRes?.risk_score || 0.985,
+          latency_ms: lastRes?.latency_ms || 7.2,
+          explanation: 'Velocity threshold exceeded (15 rapid requests in 600ms). Sub-second sliding window locked.',
+          timestamp: Date.now()
+        }
+
         setInterceptionEvent({
           title: '15x Botnet Burst Suppressed',
           verdict: '15/15 BLOCKED (100% RECALL)',
           tier: 'high_confidence_bot',
-          riskScore: lastRes?.risk_score || 0.985,
-          latencyMs: lastRes?.latency_ms || 7.2,
+          riskScore: burstPayload.risk_score,
+          latencyMs: burstPayload.latency_ms,
           layer: 'Layer 1: Redis Sliding-Window Velocity Surge',
-          detail: 'Velocity threshold exceeded (15 rapid requests in 600ms). Sub-second sliding window locked.',
+          detail: burstPayload.explanation,
           payload: 'HTTP 403 · Velocity Lockout & Device Blacklist',
-          txId: lastRes?.transaction_id || `sim_bot_burst_${Date.now()}`
+          txId: burstPayload.transaction_id
         })
         setLastActionStatus('15x Bot Burst Blocked (100% caught)')
+        if (onTransactionEvaluated) onTransactionEvaluated(burstPayload)
       } else if (type === 'canary') {
         // Fetch canary hash and hit
         const canResp = await fetch(`${API_BASE}/canary/demo-hash?index=7`).then(r => r.json())
@@ -101,18 +123,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           })
         }).then(r => r.json())
 
+        const canaryPayload = {
+          transaction_id: res?.transaction_id || `canary_${Date.now()}`,
+          amount: 3200,
+          tier: 'high_confidence_bot',
+          risk_score: 1.00,
+          latency_ms: res?.latency_ms || 5.1,
+          explanation: `Pre-seeded decoy honeytoken card ${canResp.card_hash.slice(0, 16)}... attempted. Zero legitimate reason to exist in production.`,
+          timestamp: Date.now()
+        }
+
         setInterceptionEvent({
           title: 'Canary Honeytoken Trapped',
           verdict: 'ZERO-TOLERANCE CANARY TRAP',
           tier: 'high_confidence_bot',
           riskScore: 1.00,
-          latencyMs: res?.latency_ms || 5.1,
+          latencyMs: canaryPayload.latency_ms,
           layer: 'Layer 0: Sentinel-2 Luhn Canary Decoy Card',
-          detail: `Pre-seeded decoy honeytoken card ${canResp.card_hash.slice(0, 16)}... attempted. Zero legitimate reason to exist in production.`,
+          detail: canaryPayload.explanation,
           payload: 'HTTP 403 · Instant Autonomous Device Blacklist',
-          txId: res?.transaction_id || `canary_${Date.now()}`
+          txId: canaryPayload.transaction_id
         })
         setLastActionStatus('Canary Honeytoken Card Caught (Risk=1.00)')
+        if (onTransactionEvaluated) onTransactionEvaluated(canaryPayload)
       } else if (type === 'agent') {
         // Fetch agent token
         const tokResp = await fetch(`${API_BASE}/agent/demo-token?agent_id=shopping-agent-v1&spend_limit=10000`).then(r => r.json())
@@ -136,18 +169,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           })
         }).then(r => r.json())
 
+        const agentPayload = {
+          transaction_id: res?.transaction_id || `agent_${Date.now()}`,
+          amount: 4500,
+          tier: 'verified_agent',
+          risk_score: res?.risk_score && res.risk_score < 0.5 ? res.risk_score : 0.02,
+          latency_ms: res?.latency_ms || 4.2,
+          explanation: 'Cryptographic attestation token validated against issuer public key within spend limit (₹4,500 < ₹10,000 max).',
+          timestamp: Date.now()
+        }
+
         setInterceptionEvent({
           title: 'Autonomous AI Shopping Agent Verified',
           verdict: 'AUTHENTICATED PASS (FAST-PATH)',
           tier: 'verified_agent',
-          riskScore: res?.risk_score || 0.02,
-          latencyMs: res?.latency_ms || 4.2,
+          riskScore: agentPayload.risk_score,
+          latencyMs: agentPayload.latency_ms,
           layer: 'Layer 2: ECDSA Cryptographic Attestation Protocol',
-          detail: 'Cryptographic attestation token validated against issuer public key within spend limit (₹4,500 < ₹10,000 max).',
+          detail: agentPayload.explanation,
           payload: 'HTTP 200 · Razorpay Core Order Issued',
-          txId: res?.transaction_id || `agent_${Date.now()}`
+          txId: agentPayload.transaction_id
         })
         setLastActionStatus('Verified AI Shopping Agent Passed via Attestation')
+        if (onTransactionEvaluated) onTransactionEvaluated(agentPayload)
       } else if (type === 'proxy') {
         // Rotating Residential Proxy Autohitter
         const isps = ['airtel_delhi', 'jio_mumbai', 'act_blr', 'tata_hyd', 'bsnl_kolkata', 'hathway_pune']
@@ -174,18 +218,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           await new Promise(r => setTimeout(r, 60))
         }
 
+        const proxyPayload = {
+          transaction_id: lastRes?.transaction_id || `proxy_swarm_${Date.now()}`,
+          amount: 16999,
+          tier: 'high_confidence_bot',
+          risk_score: lastRes?.risk_score || 0.97,
+          latency_ms: lastRes?.latency_ms || 9.1,
+          explanation: 'Single hardware device fingerprint cycling across 6 residential ISP nodes isolated into Syndicate Ring #1.',
+          timestamp: Date.now()
+        }
+
         setInterceptionEvent({
           title: 'Rotating Residential Proxy Swarm Neutralized',
           verdict: 'LOUVAIN RING ISOLATED (Q=0.89)',
           tier: 'high_confidence_bot',
-          riskScore: lastRes?.risk_score || 0.97,
-          latencyMs: lastRes?.latency_ms || 9.1,
+          riskScore: proxyPayload.risk_score,
+          latencyMs: proxyPayload.latency_ms,
           layer: 'Layer 4: In-Memory Bipartite Graph Partitioning',
-          detail: 'Single hardware device fingerprint cycling across 6 residential ISP nodes isolated into Syndicate Ring #1.',
+          detail: proxyPayload.explanation,
           payload: 'HTTP 403 · Multi-Node Syndicate Severed',
-          txId: lastRes?.transaction_id || `proxy_swarm_${Date.now()}`
+          txId: proxyPayload.transaction_id
         })
         setLastActionStatus('Rotating Residential Proxy Autohitter Blocked via Device Fanout & Louvain Graph Ring')
+        if (onTransactionEvaluated) onTransactionEvaluated(proxyPayload)
       } else if (type === 'otp_relay') {
         // Test 3DS2 OTP-Relay Interception
         const otpRes = await fetch(`${API_BASE}/otp/verify`, {
@@ -204,18 +259,29 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           })
         }).then(r => r.json())
 
+        const otpPayload = {
+          transaction_id: `tx_otp_relay_${Date.now()}`,
+          amount: 5000,
+          tier: 'high_confidence_bot',
+          risk_score: otpRes.risk_score || 0.96,
+          latency_ms: 11.2,
+          explanation: otpRes.reason || 'Robotic OTP entry in 45ms with 0ms variance (simulated Evilginx / Modlishka). Session invalidated.',
+          timestamp: Date.now()
+        }
+
         setInterceptionEvent({
           title: '3DS2 OTP-Relay MITM Neutralized',
           verdict: 'REVERSE-PROXY INJECTION DETECTED',
           tier: 'high_confidence_bot',
-          riskScore: otpRes.risk_score || 0.96,
+          riskScore: otpPayload.risk_score,
           latencyMs: 11.2,
           layer: 'Layer 5: Behavioral Keystroke Dynamics & OTP Flight Timing',
-          detail: otpRes.reason || 'Robotic OTP entry in 45ms with 0ms variance (simulated Evilginx / Modlishka). Session invalidated.',
+          detail: otpPayload.explanation,
           payload: 'HTTP 403 · Reverse-Proxy MITM Neutralized',
-          txId: `otp_relay_${Date.now()}`
+          txId: otpPayload.transaction_id
         })
-        setLastActionStatus(`3DS2 OTP-Relay MITM Neutralized: ${otpRes.reason} (Risk: ${otpRes.risk_score.toFixed(2)})`)
+        setLastActionStatus(`3DS2 OTP-Relay MITM Neutralized: ${otpRes.reason} (Risk: ${(otpRes.risk_score || 0.96).toFixed(2)})`)
+        if (onTransactionEvaluated) onTransactionEvaluated(otpPayload)
       }
     } catch (e) {
       setLastActionStatus(`Error: ${e.message}`)

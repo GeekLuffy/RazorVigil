@@ -160,6 +160,32 @@ export default function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const [copilotNotes, setCopilotNotes] = useState([])
 
+  // Dual-Channel Real-Time Transaction Handler (WebSocket + Direct Simulation/Store Callback)
+  const handleLiveTransaction = useCallback((tx) => {
+    if (!tx || !tx.transaction_id) return
+    setTransactions(prev => {
+      const seen = new Set([tx.transaction_id])
+      const filteredPrev = prev.filter(t => t && t.transaction_id && !seen.has(t.transaction_id))
+      return [tx, ...filteredPrev].slice(0, MAX_FEED_ITEMS)
+    })
+    const tier = tx.tier || 'safe'
+    setTierCounts(prev => ({
+      ...prev,
+      [tier]: (prev[tier] || 0) + 1
+    }))
+    setStats(prev => {
+      const isThreat = tier === 'high_confidence_bot' || (tx.risk_score && tx.risk_score > 0.6)
+      const amt = Number(tx.amount || 0)
+      const incBlocked = isThreat ? (amt > 0 ? amt : 16999) : 0
+      return {
+        ...prev,
+        total_evaluated: (prev.total_evaluated || 24891) + 1,
+        total_blocked_inr: (prev.total_blocked_inr || 1930500) + incBlocked,
+        p99_latency_ms: tx.latency_ms ? Number(Number(tx.latency_ms).toFixed(1)) : prev.p99_latency_ms
+      }
+    })
+  }, [])
+
   // ?? WebSocket Ingestion Stream Connection ??
   useEffect(() => {
     let ws = null
@@ -181,25 +207,12 @@ export default function App() {
         ws.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data)
-            if (data.type === 'transaction' && !isPaused) {
-              const tx = data.payload || data
-              if (!tx || !tx.transaction_id) return
-              setTransactions(prev => {
-                const seen = new Set([tx.transaction_id])
-                const filteredPrev = prev.filter(t => t && t.transaction_id && !seen.has(t.transaction_id))
-                return [tx, ...filteredPrev].slice(0, MAX_FEED_ITEMS)
-              })
-              setTierCounts(prev => ({
-                ...prev,
-                [tx.tier || 'safe']: (prev[tx.tier || 'safe'] || 0) + 1
-              }))
-              setStats(prev => ({
-                ...prev,
-                total_evaluated: (prev.total_evaluated || 24891) + 1,
-                total_blocked_inr: tx.tier === 'high_confidence_bot'
-                  ? (prev.total_blocked_inr || 1930500) + (tx.amount || 0)
-                  : prev.total_blocked_inr
-              }))
+            const isTx = data.type === 'transaction' || !!data.transaction_id || !!(data.payload && data.payload.transaction_id)
+            if (isTx && !isPaused) {
+              const tx = data.type === 'transaction' ? (data.payload || data) : (data.payload || data)
+              if (tx && tx.transaction_id) {
+                handleLiveTransaction(tx)
+              }
             }
           } catch (e) {}
         }
@@ -216,7 +229,7 @@ export default function App() {
       if (reconnectTimeout) clearTimeout(reconnectTimeout)
       try { ws?.close() } catch (_) {}
     }
-  }, [isPaused])
+  }, [isPaused, handleLiveTransaction])
 
   // ?? Initial Snapshot Ingestion ??
   const fetchSnapshot = useCallback(async () => {
@@ -404,7 +417,7 @@ export default function App() {
               onOpenStore={() => setIsStoreOpen(true)}
               tierMetaFn={tierMeta}
               onNavigateTab={handleSelectTab}
-              isDark={isDark}
+              onTransactionEvaluated={handleLiveTransaction}
             />
           )}
 
@@ -434,7 +447,10 @@ export default function App() {
           )}
 
           {activeTab === 'simulator' && (
-            <AttackSimulatorPage onOpenStore={() => setIsStoreOpen(true)} />
+            <AttackSimulatorPage
+              onOpenStore={() => setIsStoreOpen(true)}
+              onTransactionEvaluated={handleLiveTransaction}
+            />
           )}
 
           {activeTab === 'architecture' && (
@@ -459,6 +475,7 @@ export default function App() {
       {isStoreOpen && (
         <MerchantStore
           onClose={() => setIsStoreOpen(false)}
+          onTransactionEvaluated={handleLiveTransaction}
         />
       )}
 

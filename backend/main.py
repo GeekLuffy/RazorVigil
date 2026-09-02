@@ -299,8 +299,13 @@ async def checkout(
     if proxy_res.is_vpn_or_proxy:
         req.asn_type = proxy_res.detected_asn_type
 
-    # 0.1 Anti-Checker Guard (Layer 0 Sentinel against Telegram scrapers & micro-auths)
-    if anti_checker:
+    # 0.1 Check for Cryptographic Agent Attestation (AP2 / shopping agents in cloud datacenters)
+    attestation = None
+    if x_agent_attestation:
+        attestation, _ = agent_validator.validate(x_agent_attestation, client_ip=req.ip_hash)
+
+    # 0.2 Anti-Checker Guard (Layer 0 Sentinel against Telegram scrapers & micro-auths) - skipped for verified agents
+    if not attestation and anti_checker:
         is_bot, bot_reason, bot_meta = anti_checker.evaluate_request(
             amount=req.amount,
             device_fingerprint=req.device_fingerprint,
@@ -344,7 +349,6 @@ async def checkout(
             asyncio.create_task(_broadcast(response.model_dump()))
         return response
 
-    attestation, _ = agent_validator.validate(x_agent_attestation or "", client_ip=req.ip_hash)
     if attestation:
         if not agent_validator.check_spend_limit(attestation, req.amount):
             latency_ms = (time.perf_counter() - t0) * 1000
@@ -1787,6 +1791,29 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 async def _broadcast(data: dict[str, Any]):
+    global _quarantined_threats_count
+    # Ensure all transactions follow the uniform {"type": "transaction", "payload": tx} schema
+    if "type" not in data and "transaction_id" in data:
+        data = {
+            "type": "transaction",
+            "payload": data
+        }
+
+    # Automatically persist live evaluated transactions into transaction_store and telemetry state
+    if data.get("type") == "transaction":
+        tx = data.get("payload", {})
+        tx_id = tx.get("transaction_id")
+        if tx_id:
+            transaction_store[tx_id] = tx
+            tier = tx.get("tier", "safe")
+            _eval_counts[tier] = _eval_counts.get(tier, 0) + 1
+            if tier == "high_confidence_bot":
+                _quarantined_threats_count += 1
+            if tx.get("latency_ms"):
+                _latency_history.append(float(tx["latency_ms"]))
+                if len(_latency_history) > 500:
+                    _latency_history.pop(0)
+
     payload = json.dumps(data, default=str)
     dead: list[WebSocket] = []
     for ws in ws_clients:
