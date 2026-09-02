@@ -33,6 +33,36 @@ _FT_PATH = _MODEL_DIR / "ft_transformer_model.pt"
 _CALIB_PATH = _MODEL_DIR / "conformal_calibrator.pkl"
 
 
+class ClusterFTTransformer(torch.nn.Module):
+    def __init__(self, n_num: int = 16, card_cat: list = None, d_token: int = 96, n_heads: int = 8, n_layers: int = 4):
+        super().__init__()
+        card_cat = card_cat or [4]
+        self.num_tokenizer = torch.nn.ModuleList([torch.nn.Linear(1, d_token) for _ in range(n_num)])
+        self.cat_tokenizer = torch.nn.ModuleList([torch.nn.Embedding(card, d_token) for card in card_cat])
+        self.cls_token = torch.nn.Parameter(torch.randn(1, 1, d_token) * 0.02)
+        encoder_layer = torch.nn.TransformerEncoderLayer(
+            d_model=d_token, nhead=n_heads, dim_feedforward=d_token * 4,
+            dropout=0.1, activation="gelu", batch_first=True
+        )
+        self.transformer = torch.nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
+        self.head = torch.nn.Sequential(
+            torch.nn.LayerNorm(d_token),
+            torch.nn.Linear(d_token, 32),
+            torch.nn.GELU(),
+            torch.nn.Linear(32, 1)
+        )
+
+    def forward(self, x_num: torch.Tensor, x_cat: torch.Tensor) -> torch.Tensor:
+        B = x_num.shape[0]
+        tokens = [self.num_tokenizer[i](x_num[:, i:i+1]).unsqueeze(1) for i in range(x_num.shape[1])]
+        for i in range(x_cat.shape[1]):
+            tokens.append(self.cat_tokenizer[i](x_cat[:, i]).unsqueeze(1))
+        cls = self.cls_token.expand(B, -1, -1)
+        x = torch.cat([cls] + tokens, dim=1)
+        x = self.transformer(x)
+        return torch.sigmoid(self.head(x[:, 0, :]))
+
+
 class RiskScorer:
     """
     Wraps the complete heterogeneous neural-tree quad-ensemble with Split Conformal Calibration.
@@ -43,7 +73,8 @@ class RiskScorer:
         self._lgbm = None
         self._catboost = None
         self._iso_forest = None
-        self._ft_model: Optional[FTTransformer] = None
+        self._ft_model = None
+        self._ft_is_cluster = False
         self._conformal_calibrator: Optional[ConformalRiskCalibrator] = None
         self._if_score_min: float = -0.5
         self._if_score_range: float = 1.0
@@ -80,12 +111,24 @@ class RiskScorer:
         # 4. PyTorch FT-Transformer
         if _FT_PATH.exists():
             try:
-                model = FTTransformer(n_num_features=17, d_token=64, n_blocks=3, n_heads=4)
-                state_dict = torch.load(_FT_PATH, map_location="cpu")
-                model.load_state_dict(state_dict)
+                ckpt = torch.load(_FT_PATH, map_location="cpu")
+                if isinstance(ckpt, dict) and "state_dict" in ckpt:
+                    model = ClusterFTTransformer(
+                        n_num=len(ckpt.get("num_cols", [])) or 16,
+                        card_cat=ckpt.get("card_cat", [4]),
+                        d_token=ckpt.get("d_token", 96),
+                        n_heads=ckpt.get("n_heads", 8),
+                        n_layers=ckpt.get("n_layers", 4)
+                    )
+                    model.load_state_dict(ckpt["state_dict"])
+                    self._ft_is_cluster = True
+                else:
+                    model = FTTransformer(n_num_features=17, d_token=64, n_blocks=3, n_heads=4)
+                    model.load_state_dict(ckpt)
+                    self._ft_is_cluster = False
                 model.eval()
                 self._ft_model = model
-                logger.info("[RiskScorer] PyTorch FT-Transformer neural model loaded from %s", _FT_PATH)
+                logger.info("[RiskScorer] PyTorch FT-Transformer neural model loaded from %s (cluster=%s)", _FT_PATH, self._ft_is_cluster)
             except Exception as e:
                 logger.warning("[RiskScorer] Could not load FT-Transformer: %s", e)
                 self._ft_model = None
@@ -109,21 +152,39 @@ class RiskScorer:
 
         # LightGBM: P(fraud)
         if self._lgbm is not None:
-            lgbm_prob = float(self._lgbm.predict_proba(row)[0][1])
+            lgbm_prob = float(self._lgbm.predict_proba(row)[:, 1][0])
         else:
             lgbm_prob = 0.5
 
         # CatBoost: P(fraud)
         if self._catboost is not None:
-            cb_prob = float(self._catboost.predict_proba(row)[0][1])
+            try:
+                cat_names = [
+                    'amount', 'amount_zscore', 'hour_sin', 'hour_cos', 'asn_type_encoded',
+                    'ja3_ua_mismatch', 'keystroke_entropy', 'mouse_jitter_score', 'paste_event',
+                    'time_on_page_s', 'bin_card_count', 'bin_name_count', 'ip_distinct_pan_count',
+                    'device_distinct_bin_count', 'device_distinct_ip_count', 'cvv_cycle_attempts',
+                    'cluster_risk_score'
+                ]
+                if row.shape[1] == len(cat_names):
+                    import pandas as pd
+                    row_df = pd.DataFrame(row, columns=cat_names)
+                    row_df['asn_type_encoded'] = row_df['asn_type_encoded'].fillna(0).astype(int)
+                    cb_prob = float(self._catboost.predict_proba(row_df)[:, 1][0])
+                else:
+                    cb_prob = float(self._catboost.predict_proba(row)[:, 1][0])
+            except Exception as e:
+                logger.debug("CatBoost predict error: %s", e)
+                cb_prob = lgbm_prob
         else:
-            cb_prob = lgbm_prob  # Fallback to LightGBM
+            cb_prob = 0.5
 
-        # IsolationForest: raw score is negative (more negative = more anomalous)
+        # IsolationForest: anomaly score ? normalized to [0, 1]
         if self._iso_forest is not None:
-            raw_if = float(self._iso_forest.score_samples(row)[0])
-            normalized_if = 1.0 - (raw_if - self._if_score_min) / max(self._if_score_range, 1e-6)
-            normalized_if = float(np.clip(normalized_if, 0.0, 1.0))
+            raw_if = float(self._iso_forest.decision_function(row)[0])
+            norm = (raw_if - self._if_score_min) / (self._if_score_range + 1e-9)
+            norm = float(np.clip(norm, 0.0, 1.0))
+            normalized_if = 1.0 - norm
         else:
             normalized_if = 0.5
 
@@ -136,8 +197,18 @@ class RiskScorer:
         try:
             with torch.no_grad():
                 x_tensor = torch.tensor(feature_vec.reshape(1, -1), dtype=torch.float32)
-                prob, _ = self._ft_model(x_tensor)
-                return float(prob.item())
+                if self._ft_is_cluster:
+                    cat_idx = int(x_tensor[0, 4].item()) if x_tensor.shape[1] > 4 else 0
+                    x_cat = torch.tensor([[max(0, min(3, cat_idx))]], dtype=torch.long)
+                    if x_tensor.shape[1] == 17:
+                        x_num = torch.cat([x_tensor[:, :4], x_tensor[:, 5:]], dim=1)
+                    else:
+                        x_num = x_tensor[:, :16]
+                    prob = self._ft_model(x_num, x_cat)
+                    return float(prob.item())
+                else:
+                    prob, _ = self._ft_model(x_tensor)
+                    return float(prob.item())
         except Exception as e:
             logger.warning("FT-Transformer inference error: %s", e)
             return 0.5

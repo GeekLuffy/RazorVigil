@@ -20,6 +20,8 @@ import {
   Clock
 } from 'lucide-react'
 import { API_BASE } from '../config'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 export default function CopilotIncidentRoom({ isOpen, onClose, pinnedTx, onSelectTx }) {
   const [messages, setMessages] = useState([
@@ -233,22 +235,42 @@ export default function CopilotIncidentRoom({ isOpen, onClose, pinnedTx, onSelec
               }`}
             >
               {/* Formatted Markdown Content */}
-              <div className="whitespace-pre-wrap font-sans text-xs space-y-2">
-                {msg.text.split('\n').map((line, lIdx) => {
-                  if (line.startsWith('### ')) {
-                    return <h4 key={lIdx} className="font-bold text-white text-sm mt-1">{line.replace('### ', '')}</h4>
-                  }
-                  if (line.startsWith('#### ')) {
-                    return <h5 key={lIdx} className="font-bold text-indigo-300 text-xs mt-1">{line.replace('#### ', '')}</h5>
-                  }
-                  if (line.startsWith('```')) {
-                    return null // Handled in code block section
-                  }
-                  if (line.startsWith('- **') || line.startsWith('1. **') || line.startsWith('2. **') || line.startsWith('3. **')) {
-                    return <div key={lIdx} className="pl-1 text-slate-300">{line}</div>
-                  }
-                  return <p key={lIdx} className="text-slate-300">{line}</p>
-                })}
+              <div className="font-sans text-xs space-y-2 leading-relaxed text-slate-200">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    h1: ({ node, ...props }) => <h3 className="text-sm font-bold text-white mt-3 mb-1.5 border-b border-slate-700/60 pb-1" {...props} />,
+                    h2: ({ node, ...props }) => <h4 className="text-xs font-bold text-indigo-300 mt-2.5 mb-1" {...props} />,
+                    h3: ({ node, ...props }) => <h5 className="text-xs font-bold text-slate-100 mt-2 mb-1 flex items-center gap-1.5" {...props} />,
+                    h4: ({ node, ...props }) => <h6 className="text-xs font-semibold text-indigo-300/90 mt-1.5 mb-0.5" {...props} />,
+                    p: ({ node, ...props }) => <p className="text-slate-300 mb-2 last:mb-0" {...props} />,
+                    strong: ({ node, ...props }) => <strong className="font-semibold text-white" {...props} />,
+                    em: ({ node, ...props }) => <em className="text-indigo-200 not-italic" {...props} />,
+                    ul: ({ node, ...props }) => <ul className="list-disc pl-4 space-y-1 my-1.5 text-slate-300" {...props} />,
+                    ol: ({ node, ...props }) => <ol className="list-decimal pl-4 space-y-1 my-1.5 text-slate-300" {...props} />,
+                    li: ({ node, ...props }) => <li className="text-slate-300 pl-0.5" {...props} />,
+                    code: ({ inline, className, children, ...props }) => {
+                      if (inline) {
+                        return <code className="px-1.5 py-0.5 rounded bg-slate-950 font-mono text-[11px] text-amber-300 border border-slate-800" {...props}>{children}</code>
+                      }
+                      return (
+                        <pre className="p-3 rounded-lg bg-slate-950/90 font-mono text-[11px] text-emerald-300 border border-slate-800 overflow-x-auto my-2 shadow-inner">
+                          <code {...props}>{children}</code>
+                        </pre>
+                      )
+                    },
+                    table: ({ node, ...props }) => (
+                      <div className="overflow-x-auto my-2.5 rounded-lg border border-slate-800 bg-slate-950/60">
+                        <table className="w-full text-left border-collapse text-[11px]" {...props} />
+                      </div>
+                    ),
+                    th: ({ node, ...props }) => <th className="p-2 bg-slate-800/80 font-bold text-slate-200 border-b border-slate-700" {...props} />,
+                    td: ({ node, ...props }) => <td className="p-2 border-b border-slate-800/60 text-slate-300" {...props} />,
+                    blockquote: ({ node, ...props }) => <blockquote className="border-l-2 border-indigo-500 pl-2.5 my-1.5 italic text-slate-400" {...props} />
+                  }}
+                >
+                  {msg.text}
+                </ReactMarkdown>
               </div>
 
               {/* Citations Section */}

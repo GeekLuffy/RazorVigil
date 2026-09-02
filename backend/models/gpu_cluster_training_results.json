@@ -1,15 +1,33 @@
 {
-  "status": "success",
-  "host": "bd216server3",
-  "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
-  "gpu_vram_gb": 10.57,
-  "catboost_test_pr_auc": 0.9997397952646951,
-  "catboost_test_roc_auc": 0.9998880952380952,
-  "ft_transformer_test_pr_auc": 0.9992099679881621,
-  "ft_transformer_test_roc_auc": 0.9996666666666666,
-  "conformal_q_hat_95": 0.02489340305328369,
-  "calibration_samples": 2000,
-  "test_samples": 2000,
-  "training_time_sec": 26.55,
-  "timestamp": 1788373826.3683267
+  "status": "SUCCESS",
+  "dataset_rows": 100000,
+  "trained_on": "bd216server3 (CUDA:4)",
+  "timestamp": 1788381600.7513301,
+  "total_training_time_s": 161.96,
+  "catboost": {
+    "iterations": 2500,
+    "depth": 7,
+    "pr_auc": 0.99987,
+    "roc_auc": 0.99994,
+    "f1": 0.99534,
+    "train_time_s": 17.25
+  },
+  "ft_transformer": {
+    "layers": 4,
+    "heads": 8,
+    "epochs": 12,
+    "pr_auc": 0.99977,
+    "roc_auc": 0.9999,
+    "f1": 0.99298,
+    "train_time_s": 144.71
+  },
+  "conformal_prediction": {
+    "alpha": 0.05,
+    "coverage_target": 0.95,
+    "q_hat": 0.006
+  },
+  "gpu_benchmark": {
+    "throughput_tps": 148765.4,
+    "latency_ms": 0.007
+  }
 }
