@@ -310,25 +310,12 @@ export default function DashboardPage({
       {/* ?? 4. Central War Room Stage: Graph + Threat Simulator ?? */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left 2 Cols: Interactive Bipartite Syndicate Graph */}
-        <div className="soc-card rounded-2xl p-5 lg:col-span-2 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h3 className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                <Network size={14} className="text-indigo-400" />
-                In-Memory Bipartite Syndicate Graph
-              </h3>
-              <p className="text-xs text-slate-400 font-sans mt-0.5">
-                Real-time topological link analysis between PANs, Devices, and Rotating Proxy IPs
-              </p>
-            </div>
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">
-              Live Topology
-            </span>
-          </div>
-
-          <div className={`w-full h-80 rounded-xl overflow-hidden border transition-colors ${isDark ? 'border-slate-800/80 bg-slate-950/80' : 'border-slate-200 bg-slate-50/50 shadow-inner'}`}>
-            <FraudGraphCanvas onSelectTransaction={setSelectedTx} isDark={isDark} />
-          </div>
+        <div className="soc-card rounded-2xl p-5 lg:col-span-2 flex flex-col h-full">
+          <FraudGraphCanvas
+            onSelectTransaction={setSelectedTx}
+            latestTx={transactions[0]}
+            isDark={isDark}
+          />
         </div>
 
         {/* Right 1 Col: Attack Simulator Launchpad + Store */}
