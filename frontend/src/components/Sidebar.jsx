@@ -1,7 +1,7 @@
 import React from 'react'
 import {
   Shield, LayoutDashboard, Layers, Activity, BarChart3,
-  Network, Flame, FileText, Scale, Moon, Sun, Globe,
+  Network, Flame, FileText, Scale, Moon, Sun,
   Radio, CheckCircle2, ShoppingBag, Bot, Zap, Cpu
 } from 'lucide-react'
 
@@ -143,7 +143,7 @@ export default function Sidebar({
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             <div>
               <div className="text-[11px] font-bold text-slate-200">ML Engine &amp; Redis</div>
-              <div className="text-[9px] text-slate-400 font-mono">P99: 8.4ms ? Active</div>
+              <div className="text-[9px] text-slate-400 font-mono">P99: 8.4ms · Active</div>
             </div>
           </div>
           <Zap size={14} className="text-emerald-400" />
@@ -174,7 +174,7 @@ export default function Sidebar({
                 lang === 'HI' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
               }`}
             >
-              ?????
+              हिन्दी
             </button>
           </div>
         </div>

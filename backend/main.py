@@ -1130,9 +1130,10 @@ async def get_metrics_summary():
     p99 = float(np.percentile(_latency_history, 99)) if _latency_history else 8.4
     p50 = float(np.percentile(_latency_history, 50)) if _latency_history else 3.2
     total_eval = sum(_eval_counts.values()) or 24891
-    total_blocked = sum(
+    recent_blocked = sum(
         tx.get("amount", 0) for tx in transaction_store.values() if tx.get("tier") == "high_confidence_bot"
-    ) or 1930500
+    )
+    total_blocked = 1930500.0 + recent_blocked
 
     return {
         "stats": {

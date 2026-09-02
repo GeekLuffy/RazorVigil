@@ -60,12 +60,12 @@ export default function RiskIntelligencePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center font-mono">
             <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800">
               <div className="text-[10px] text-slate-400 uppercase font-sans">Gross Fraud Prevented</div>
-              <div className="text-base font-black text-rose-400 mt-0.5">?19.30 Lakh</div>
+              <div className="text-base font-black text-rose-400 mt-0.5">₹19.30 Lakh</div>
               <div className="text-[9px] text-slate-500">142 Syndicates</div>
             </div>
             <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800">
               <div className="text-[10px] text-slate-400 uppercase font-sans">FP Friction Cost</div>
-              <div className="text-base font-black text-amber-400 mt-0.5">?18,450</div>
+              <div className="text-base font-black text-amber-400 mt-0.5">₹18,450</div>
               <div className="text-[9px] text-slate-500">80 False Checks</div>
             </div>
             <div className="p-3 bg-slate-950/80 rounded-xl border border-emerald-500/40 col-span-2 sm:col-span-1">
@@ -85,7 +85,7 @@ export default function RiskIntelligencePage() {
               <BarChart3 size={16} className="text-indigo-400" />
               7-Day Fraud Loss Mitigation vs. Friction Cost
             </h3>
-            <span className="text-xs font-mono text-emerald-400 font-bold">?19.3L Total Protected</span>
+            <span className="text-xs font-mono text-emerald-400 font-bold">₹19.3L Total Protected</span>
           </div>
 
           <div className="h-64 w-full">

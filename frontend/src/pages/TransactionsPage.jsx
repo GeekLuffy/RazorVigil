@@ -6,9 +6,9 @@ import {
   CreditCard, MapPin, Globe, User, Radio, Cpu, Activity
 } from 'lucide-react'
 
-function fmt(n) { return typeof n === 'number' ? n.toFixed(3) : '?' }
-function fmtMs(n) { return typeof n === 'number' ? `${n.toFixed(1)}ms` : '?' }
-function fmtRupees(n) { return `?${Number(n || 0).toLocaleString('en-IN')}` }
+function fmt(n) { return typeof n === 'number' ? n.toFixed(3) : '—' }
+function fmtMs(n) { return typeof n === 'number' ? `${n.toFixed(1)}ms` : '—' }
+function fmtRupees(n) { return `₹${Number(n || 0).toLocaleString('en-IN')}` }
 
 export default function TransactionsPage({
   transactions = [],
@@ -212,7 +212,7 @@ export default function TransactionsPage({
           }`}
         >
           <span className="text-amber-300 text-[11px] font-sans flex items-center gap-1">
-            ?? Canary Traps
+            Canary Traps
           </span>
           <div className="text-xl font-bold text-amber-300 mt-1">{canaryCount}</div>
         </div>
@@ -224,7 +224,7 @@ export default function TransactionsPage({
           }`}
         >
           <span className="text-indigo-300 text-[11px] font-sans flex items-center gap-1">
-            ?? AP2 Agents
+            AP2 Agents
           </span>
           <div className="text-xl font-bold text-indigo-300 mt-1">{agentCount}</div>
         </div>

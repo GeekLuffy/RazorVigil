@@ -22,9 +22,15 @@ const PIE_COLORS = {
   verified_agent: '#818cf8'
 }
 
-function fmt(n) { return typeof n === 'number' ? n.toFixed(3) : '?' }
-function fmtMs(n) { return typeof n === 'number' ? `${n.toFixed(1)}ms` : '?' }
-function fmtRupees(n) { return `?${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` }
+function fmt(n) { return typeof n === 'number' ? n.toFixed(3) : '—' }
+function fmtMs(n) { return typeof n === 'number' ? `${n.toFixed(1)}ms` : '—' }
+function fmtRupees(n) {
+  const num = Number(n || 0)
+  if (num >= 100000) {
+    return `₹${(num / 100000).toFixed(1)} Lakhs`
+  }
+  return `₹${num.toLocaleString('en-IN')}`
+}
 
 export default function DashboardPage({
   stats,
@@ -49,7 +55,7 @@ export default function DashboardPage({
 
   return (
     <div className="space-y-6 font-sans">
-      {/* ?? 1. LandGuard Style Hero Title Banner ?? */}
+      {/* ?? 1. Hero Title Banner ?? */}
       <div className="soc-card rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
@@ -69,7 +75,7 @@ export default function DashboardPage({
         <div className="flex items-center gap-3">
           <button
             onClick={() => onNavigateTab && onNavigateTab('simulator')}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-sans transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-sans transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer"
           >
             <Flame size={14} />
             <span>Launch Attack Simulator</span>
@@ -77,7 +83,7 @@ export default function DashboardPage({
 
           <button
             onClick={() => onNavigateTab && onNavigateTab('transactions')}
-            className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold font-mono transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold font-mono transition-all flex items-center gap-2 cursor-pointer"
           >
             <ShieldAlert size={14} className="text-rose-400" />
             <span>Active Threats ({botThreatsCount})</span>
@@ -85,7 +91,7 @@ export default function DashboardPage({
         </div>
       </div>
 
-      {/* ?? 2. Clean LandGuard-Style 4 KPI Cards Row ?? */}
+      {/* ?? 2. Clean 4 KPI Cards Row ?? */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* KPI 1: P99 Latency */}
         <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
@@ -115,7 +121,7 @@ export default function DashboardPage({
               99.57%
             </div>
             <div className="text-[11px] text-cyan-400 font-medium font-sans flex items-center gap-1">
-              <span>? +37.5% verified vs legacy rules</span>
+              <span>↗ +37.5% verified vs legacy rules</span>
             </div>
           </div>
           <div className="icon-badge-cyan">
@@ -160,7 +166,7 @@ export default function DashboardPage({
         </div>
       </div>
 
-      {/* ?? 3. Multi-Sensor Gating Constellation Banner (LandGuard Style) ?? */}
+      {/* ?? 3. Multi-Sensor Gating Constellation Banner ?? */}
       <div className="soc-card rounded-2xl p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div>
@@ -177,7 +183,7 @@ export default function DashboardPage({
 
           <div className="text-right">
             <div className="text-2xl font-black font-mono text-emerald-400">
-              ?19.3 Lakhs
+              ₹19.3 Lakhs
             </div>
             <div className="text-[10px] text-slate-400 font-mono uppercase">
               Annual Surveillance Savings (88% Cost Drop)
@@ -216,7 +222,7 @@ export default function DashboardPage({
                   Quad-Ensemble ML Pipeline
                 </div>
                 <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-                  17-D Features ? Sub-8ms
+                  17-D Features · Sub-8ms
                 </div>
               </div>
             </div>
@@ -281,7 +287,7 @@ export default function DashboardPage({
             </div>
             <button
               onClick={onOpenStore}
-              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20"
+              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20 cursor-pointer"
             >
               <ShoppingBag size={12} />
               <span>Launch Store</span>
@@ -290,7 +296,7 @@ export default function DashboardPage({
         </div>
       </div>
 
-      {/* ?? 5. Live Telemetry Stream & Decision Tiers (LandGuard Profile) ?? */}
+      {/* ?? 5. Live Telemetry Stream & Decision Tiers ?? */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left 2 Cols: Live Feed Ticker */}
         <div className="soc-card rounded-2xl p-5 lg:col-span-2">
@@ -307,7 +313,7 @@ export default function DashboardPage({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsPaused(!isPaused)}
-                className={`px-3 py-1 rounded-xl text-xs font-mono font-bold border transition flex items-center gap-1.5 ${
+                className={`px-3 py-1 rounded-xl text-xs font-mono font-bold border transition flex items-center gap-1.5 cursor-pointer ${
                   isPaused
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                     : 'bg-slate-950 text-slate-300 hover:text-white border-slate-800'
@@ -343,11 +349,11 @@ export default function DashboardPage({
                     <div>
                       <div className="font-bold text-white flex items-center gap-1.5">
                         <span>{tx.merchant_name || 'Razorpay Merchant'}</span>
-                        <span className="text-slate-400 font-normal">? ?{tx.amount?.toLocaleString('en-IN') || '0'}</span>
+                        <span className="text-slate-400 font-normal">· ₹{tx.amount?.toLocaleString('en-IN') || '0'}</span>
                       </div>
                       <div className="text-[11px] text-slate-400 flex items-center gap-2 font-sans mt-0.5">
                         <span>{tx.customer_name || 'Customer'} ({tx.user_city?.split(',')[0] || 'India'})</span>
-                        <span>?</span>
+                        <span>·</span>
                         <span className="font-mono text-[10px] text-indigo-300">{tx.layer_triggered || 'Layer 4: Quad-Ensemble'}</span>
                       </div>
                     </div>

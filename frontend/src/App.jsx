@@ -33,15 +33,15 @@ const MAX_FEED_ITEMS = 120
 
 // ?? Semantic Risk Tier Metadata ??
 const TIER_META = {
-  safe:                { label: 'SAFE',           color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '?' },
-  soft_risk:           { label: 'SOFT RISK',      color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  icon: '?' },
-  elevated_review:     { label: 'ELEVATED',       color: '#f59e0b', bg: 'rgba(245,158,11,0.15)',  icon: '?' },
-  high_confidence_bot: { label: 'BOT BLOCKED',    color: '#f43f5e', bg: 'rgba(244,63,94,0.12)',   icon: '?' },
-  verified_agent:      { label: 'VERIFIED AGENT', color: '#818cf8', bg: 'rgba(129,140,248,0.12)', icon: '??' },
+  safe:                { label: 'SAFE',           color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '✓' },
+  soft_risk:           { label: 'SOFT RISK',      color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  icon: '✓' },
+  elevated_review:     { label: 'ELEVATED',       color: '#f59e0b', bg: 'rgba(245,158,11,0.15)',  icon: '✓' },
+  high_confidence_bot: { label: 'BOT BLOCKED',    color: '#f43f5e', bg: 'rgba(244,63,94,0.12)',   icon: '✓' },
+  verified_agent:      { label: 'VERIFIED AGENT', color: '#818cf8', bg: 'rgba(129,140,248,0.12)', icon: '⚡' },
 }
 
 function tierMeta(tier) {
-  return TIER_META[tier] ?? { label: tier, color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: '?' }
+  return TIER_META[tier] ?? { label: tier, color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', icon: '✓' }
 }
 
 const ALL_TABS = [
@@ -300,7 +300,7 @@ export default function App() {
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-slate-400 font-medium">Surveillance Corridors:</span>
             <span className="text-white font-bold truncate">
-              Razorpay Gateway ? HDFC ? ICICI ? SBI ? UPI 2.0 (Live)
+              Razorpay Gateway · HDFC · ICICI · SBI · UPI 2.0 (Live)
             </span>
           </div>
 
