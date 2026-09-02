@@ -3,7 +3,7 @@ import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
   ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords,
-  Layers, Percent, Moon, Sun, UserCheck
+  Layers, Percent, Moon, Sun, UserCheck, Cpu, Server
 } from 'lucide-react'
 
 // ?? Fixed Left Sidebar ??
@@ -26,6 +26,7 @@ import ExecutiveGuideModal from './components/ExecutiveGuideModal'
 import StressBenchmarkModal from './components/StressBenchmarkModal'
 import CopilotIncidentRoom from './components/CopilotIncidentRoom'
 import IntegrationExportModal from './components/IntegrationExportModal'
+import GPUClusterModal from './components/GPUClusterModal'
 
 import { API_BASE, WS_URL } from './config'
 
@@ -153,6 +154,7 @@ export default function App() {
   const [isGuideOpen, setIsGuideOpen] = useState(false)
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false)
   const [isExportOpen, setIsExportOpen] = useState(false)
+  const [isGPUModalOpen, setIsGPUModalOpen] = useState(false)
   const [copilotNotes, setCopilotNotes] = useState([])
 
   // ?? WebSocket Ingestion Stream Connection ??
@@ -257,6 +259,8 @@ export default function App() {
         setIsBenchmarkOpen(prev => !prev)
       } else if (key === 'E') {
         setIsExportOpen(prev => !prev)
+      } else if (key === 'G') {
+        setIsGPUModalOpen(prev => !prev)
       } else if (e.key === '?') {
         setIsGuideOpen(prev => !prev)
       } else if (e.key === ' ') {
@@ -268,6 +272,7 @@ export default function App() {
         setIsGuideOpen(false)
         setIsBenchmarkOpen(false)
         setIsExportOpen(false)
+        setIsGPUModalOpen(false)
         setSelectedTx(null)
       }
     }
@@ -307,6 +312,22 @@ export default function App() {
 
           {/* Right: Quick Tools & Admin Avatar */}
           <div className="flex items-center gap-3">
+            {/* Remote GPU Super-Cluster Status Button */}
+            <button
+              onClick={() => setIsGPUModalOpen(true)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${
+                isDark
+                  ? 'bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-400 border-emerald-800/60 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300'
+              }`}
+              title="Inspect bd216server3 GPU Super-Cluster (6x RTX 2080 Ti) (G)"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <Cpu size={12} />
+              <span className="hidden md:inline">bd216server3</span>
+              <span className="text-[10px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-normal">6x GPU · 66GB</span>
+            </button>
+
             {/* Quick Action Buttons */}
             <button
               onClick={() => setIsBenchmarkOpen(true)}
@@ -453,6 +474,12 @@ export default function App() {
           onOpenLab={() => { setIsGuideOpen(false); handleSelectTab('simulator'); }}
         />
       )}
+
+      <GPUClusterModal
+        isOpen={isGPUModalOpen}
+        onClose={() => setIsGPUModalOpen(false)}
+        isDark={isDark}
+      />
     </div>
   )
 }

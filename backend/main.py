@@ -1151,6 +1151,16 @@ async def get_metrics_summary():
     }
 
 
+@app.get("/api/gpu/cluster")
+@app.get("/gpu/cluster")
+def get_gpu_cluster_status():
+    """Returns live hardware telemetry and model status from remote GPU server bd216server3 (6x RTX 2080 Ti)."""
+    from backend.gpu.cluster_client import get_cluster_telemetry
+    return get_cluster_telemetry()
+
+
+
+
 class BenchmarkRequest(BaseModel):
     concurrency: int = Field(default=50, ge=5, le=200)
     total_requests: int = Field(default=300, ge=10, le=2000)

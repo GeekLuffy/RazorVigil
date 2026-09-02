@@ -1,8 +1,15 @@
 {
   "status": "success",
-  "ft_transformer_val_pr_auc": 0.999274,
-  "conformal_q_hat": 0.1697,
-  "calibration_samples": 10000,
-  "gpu_count": 0,
-  "timestamp": 1788216417.39224
+  "host": "bd216server3",
+  "gpu_name": "NVIDIA GeForce RTX 2080 Ti",
+  "gpu_vram_gb": 10.57,
+  "catboost_test_pr_auc": 0.9997397952646951,
+  "catboost_test_roc_auc": 0.9998880952380952,
+  "ft_transformer_test_pr_auc": 0.9992099679881621,
+  "ft_transformer_test_roc_auc": 0.9996666666666666,
+  "conformal_q_hat_95": 0.02489340305328369,
+  "calibration_samples": 2000,
+  "test_samples": 2000,
+  "training_time_sec": 26.55,
+  "timestamp": 1788373826.3683267
 }
