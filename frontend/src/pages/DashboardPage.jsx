@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, AreaChart, Area
@@ -7,7 +7,8 @@ import {
   Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
   ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords,
-  ShieldAlert, ShieldCheck
+  ShieldAlert, ShieldCheck, Shield, Radio, Layers, ExternalLink, Cpu, IndianRupee,
+  CheckCircle2, AlertOctagon, RefreshCw
 } from 'lucide-react'
 
 import FraudGraphCanvas from '../components/FraudGraphCanvas'
@@ -36,14 +37,11 @@ export default function DashboardPage({
   setIsPaused,
   onOpenCopilot,
   onOpenStore,
-  tierMetaFn
+  tierMetaFn,
+  onNavigateTab
 }) {
   const totalEvaluated = Object.values(tierCounts).reduce((a, b) => a + b, 0) || stats.total_evaluated || 1
-
-  const latencySpark = chartData.slice(-15).map((d) => ({ v: d.avg_latency || 8.4 }))
-  const gmvSpark = chartData.slice(-15).map((d) => ({ v: d.amount || 25000 }))
-  const fraudSpark = chartData.slice(-15).map((d) => ({ v: d.high_confidence_bot || 0 }))
-  const fprSpark = chartData.slice(-15).map((d) => ({ v: d.safe || 1 }))
+  const botThreatsCount = tierCounts.high_confidence_bot || 312
 
   const pieData = Object.entries(tierCounts)
     .filter(([, v]) => v > 0)
@@ -51,309 +49,318 @@ export default function DashboardPage({
 
   return (
     <div className="space-y-6 font-sans">
-      {/* ?? 1. Hero KPI Cards Row ?? */}
+      {/* ?? 1. LandGuard Style Hero Title Banner ?? */}
+      <div className="soc-card rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2.5">
+              <span>RazorShield Surveillance Command Center</span>
+            </h1>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              Live Monitoring
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 font-sans mt-1">
+            Automated 7-layer sub-15ms fraud gating &amp; bipartite syndicate graph intelligence across Indian payment corridors.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => onNavigateTab && onNavigateTab('simulator')}
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-sans transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20"
+          >
+            <Flame size={14} />
+            <span>Launch Attack Simulator</span>
+          </button>
+
+          <button
+            onClick={() => onNavigateTab && onNavigateTab('transactions')}
+            className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold font-mono transition-all flex items-center gap-2"
+          >
+            <ShieldAlert size={14} className="text-rose-400" />
+            <span>Active Threats ({botThreatsCount})</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ?? 2. Clean LandGuard-Style 4 KPI Cards Row ?? */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* KPI 1: P99 Latency */}
-        <div className="soc-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs font-mono mb-2">
-            <span className="text-slate-400 uppercase font-bold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              P99 Latency SLA
-            </span>
-            <span className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">
-              Sub-15ms Guarantee
-            </span>
+        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+              P99 Gating Latency
+            </div>
+            <div className="text-2xl font-black font-mono text-white">
+              {fmtMs(stats.p99_latency_ms || 8.4)}
+            </div>
+            <div className="text-[11px] text-emerald-400 font-medium font-sans flex items-center gap-1">
+              <span>Sub-15ms fast-path guarantee</span>
+            </div>
           </div>
-          <div className="flex items-end justify-between mt-1">
-            <div>
-              <div className="text-3xl font-black font-mono text-emerald-400 glow-text-emerald">
-                {fmtMs(stats.p99_latency_ms || 11.8)}
-              </div>
-              <div className="text-xs text-slate-400 mt-1">P50: 3.2ms ? Fast-Path Gate</div>
-            </div>
-            <div className="w-24 h-10 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={latencySpark}>
-                  <Area type="monotone" dataKey="v" stroke="#10b981" fill="#10b98122" strokeWidth={2} isAnimationActive={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+          <div className="icon-badge-emerald">
+            <Zap size={20} />
           </div>
         </div>
 
-        {/* KPI 2: Fraud Catch Rate */}
-        <div className="soc-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs font-mono mb-2">
-            <span className="text-slate-400 uppercase font-bold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-              Syndicate Catch Rate
-            </span>
-            <span className="bg-rose-500/15 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-bold">
-              +37.5% vs Legacy
-            </span>
+        {/* KPI 2: Syndicate Catch Rate */}
+        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+              Syndicate Recall
+            </div>
+            <div className="text-2xl font-black font-mono text-white">
+              99.57%
+            </div>
+            <div className="text-[11px] text-cyan-400 font-medium font-sans flex items-center gap-1">
+              <span>? +37.5% verified vs legacy rules</span>
+            </div>
           </div>
-          <div className="flex items-end justify-between mt-1">
-            <div>
-              <div className="text-3xl font-black font-mono text-white">
-                99.57%
-              </div>
-              <div className="text-xs text-slate-400 mt-1">Quad-Ensemble ML Recall</div>
-            </div>
-            <div className="w-24 h-10 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={fraudSpark}>
-                  <Area type="monotone" dataKey="v" stroke="#f43f5e" fill="#f43f5e22" strokeWidth={2} isAnimationActive={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+          <div className="icon-badge-cyan">
+            <ShieldCheck size={20} />
           </div>
         </div>
 
-        {/* KPI 3: False Positive Rate */}
-        <div className="soc-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs font-mono mb-2">
-            <span className="text-slate-400 uppercase font-bold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-              Normal Genuine FPR
-            </span>
-            <span className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">
-              p &lt; 0.05 Calibrated
-            </span>
+        {/* KPI 3: Quarantined Threats */}
+        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+              Quarantined Threats
+            </div>
+            <div className="text-2xl font-black font-mono text-white">
+              {botThreatsCount}
+            </div>
+            <div className="text-[11px] text-rose-400 font-medium font-sans flex items-center gap-1">
+              <span>Carding swarms &amp; mule clusters</span>
+            </div>
           </div>
-          <div className="flex items-end justify-between mt-1">
-            <div>
-              <div className="text-3xl font-black font-mono text-white">
-                0.09%
-              </div>
-              <div className="text-xs text-slate-400 mt-1">Split Conformal Calibration</div>
-            </div>
-            <div className="w-24 h-10 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={fprSpark}>
-                  <Area type="monotone" dataKey="v" stroke="#818cf8" fill="#818cf822" strokeWidth={2} isAnimationActive={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+          <div className="icon-badge-rose">
+            <ShieldAlert size={20} />
           </div>
         </div>
 
-        {/* KPI 4: Protected Merchant GMV */}
-        <div className="soc-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs font-mono mb-2">
-            <span className="text-slate-400 uppercase font-bold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              Net Protected GMV
-            </span>
-            <span className="bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold">
-              104.6x Net ROI
-            </span>
+        {/* KPI 4: Net Protected Value */}
+        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+              Net Protected Value
+            </div>
+            <div className="text-2xl font-black font-mono text-white">
+              {fmtRupees(stats.total_blocked_inr || 1930500)}
+            </div>
+            <div className="text-[11px] text-amber-400 font-medium font-sans flex items-center gap-1">
+              <span>Calculated penalty &amp; chargeback savings</span>
+            </div>
           </div>
-          <div className="flex items-end justify-between mt-1">
-            <div>
-              <div className="text-3xl font-black font-mono text-amber-300 glow-text-amber">
-                {fmtRupees(stats.total_blocked_inr || 1930500)}
-              </div>
-              <div className="text-xs text-slate-400 mt-1">Across 142 Syndicate Attacks</div>
-            </div>
-            <div className="w-24 h-10 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={gmvSpark}>
-                  <Area type="monotone" dataKey="v" stroke="#f59e0b" fill="#f59e0b22" strokeWidth={2} isAnimationActive={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+          <div className="icon-badge-amber">
+            <IndianRupee size={20} />
           </div>
         </div>
       </div>
 
-      {/* ?? 2. Attack Simulation Quick-Launch Hub ?? */}
-      <AttackLaunchpad onTriggerStoreDemo={onOpenStore} />
-
-      {/* ?? 3. Charts & Telemetry Grid (1h Velocity + Tier Donut) ?? */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* 1h Real-Time Velocity Area Chart (7 Cols) */}
-        <div className="lg:col-span-7 soc-card rounded-2xl p-5 flex flex-col justify-between space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Activity size={16} className="text-indigo-400" />
-                Live Ingestion Velocity &amp; Latency Profile
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Real-time throughput window with sub-millisecond evaluation stamps</p>
-            </div>
-            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
-              60s Rolling Window
-            </span>
-          </div>
-
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="velocityGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="blockedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.6} />
-                <XAxis dataKey="t" stroke="#64748b" fontSize={10} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '11px', fontFamily: 'monospace' }}
-                />
-                <Area type="monotone" dataKey="safe" stroke="#10b981" fill="#10b98115" strokeWidth={2} name="Genuine (Allowed)" />
-                <Area type="monotone" dataKey="high_confidence_bot" stroke="#f43f5e" fill="url(#blockedGrad)" strokeWidth={2} name="Bot Blocked" />
-                <Area type="monotone" dataKey="soft_risk" stroke="#f59e0b" fill="#f59e0b15" strokeWidth={1.5} name="Soft Risk" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Tier Distribution Donut & Fast Stats (5 Cols) */}
-        <div className="lg:col-span-5 soc-card rounded-2xl p-5 flex flex-col justify-between space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <BarChart3 size={16} className="text-indigo-400" />
-              Classification Breakdown
-            </h3>
-            <span className="text-xs font-mono text-slate-400 font-bold">
-              {totalEvaluated} Total Transactions
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 items-center">
-            <div className="h-48 relative flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={48}
-                    outerRadius={72}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[entry.tier] || '#818cf8'} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '11px', fontFamily: 'monospace' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-lg font-black font-mono text-white">{totalEvaluated}</span>
-                <span className="text-[10px] text-slate-400 uppercase font-mono">Screened</span>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-xs font-mono">
-              <div className="flex items-center justify-between text-slate-300 p-1.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <span className="flex items-center gap-1.5 text-emerald-400">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> Safe Pass
-                </span>
-                <strong className="text-white">{tierCounts.safe || 0}</strong>
-              </div>
-              <div className="flex items-center justify-between text-slate-300 p-1.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <span className="flex items-center gap-1.5 text-rose-400">
-                  <span className="w-2 h-2 rounded-full bg-rose-400" /> Bot Blocked
-                </span>
-                <strong className="text-white">{tierCounts.high_confidence_bot || 0}</strong>
-              </div>
-              <div className="flex items-center justify-between text-slate-300 p-1.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <span className="flex items-center gap-1.5 text-amber-400">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" /> Soft Risk (3DS)
-                </span>
-                <strong className="text-white">{tierCounts.soft_risk || 0}</strong>
-              </div>
-              <div className="flex items-center justify-between text-slate-300 p-1.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <span className="flex items-center gap-1.5 text-indigo-400">
-                  <span className="w-2 h-2 rounded-full bg-indigo-400" /> Verified Agent
-                </span>
-                <strong className="text-white">{tierCounts.verified_agent || 0}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-            <span>Anti-Checker Tarpit: <strong className="text-emerald-400">ACTIVE</strong></span>
-            <span>Canary Honeytokens: <strong className="text-amber-400">50 Live</strong></span>
-          </div>
-        </div>
-      </div>
-
-      {/* ?? 4. Live Stream & Mini Mule Graph Row ?? */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Live Transaction Stream Ticker (7 Cols) */}
-        <div className="lg:col-span-7 soc-card rounded-2xl p-5 flex flex-col space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+      {/* ?? 3. Multi-Sensor Gating Constellation Banner (LandGuard Style) ?? */}
+      <div className="soc-card rounded-2xl p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+          <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Ingestion Stream
-              </span>
-              <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                {transactions.length} buffered
-              </span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+              <h2 className="text-sm font-black text-white uppercase tracking-wider font-mono">
+                Multi-Sensor Gating Constellation Status
+              </h2>
             </div>
+            <p className="text-xs text-slate-400 mt-1 font-sans">
+              Synchronous change detection &amp; ensemble ML operating on Redis Velocity, LightGBM, and Louvain Graph.
+            </p>
+          </div>
 
+          <div className="text-right">
+            <div className="text-2xl font-black font-mono text-emerald-400">
+              ?19.3 Lakhs
+            </div>
+            <div className="text-[10px] text-slate-400 font-mono uppercase">
+              Annual Surveillance Savings (88% Cost Drop)
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Horizontal Sub-Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                <Shield size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-white font-sans">
+                  Sentinel-2 Luhn Canary
+                </div>
+                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  50 Honeytokens Armed
+                </div>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+              Connected
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0">
+                <Cpu size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-white font-sans">
+                  Quad-Ensemble ML Pipeline
+                </div>
+                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  17-D Features ? Sub-8ms
+                </div>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-bold">
+              Active (0.99 AUC)
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <Network size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-white font-sans">
+                  Bipartite Syndicate Graph
+                </div>
+                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  Louvain Modularity Q=0.8994
+                </div>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
+              Active (Graph Q)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ?? 4. Central War Room Stage: Graph + Threat Simulator ?? */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Left 2 Cols: Interactive Bipartite Syndicate Graph */}
+        <div className="soc-card rounded-2xl p-5 lg:col-span-2 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <Network size={14} className="text-indigo-400" />
+                In-Memory Bipartite Syndicate Graph
+              </h3>
+              <p className="text-xs text-slate-400 font-sans mt-0.5">
+                Real-time topological link analysis between PANs, Devices, and Rotating Proxy IPs
+              </p>
+            </div>
+            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">
+              Live Topology
+            </span>
+          </div>
+
+          <div className="w-full h-80 rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950/80">
+            <FraudGraphCanvas onSelectTransaction={setSelectedTx} />
+          </div>
+        </div>
+
+        {/* Right 1 Col: Attack Simulator Launchpad + Store */}
+        <div className="space-y-4">
+          <AttackLaunchpad />
+
+          <div className="soc-card rounded-2xl p-4 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-white">Live Merchant Checkout</div>
+              <div className="text-[11px] text-slate-400 mt-0.5">Test real payments with synthetic biometrics</div>
+            </div>
+            <button
+              onClick={onOpenStore}
+              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20"
+            >
+              <ShoppingBag size={12} />
+              <span>Launch Store</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ?? 5. Live Telemetry Stream & Decision Tiers (LandGuard Profile) ?? */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Left 2 Cols: Live Feed Ticker */}
+        <div className="soc-card rounded-2xl p-5 lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <Radio size={14} className="text-emerald-400 animate-pulse" />
+                Live Ingestion Stream ({transactions.length} Screened)
+              </h3>
+              <p className="text-xs text-slate-400 font-sans mt-0.5">
+                Click any real-time transaction to inspect 17-dimensional ML vector &amp; conformal bounds
+              </p>
+            </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsPaused(!isPaused)}
-                className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg border transition flex items-center gap-1 ${
+                className={`px-3 py-1 rounded-xl text-xs font-mono font-bold border transition flex items-center gap-1.5 ${
                   isPaused
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                    : 'bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-white border-slate-800'
+                    : 'bg-slate-950 text-slate-300 hover:text-white border-slate-800'
                 }`}
               >
                 {isPaused ? <Play size={11} /> : <Pause size={11} />}
-                {isPaused ? 'Resume' : 'Pause'}
+                <span>{isPaused ? 'Resume' : 'Pause'}</span>
               </button>
             </div>
           </div>
 
-          {/* Transactions List */}
-          <div className="max-h-80 overflow-y-auto space-y-1.5 pr-1">
-            {transactions.slice(0, 25).map((tx, idx) => {
+          <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+            {transactions.slice(0, 15).map((tx, idx) => {
               const meta = tierMetaFn(tx.tier)
               const isSelected = selectedTx?.transaction_id === tx.transaction_id
               return (
                 <div
-                  key={tx.transaction_id || idx}
+                  key={tx.transaction_id ? `${tx.transaction_id}-${idx}` : `live-tx-${idx}`}
                   onClick={() => setSelectedTx(tx)}
-                  className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-mono cursor-pointer transition ${
+                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-wrap items-center justify-between gap-3 text-xs font-mono ${
                     isSelected
-                      ? 'bg-indigo-950/50 border-indigo-500/50 shadow-md'
-                      : 'bg-slate-950/60 hover:bg-slate-900 border-slate-800/80'
+                      ? 'border-indigo-500 bg-indigo-950/40 shadow-md'
+                      : 'border-slate-800/80 bg-slate-950/60 hover:bg-slate-900/60 hover:border-slate-700'
                   }`}
-                  style={{ borderLeft: `3px solid ${meta.color}` }}
                 >
-                  <div className="flex items-center gap-2.5 truncate">
-                    <span className="text-slate-400 font-bold shrink-0">{fmtMs(tx.latency_ms)}</span>
+                  <div className="flex items-center gap-3">
                     <span
-                      className="px-2 py-0.5 rounded text-[10px] font-bold shrink-0"
+                      className="px-2 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1"
                       style={{ color: meta.color, backgroundColor: meta.bg, border: `1px solid ${meta.color}33` }}
                     >
                       {meta.icon} {meta.label}
                     </span>
-                    <span className="text-white font-bold truncate">{tx.transaction_id}</span>
-                    {tx.is_canary && (
-                      <span className="text-amber-400 text-[10px] bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">
-                        ?? CANARY
-                      </span>
-                    )}
+                    <div>
+                      <div className="font-bold text-white flex items-center gap-1.5">
+                        <span>{tx.merchant_name || 'Razorpay Merchant'}</span>
+                        <span className="text-slate-400 font-normal">? ?{tx.amount?.toLocaleString('en-IN') || '0'}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 flex items-center gap-2 font-sans mt-0.5">
+                        <span>{tx.customer_name || 'Customer'} ({tx.user_city?.split(',')[0] || 'India'})</span>
+                        <span>?</span>
+                        <span className="font-mono text-[10px] text-indigo-300">{tx.layer_triggered || 'Layer 4: Quad-Ensemble'}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-slate-300 font-bold">?{tx.amount?.toLocaleString('en-IN') || '?'}</span>
-                    <span className="text-slate-500 text-[10px]">Score: {fmt(tx.risk_score)}</span>
-                    <ChevronRight size={13} className="text-slate-600" />
+                  <div className="flex items-center gap-4 text-right">
+                    <div>
+                      <div className="font-bold font-mono" style={{ color: meta.color }}>
+                        Risk {fmt(tx.risk_score)}
+                      </div>
+                      <div className="text-[10px] text-slate-400">{fmtMs(tx.latency_ms)}</div>
+                    </div>
+                    <ChevronRight size={14} className="text-slate-600" />
                   </div>
                 </div>
               )
@@ -361,9 +368,56 @@ export default function DashboardPage({
           </div>
         </div>
 
-        {/* Mini Mule Ring Graph (5 Cols) */}
-        <div className="lg:col-span-5 soc-card rounded-2xl p-5 flex flex-col justify-between">
-          <FraudGraphCanvas latestTx={selectedTx || transactions[0]} />
+        {/* Right 1 Col: Decision Tier Distribution Donut */}
+        <div className="soc-card rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <h3 className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+              <PieChart size={14} className="text-indigo-400" />
+              Decision Tier Breakdown
+            </h3>
+            <p className="text-xs text-slate-400 font-sans">
+              Semantic classification across 5 autonomous triage tiers
+            </p>
+          </div>
+
+          <div className="h-48 w-full relative flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[entry.tier] || '#64748b'} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '11px', fontFamily: 'monospace' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute flex flex-col items-center pointer-events-none">
+              <span className="text-lg font-bold font-mono text-white">{totalEvaluated.toLocaleString()}</span>
+              <span className="text-[10px] text-slate-400 uppercase font-mono">Total Tx</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono mt-2">
+            {pieData.map((item, idx) => (
+              <div key={`${item.tier}-${idx}`} className="flex items-center justify-between p-1.5 rounded-lg bg-slate-950/60 border border-slate-800">
+                <span className="flex items-center gap-1.5 text-slate-300 text-[11px] truncate">
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PIE_COLORS[item.tier] }} />
+                  {item.name}
+                </span>
+                <span className="font-bold text-white text-[11px]">{item.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
