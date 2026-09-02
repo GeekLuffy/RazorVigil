@@ -9,24 +9,24 @@ export const NAV_SECTIONS = [
   {
     category: 'SURVEILLANCE & DEFENSE',
     items: [
-      { id: 'dashboard', label: 'Command Center', icon: LayoutDashboard, key: '1' },
-      { id: 'transactions', label: 'Live Ledger HUD', icon: Layers, key: '2' },
-      { id: 'syndicates', label: 'Syndicate Graph', icon: Network, key: '3' },
+      { id: 'dashboard', label: 'Command Center', icon: LayoutDashboard },
+      { id: 'transactions', label: 'Live Ledger HUD', icon: Layers },
+      { id: 'syndicates', label: 'Syndicate Graph', icon: Network },
     ]
   },
   {
     category: 'INTELLIGENCE & MODELS',
     items: [
-      { id: 'risk-intelligence', label: 'Risk Intelligence', icon: Activity, key: '4' },
-      { id: 'model-evaluation', label: 'Model Studio', icon: BarChart3, key: '5' },
-      { id: 'simulator', label: 'Attack Simulator', icon: Flame, key: '6' },
+      { id: 'risk-intelligence', label: 'Risk Intelligence', icon: Activity },
+      { id: 'model-evaluation', label: 'Model Studio', icon: BarChart3 },
+      { id: 'simulator', label: 'Attack Simulator', icon: Flame },
     ]
   },
   {
     category: 'GOVERNANCE & AUDIT',
     items: [
-      { id: 'audit-log', label: 'Dispute Cases', icon: Scale, key: '7', badge: '18' },
-      { id: 'architecture', label: 'RBI Architecture', icon: FileText, key: '8' },
+      { id: 'audit-log', label: 'Dispute Cases', icon: Scale, badge: '18' },
+      { id: 'architecture', label: 'RBI Architecture', icon: FileText },
     ]
   }
 ]
@@ -106,24 +106,13 @@ export default function Sidebar({
                       <span>{item.label}</span>
                     </div>
 
-                    <div className="flex items-center gap-1.5 font-mono text-[10px]">
-                      {item.badge && (
-                        <span className={`px-1.5 py-0.2 rounded-full font-bold border ${
-                          isDark ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' : 'bg-rose-100 text-rose-700 border-rose-200'
-                        }`}>
-                          {item.badge}
-                        </span>
-                      )}
-                      <kbd className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors ${
-                        isActive
-                          ? isDark ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-emerald-100 border-emerald-300 text-emerald-800'
-                          : isDark
-                            ? 'bg-slate-900 border-slate-800 text-slate-400 group-hover:text-slate-300 group-hover:border-slate-700'
-                            : 'bg-slate-100 border-slate-300 text-slate-800 shadow-sm group-hover:bg-white group-hover:text-slate-950 group-hover:border-slate-400'
+                    {item.badge && (
+                      <span className={`px-1.5 py-0.2 rounded-full font-mono text-[10px] font-bold border ${
+                        isDark ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' : 'bg-rose-100 text-rose-700 border-rose-200'
                       }`}>
-                        {item.key}
-                      </kbd>
-                    </div>
+                        {item.badge}
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -145,7 +134,6 @@ export default function Sidebar({
               <ShoppingBag className="w-4 h-4 text-indigo-500" />
               <span>Merchant Storefront</span>
             </div>
-            <kbd className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border transition-colors ${isDark ? 'text-slate-400 bg-slate-950 border-slate-800' : 'text-slate-800 bg-slate-100 border-slate-300 shadow-sm'}`}>S</kbd>
           </button>
 
           <button
@@ -160,9 +148,6 @@ export default function Sidebar({
               <Bot className="w-4 h-4 text-pink-500 animate-pulse" />
               <span>Forensic Copilot</span>
             </div>
-            <kbd className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border transition-colors ${
-              isDark ? 'text-pink-400 bg-pink-950/80 border-pink-500/30' : 'text-pink-800 bg-pink-100 border-pink-300 shadow-sm'
-            }`}>C</kbd>
           </button>
         </div>
       </div>

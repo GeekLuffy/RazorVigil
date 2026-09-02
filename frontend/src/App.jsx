@@ -242,31 +242,11 @@ export default function App() {
     return () => clearInterval(interval)
   }, [fetchSnapshot])
 
-  // ?? Global Keyboard Hotkeys ??
+  // Modal Dismissal Keyboard Listener
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
-      const key = e.key.toUpperCase()
-
-      if (e.key >= '1' && e.key <= '8') {
-        const tabIdx = parseInt(e.key, 10) - 1
-        if (ALL_TABS[tabIdx]) handleSelectTab(ALL_TABS[tabIdx].id)
-      } else if (key === 'S') {
-        setIsStoreOpen(prev => !prev)
-      } else if (key === 'C') {
-        setIsCopilotOpen(prev => !prev)
-      } else if (key === 'B') {
-        setIsBenchmarkOpen(prev => !prev)
-      } else if (key === 'E') {
-        setIsExportOpen(prev => !prev)
-      } else if (key === 'G') {
-        setIsGPUModalOpen(prev => !prev)
-      } else if (e.key === '?') {
-        setIsGuideOpen(prev => !prev)
-      } else if (e.key === ' ') {
-        e.preventDefault()
-        setIsPaused(prev => !prev)
-      } else if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
         setIsStoreOpen(false)
         setIsCopilotOpen(false)
         setIsGuideOpen(false)
@@ -320,7 +300,7 @@ export default function App() {
                   ? 'bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-400 border-emerald-800/60 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
                   : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300'
               }`}
-              title="Inspect bd216server3 GPU Super-Cluster (6x RTX 2080 Ti) (G)"
+              title="Inspect bd216server3 GPU Super-Cluster (6x RTX 2080 Ti)"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <Cpu size={12} />
@@ -332,7 +312,7 @@ export default function App() {
             <button
               onClick={() => setIsBenchmarkOpen(true)}
               className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-amber-400 border-slate-800' : 'bg-amber-50 hover:bg-amber-100 text-amber-600 border-amber-200'}`}
-              title="Run SLA Stress Benchmark (B)"
+              title="Run SLA Stress Benchmark"
             >
               <Zap size={12} />
               <span className="hidden sm:inline">Benchmark</span>
@@ -341,7 +321,7 @@ export default function App() {
             <button
               onClick={() => setIsExportOpen(true)}
               className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-cyan-400 border-slate-800' : 'bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border-cyan-200'}`}
-              title="SDK & WAF Export (E)"
+              title="SDK & WAF Export"
             >
               <Package size={12} />
               <span className="hidden sm:inline">SDK Export</span>
@@ -350,7 +330,7 @@ export default function App() {
             <button
               onClick={() => setIsGuideOpen(true)}
               className={`p-1.5 rounded-lg border transition ${isDark ? 'text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border-slate-800' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'}`}
-              title="Guided Tour (?)"
+              title="Guided Tour"
             >
               <Sparkles size={13} className="text-indigo-400" />
             </button>
