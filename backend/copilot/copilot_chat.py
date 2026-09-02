@@ -20,6 +20,9 @@ import urllib.error
 from typing import Any, Dict, List, Optional
 import numpy as np
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # ---------------------------------------------------------------------------
@@ -158,8 +161,8 @@ class CopilotIncidentEngine:
         if not gemini_key:
             return None
 
-        # Try gemini-2.0-flash first, fallback to gemini-1.5-flash
-        models_to_try = ["gemini-2.0-flash", "gemini-1.5-flash"]
+        # Try gemini-3.6-flash first, fallback to gemini-1.5-flash
+        models_to_try = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
         for model in models_to_try:
             try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={gemini_key}"
