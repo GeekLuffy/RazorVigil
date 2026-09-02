@@ -426,35 +426,17 @@ export default function App() {
       )}
 
       {isStoreOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-5xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative">
-            <button
-              onClick={() => setIsStoreOpen(false)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-800 rounded-xl border border-slate-800 transition z-20"
-            >
-              ?
-            </button>
-            <MerchantStore />
-          </div>
-        </div>
+        <MerchantStore
+          onClose={() => setIsStoreOpen(false)}
+        />
       )}
 
-      {isCopilotOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative">
-            <button
-              onClick={() => setIsCopilotOpen(false)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-800 rounded-xl border border-slate-800 transition z-20"
-            >
-              ?
-            </button>
-            <CopilotIncidentRoom
-              selectedTx={selectedTx}
-              onAddRule={(rule) => setCopilotNotes(prev => [...prev, rule])}
-            />
-          </div>
-        </div>
-      )}
+      <CopilotIncidentRoom
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        pinnedTx={selectedTx}
+        onAddRule={(rule) => setCopilotNotes(prev => [...prev, rule])}
+      />
 
       {isBenchmarkOpen && (
         <StressBenchmarkModal onClose={() => setIsBenchmarkOpen(false)} />

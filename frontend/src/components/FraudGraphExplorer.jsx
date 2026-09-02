@@ -268,11 +268,18 @@ export default function FraudGraphExplorer() {
       }
 
       // D. Render Canvas Frame
-      ctx.clearRect(0, 0, width, height)
+      const isLightMode = typeof document !== 'undefined' && document.body.classList.contains('light-theme')
+
+      if (isLightMode) {
+        ctx.fillStyle = '#f8fafc'
+        ctx.fillRect(0, 0, width, height)
+      } else {
+        ctx.clearRect(0, 0, width, height)
+      }
 
       // Cyber Grid Backdrop
       ctx.save()
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'
+      ctx.strokeStyle = isLightMode ? 'rgba(15, 23, 42, 0.06)' : 'rgba(255, 255, 255, 0.03)'
       ctx.lineWidth = 1
       const gridSize = 35
       for (let x = 0; x < width; x += gridSize) {
@@ -388,7 +395,7 @@ export default function FraudGraphExplorer() {
         // Inner Core
         ctx.beginPath()
         ctx.arc(n.x, n.y, nodeRadius * 0.38, 0, Math.PI * 2)
-        ctx.fillStyle = '#0b0f19'
+        ctx.fillStyle = isLightMode ? '#ffffff' : '#0b0f19'
         ctx.fill()
 
         // Pinned Status Pin Icon
@@ -401,7 +408,7 @@ export default function FraudGraphExplorer() {
 
         // Crisp Typography Label
         ctx.font = isSelected ? 'bold 11px JetBrains Mono, monospace' : '9.5px JetBrains Mono, monospace'
-        ctx.fillStyle = isSelected ? '#ffffff' : isDimmed ? '#64748b' : '#cbd5e1'
+        ctx.fillStyle = isLightMode ? (isSelected ? '#0f172a' : isDimmed ? '#94a3b8' : '#1e293b') : (isSelected ? '#ffffff' : isDimmed ? '#64748b' : '#cbd5e1')
         ctx.textAlign = 'center'
         ctx.fillText((n.label || n.id).slice(0, 18), n.x, n.y + nodeRadius + 14)
 

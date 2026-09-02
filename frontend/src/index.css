@@ -17,159 +17,6 @@
   }
 }
 
-/* ?? LandGuard Light Theme System ?? */
-body.light-theme {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-/* Light Theme Card Surfaces */
-body.light-theme .soc-card {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
-}
-
-body.light-theme .soc-card:hover {
-  border-color: #cbd5e1 !important;
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06) !important;
-}
-
-/* Light Theme Background Overrides */
-body.light-theme .bg-slate-950,
-body.light-theme .bg-slate-950\/95,
-body.light-theme .bg-slate-950\/90,
-body.light-theme .bg-slate-950\/80,
-body.light-theme .bg-slate-950\/60 {
-  background-color: #f8fafc !important;
-}
-
-body.light-theme .bg-slate-900,
-body.light-theme .bg-slate-900\/80,
-body.light-theme .bg-slate-900\/60,
-body.light-theme .bg-slate-900\/40 {
-  background-color: #f1f5f9 !important;
-}
-
-body.light-theme .bg-slate-800,
-body.light-theme .bg-slate-800\/60,
-body.light-theme .bg-slate-800\/40 {
-  background-color: #e2e8f0 !important;
-}
-
-/* Light Theme Border Overrides */
-body.light-theme .border-slate-800,
-body.light-theme .border-slate-800\/80,
-body.light-theme .border-slate-800\/60,
-body.light-theme .border-slate-700 {
-  border-color: #e2e8f0 !important;
-}
-
-body.light-theme .divide-slate-800,
-body.light-theme .divide-slate-800\/60 {
-  border-color: #e2e8f0 !important;
-}
-
-/* Light Theme Text Overrides */
-body.light-theme .text-white,
-body.light-theme .text-slate-100 {
-  color: #0f172a !important;
-}
-
-body.light-theme .text-slate-200 {
-  color: #1e293b !important;
-}
-
-body.light-theme .text-slate-300 {
-  color: #334155 !important;
-}
-
-body.light-theme .text-slate-400 {
-  color: #475569 !important;
-}
-
-body.light-theme .text-slate-500 {
-  color: #64748b !important;
-}
-
-/* Light Theme Keyboard Badges */
-body.light-theme kbd {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #1e293b !important;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06) !important;
-}
-
-/* Light Theme Sidebar & Header */
-body.light-theme aside {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.03) !important;
-}
-
-body.light-theme header {
-  background-color: rgba(255, 255, 255, 0.92) !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03) !important;
-}
-
-/* Light Theme Form Controls */
-body.light-theme input,
-body.light-theme select {
-  background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-body.light-theme input:focus,
-body.light-theme select:focus {
-  border-color: #10b981 !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15) !important;
-}
-
-/* Light Theme Table Hover */
-body.light-theme tbody tr:hover {
-  background-color: #f1f5f9 !important;
-}
-
-/* Light Theme Modals */
-body.light-theme .fixed .bg-slate-900 {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Light Theme Badge Enhancements */
-body.light-theme .icon-badge-emerald {
-  background-color: #ecfdf5 !important;
-  color: #059669 !important;
-  border-color: #a7f3d0 !important;
-}
-
-body.light-theme .icon-badge-cyan {
-  background-color: #ecfeff !important;
-  color: #0891b2 !important;
-  border-color: #a5f3fc !important;
-}
-
-body.light-theme .icon-badge-rose {
-  background-color: #fff1f2 !important;
-  color: #e11d48 !important;
-  border-color: #fecdd3 !important;
-}
-
-body.light-theme .icon-badge-amber {
-  background-color: #fffbeb !important;
-  color: #d97706 !important;
-  border-color: #fde68a !important;
-}
-
-body.light-theme .icon-badge-indigo {
-  background-color: #eef2ff !important;
-  color: #4f46e5 !important;
-  border-color: #c7d2fe !important;
-}
-
 /* ?? Dark Theme Defaults ?? */
 .soc-card {
   background: rgba(15, 23, 42, 0.75);
@@ -179,8 +26,26 @@ body.light-theme .icon-badge-indigo {
   transition: all 0.2s ease-in-out;
 }
 
-.soc-card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
+.panel {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 1rem;
+  padding: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.panel-primary {
+  border-radius: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.glass-panel {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.70) 0%, rgba(8, 12, 24, 0.85) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.2s ease-in-out;
 }
 
 .icon-badge-emerald {
@@ -248,7 +113,219 @@ body.light-theme .icon-badge-indigo {
   flex-shrink: 0;
 }
 
-/* ?? Custom Thin Scrollbars ?? */
+/* ??????????????????????????????????????????????????????????????????
+   LANDGUARD INSTITUTIONAL LIGHT THEME SYSTEM
+   ?????????????????????????????????????????????????????????????????? */
+body.light-theme {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* 1. Eliminate Dark Gradients on Panels, Banners & Shell */
+body.light-theme .panel,
+body.light-theme .panel-primary,
+body.light-theme .panel-subtle,
+body.light-theme .soc-card,
+body.light-theme .glass-panel,
+body.light-theme div[class*="bg-gradient-to"][class*="slate"],
+body.light-theme div[class*="bg-gradient-to"][class*="indigo-950"] {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light-theme .soc-card:hover,
+body.light-theme .panel:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 2. Map All Dark Background Utilities to Clean Light Surfaces */
+body.light-theme [class*="bg-slate-950"],
+body.light-theme [class*="bg-slate-900"],
+body.light-theme [class*="bg-[#070b16]"],
+body.light-theme [class*="bg-[#080c16]"],
+body.light-theme [class*="bg-[#0a0d18]"],
+body.light-theme [class*="bg-[#0b0f19]"],
+body.light-theme [class*="bg-[#060811]"]:not(.fixed) {
+  background-color: #ffffff !important;
+}
+
+body.light-theme .panel [class*="bg-slate-950"],
+body.light-theme .panel-primary [class*="bg-slate-950"],
+body.light-theme .soc-card [class*="bg-slate-950"],
+body.light-theme .panel [class*="bg-slate-900"],
+body.light-theme .panel-primary [class*="bg-slate-900"],
+body.light-theme .soc-card [class*="bg-slate-900"] {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme [class*="bg-slate-800"] {
+  background-color: #f1f5f9 !important;
+}
+
+/* 3. Border Overrides */
+body.light-theme [class*="border-slate-800"],
+body.light-theme [class*="border-slate-700"],
+body.light-theme [class*="divide-slate-800"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* 4. Text Contrast & Heading Overrides */
+body.light-theme h1,
+body.light-theme h2,
+body.light-theme h3,
+body.light-theme h4,
+body.light-theme strong,
+body.light-theme b,
+body.light-theme .text-white:not(button):not(button *):not([class*="bg-indigo"]):not([class*="bg-emerald"]):not([class*="bg-rose"]) {
+  color: #0f172a !important;
+}
+
+body.light-theme [class*="text-slate-100"],
+body.light-theme [class*="text-slate-200"] {
+  color: #1e293b !important;
+}
+
+body.light-theme [class*="text-slate-300"] {
+  color: #334155 !important;
+}
+
+body.light-theme [class*="text-slate-400"] {
+  color: #475569 !important;
+}
+
+body.light-theme [class*="text-slate-500"] {
+  color: #64748b !important;
+}
+
+/* 5. Fixed Modals & Overlays */
+body.light-theme .fixed.inset-0 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+body.light-theme .fixed .bg-slate-950,
+body.light-theme .fixed .bg-slate-900,
+body.light-theme .fixed [class*="bg-slate-900"],
+body.light-theme .fixed [class*="bg-slate-950"],
+body.light-theme .fixed [class*="bg-[#080c16]"],
+body.light-theme .fixed [class*="bg-[#060811]"] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme .fixed input,
+body.light-theme .fixed select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* 6. Form Controls */
+body.light-theme input,
+body.light-theme select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme input:focus,
+body.light-theme select:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15) !important;
+}
+
+body.light-theme input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* 7. Action Buttons & Interactive Pills */
+body.light-theme button[class*="bg-slate-800"],
+body.light-theme button[class*="bg-slate-900"],
+body.light-theme button[class*="bg-slate-950"] {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.light-theme button[class*="bg-slate-800"]:hover,
+body.light-theme button[class*="bg-slate-900"]:hover,
+body.light-theme button[class*="bg-slate-950"]:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme button.bg-indigo-600,
+body.light-theme button.bg-emerald-600,
+body.light-theme button.bg-rose-600,
+body.light-theme button[class*="bg-indigo-600"],
+body.light-theme button[class*="bg-emerald-600"],
+body.light-theme button[class*="bg-rose-600"] {
+  color: #ffffff !important;
+}
+
+/* 8. Table Styling in Light Mode */
+body.light-theme table thead,
+body.light-theme table thead tr,
+body.light-theme table thead th {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme table tbody tr {
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+body.light-theme table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* 9. Light Theme Keyboard Badges */
+body.light-theme kbd {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 10. Light Theme Badges & Icon Accents */
+body.light-theme .icon-badge-emerald {
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
+  border-color: #a7f3d0 !important;
+}
+
+body.light-theme .icon-badge-cyan {
+  background-color: #ecfeff !important;
+  color: #0891b2 !important;
+  border-color: #a5f3fc !important;
+}
+
+body.light-theme .icon-badge-rose {
+  background-color: #fff1f2 !important;
+  color: #e11d48 !important;
+  border-color: #fecdd3 !important;
+}
+
+body.light-theme .icon-badge-amber {
+  background-color: #fffbeb !important;
+  color: #d97706 !important;
+  border-color: #fde68a !important;
+}
+
+body.light-theme .icon-badge-indigo {
+  background-color: #eef2ff !important;
+  color: #4f46e5 !important;
+  border-color: #c7d2fe !important;
+}
+
+/* 11. Custom Thin Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -269,98 +346,4 @@ body.light-theme ::-webkit-scrollbar-thumb {
 }
 body.light-theme ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.8);
-}
-
-/* Light Theme Glass Panel Overrides */
-body.light-theme .glass-panel {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Light Theme Button Color Adjustments for Attack Launchpad & Action Pills */
-body.light-theme .text-rose-200,
-body.light-theme .text-rose-300 {
-  color: #be123c !important;
-}
-body.light-theme .text-red-300 {
-  color: #b91c1c !important;
-}
-body.light-theme .text-amber-300 {
-  color: #b45309 !important;
-}
-body.light-theme .text-purple-300 {
-  color: #6b21a8 !important;
-}
-body.light-theme .text-sky-300 {
-  color: #0369a1 !important;
-}
-body.light-theme .text-emerald-300 {
-  color: #047857 !important;
-}
-body.light-theme .text-indigo-300 {
-  color: #4338ca !important;
-}
-body.light-theme .text-pink-300 {
-  color: #be185d !important;
-}
-body.light-theme .text-cyan-300 {
-  color: #0e7490 !important;
-}
-
-body.light-theme .bg-rose-600\/20 {
-  background-color: #ffe4e6 !important;
-}
-body.light-theme .bg-red-500\/15 {
-  background-color: #fee2e2 !important;
-}
-body.light-theme .bg-amber-500\/15 {
-  background-color: #fef3c7 !important;
-}
-body.light-theme .bg-purple-500\/15 {
-  background-color: #f3e8ff !important;
-}
-body.light-theme .bg-sky-500\/15 {
-  background-color: #e0f2fe !important;
-}
-body.light-theme .bg-emerald-600\/20,
-body.light-theme .bg-emerald-500\/15,
-body.light-theme .bg-emerald-500\/25 {
-  background-color: #d1fae5 !important;
-}
-body.light-theme .bg-indigo-500\/20,
-body.light-theme .bg-indigo-950\/40,
-body.light-theme .bg-indigo-950\/50 {
-  background-color: #e0e7ff !important;
-}
-body.light-theme .bg-pink-950\/20 {
-  background-color: #fce7f3 !important;
-}
-
-body.light-theme .border-rose-500\/40,
-body.light-theme .border-rose-500\/30 {
-  border-color: #fecdd3 !important;
-}
-body.light-theme .border-red-500\/30 {
-  border-color: #fecaca !important;
-}
-body.light-theme .border-amber-500\/30 {
-  border-color: #fde68a !important;
-}
-body.light-theme .border-purple-500\/30 {
-  border-color: #e9d5ff !important;
-}
-body.light-theme .border-sky-500\/30 {
-  border-color: #bae6fd !important;
-}
-body.light-theme .border-emerald-500\/30,
-body.light-theme .border-emerald-400\/50 {
-  border-color: #a7f3d0 !important;
-}
-body.light-theme .border-indigo-500\/30,
-body.light-theme .border-indigo-500 {
-  border-color: #c7d2fe !important;
-}
-body.light-theme .border-pink-500\/30 {
-  border-color: #fbcfe8 !important;
 }
