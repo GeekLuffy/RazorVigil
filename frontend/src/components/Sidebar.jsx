@@ -76,7 +76,7 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 scrollbar-thin">
         {NAV_SECTIONS.map((section, sIdx) => (
           <div key={section.category || sIdx} className="space-y-1">
-            <div className={`px-3 text-[10px] font-bold font-mono tracking-wider uppercase ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+            <div className={`px-3 text-[10px] font-extrabold font-mono tracking-wider uppercase ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>
               {section.category}
             </div>
             <div className="space-y-0.5 mt-1">
@@ -94,14 +94,14 @@ export default function Sidebar({
                           : 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm font-bold'
                         : isDark
                           ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
+                          : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100/90 border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <Icon className={`w-4 h-4 transition-colors ${
                         isActive
                           ? isDark ? 'text-emerald-400' : 'text-emerald-600'
-                          : isDark ? 'text-slate-500 group-hover:text-slate-300' : 'text-slate-400 group-hover:text-slate-700'
+                          : isDark ? 'text-slate-500 group-hover:text-slate-300' : 'text-slate-500 group-hover:text-slate-900'
                       }`} />
                       <span>{item.label}</span>
                     </div>
@@ -114,13 +114,15 @@ export default function Sidebar({
                           {item.badge}
                         </span>
                       )}
-                      <span className={`px-1 rounded text-[9px] border ${
+                      <kbd className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors ${
                         isActive
                           ? isDark ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-emerald-100 border-emerald-300 text-emerald-800'
-                          : isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
+                          : isDark
+                            ? 'bg-slate-900 border-slate-800 text-slate-400 group-hover:text-slate-300 group-hover:border-slate-700'
+                            : 'bg-slate-100 border-slate-300 text-slate-800 shadow-sm group-hover:bg-white group-hover:text-slate-950 group-hover:border-slate-400'
                       }`}>
                         {item.key}
-                      </span>
+                      </kbd>
                     </div>
                   </button>
                 )
@@ -143,7 +145,7 @@ export default function Sidebar({
               <ShoppingBag className="w-4 h-4 text-indigo-500" />
               <span>Merchant Storefront</span>
             </div>
-            <span className={`text-[10px] font-mono px-1 rounded border ${isDark ? 'text-slate-400 bg-slate-950 border-slate-800' : 'text-slate-500 bg-white border-slate-200'}`}>S</span>
+            <kbd className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border transition-colors ${isDark ? 'text-slate-400 bg-slate-950 border-slate-800' : 'text-slate-800 bg-slate-100 border-slate-300 shadow-sm'}`}>S</kbd>
           </button>
 
           <button
@@ -158,9 +160,9 @@ export default function Sidebar({
               <Bot className="w-4 h-4 text-pink-500 animate-pulse" />
               <span>Forensic Copilot</span>
             </div>
-            <span className={`text-[10px] font-mono px-1 rounded border ${
-              isDark ? 'text-pink-400 bg-pink-950/80 border-pink-500/30' : 'text-pink-700 bg-pink-100 border-pink-300'
-            }`}>C</span>
+            <kbd className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border transition-colors ${
+              isDark ? 'text-pink-400 bg-pink-950/80 border-pink-500/30' : 'text-pink-800 bg-pink-100 border-pink-300 shadow-sm'
+            }`}>C</kbd>
           </button>
         </div>
       </div>

@@ -76,17 +76,28 @@ body.light-theme .text-slate-100 {
   color: #0f172a !important;
 }
 
-body.light-theme .text-slate-200,
+body.light-theme .text-slate-200 {
+  color: #1e293b !important;
+}
+
 body.light-theme .text-slate-300 {
   color: #334155 !important;
 }
 
 body.light-theme .text-slate-400 {
-  color: #64748b !important;
+  color: #475569 !important;
 }
 
 body.light-theme .text-slate-500 {
-  color: #94a3b8 !important;
+  color: #64748b !important;
+}
+
+/* Light Theme Keyboard Badges */
+body.light-theme kbd {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Light Theme Sidebar & Header */
