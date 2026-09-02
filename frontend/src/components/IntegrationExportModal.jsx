@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { API_BASE } from '../config'
 
-export default function IntegrationExportModal({ isOpen, onClose }) {
+export default function IntegrationExportModal({ isOpen = true, onClose }) {
   const [activeTab, setActiveTab] = useState('sdk') // 'sdk' | 'rules'
   const [selectedLang, setSelectedLang] = useState('nodejs')
   const [sdkData, setSdkData] = useState(null)
@@ -26,7 +26,7 @@ export default function IntegrationExportModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!isOpen) return
+    if (isOpen === false) return
 
     const fetchData = async () => {
       try {
@@ -52,7 +52,7 @@ export default function IntegrationExportModal({ isOpen, onClose }) {
     fetchData()
   }, [isOpen])
 
-  if (!isOpen) return null
+  if (isOpen === false) return null
 
   const handleCopy = (text, key) => {
     navigator.clipboard.writeText(text)

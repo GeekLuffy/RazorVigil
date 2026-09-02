@@ -32,7 +32,7 @@ import {
 } from 'recharts'
 import { API_BASE } from '../config'
 
-export default function StressBenchmarkModal({ isOpen, onClose }) {
+export default function StressBenchmarkModal({ isOpen = true, onClose }) {
   const [concurrency, setConcurrency] = useState(50)
   const [totalRequests, setTotalRequests] = useState(300)
   const [profile, setProfile] = useState('mixed')
@@ -41,7 +41,7 @@ export default function StressBenchmarkModal({ isOpen, onClose }) {
   const [benchmarkResult, setBenchmarkResult] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
 
-  if (!isOpen) return null
+  if (isOpen === false) return null
 
   const handleRunBenchmark = async () => {
     setRunning(true)

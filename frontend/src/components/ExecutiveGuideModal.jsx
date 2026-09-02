@@ -22,16 +22,21 @@ import {
 } from 'lucide-react'
 
 export default function ExecutiveGuideModal({
-  isOpen,
+  isOpen = true,
   onClose,
   onLaunchStore,
-  onNavigateTab
+  onNavigateTab,
+  onOpenStore,
+  onOpenLab
 }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [interactiveSim, setInteractiveSim] = useState('none') // 'none' | 'genuine' | 'bot' | 'vpn'
   const [isSimulating, setIsSimulating] = useState(false)
 
-  if (!isOpen) return null
+  const handleLaunchStore = onLaunchStore || onOpenStore
+  const handleNavigateTab = onNavigateTab || onOpenLab
+
+  if (isOpen === false) return null
 
   const runSim = (type) => {
     setIsSimulating(true)

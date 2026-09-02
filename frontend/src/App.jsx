@@ -3,7 +3,7 @@ import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
   ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords,
-  Layers, Percent, Moon, Sun, UserCheck, Cpu, Server
+  Layers, Percent, Moon, Sun, UserCheck, Cpu, Server, X
 } from 'lucide-react'
 
 // ?? Fixed Left Sidebar ??
@@ -155,6 +155,7 @@ export default function App() {
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false)
   const [isExportOpen, setIsExportOpen] = useState(false)
   const [isGPUModalOpen, setIsGPUModalOpen] = useState(false)
+  const [isAdminOpen, setIsAdminOpen] = useState(false)
   const [copilotNotes, setCopilotNotes] = useState([])
 
   // ?? WebSocket Ingestion Stream Connection ??
@@ -253,6 +254,7 @@ export default function App() {
         setIsBenchmarkOpen(false)
         setIsExportOpen(false)
         setIsGPUModalOpen(false)
+        setIsAdminOpen(false)
         setSelectedTx(null)
       }
     }
@@ -345,15 +347,19 @@ export default function App() {
             </button>
 
             {/* Admin Profile Avatar (LandGuard Style) */}
-            <div className="flex items-center gap-2.5 pl-2 border-l border-slate-800">
+            <button
+              onClick={() => setIsAdminOpen(prev => !prev)}
+              className="flex items-center gap-2.5 pl-2 border-l border-slate-800 hover:opacity-80 transition text-left cursor-pointer"
+              title="View SOC Lead Session & Authority"
+            >
               <div className="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold font-mono text-xs">
                 A
               </div>
               <div className="hidden md:block text-left">
-                <div className="text-xs font-bold text-white leading-none">Administrator</div>
+                <div className={`text-xs font-bold leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>Administrator</div>
                 <div className="text-[10px] text-slate-400 leading-tight font-mono mt-0.5">FinTech SOC Lead</div>
               </div>
-            </div>
+            </button>
           </div>
         </header>
 
@@ -440,18 +446,27 @@ export default function App() {
       />
 
       {isBenchmarkOpen && (
-        <StressBenchmarkModal onClose={() => setIsBenchmarkOpen(false)} />
+        <StressBenchmarkModal
+          isOpen={isBenchmarkOpen}
+          onClose={() => setIsBenchmarkOpen(false)}
+        />
       )}
 
       {isExportOpen && (
-        <IntegrationExportModal onClose={() => setIsExportOpen(false)} />
+        <IntegrationExportModal
+          isOpen={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+        />
       )}
 
       {isGuideOpen && (
         <ExecutiveGuideModal
+          isOpen={isGuideOpen}
           onClose={() => setIsGuideOpen(false)}
           onOpenStore={() => { setIsGuideOpen(false); setIsStoreOpen(true); }}
+          onLaunchStore={() => { setIsGuideOpen(false); setIsStoreOpen(true); }}
           onOpenLab={() => { setIsGuideOpen(false); handleSelectTab('simulator'); }}
+          onNavigateTab={(tab) => { setIsGuideOpen(false); handleSelectTab(tab || 'simulator'); }}
         />
       )}
 
@@ -460,6 +475,84 @@ export default function App() {
         onClose={() => setIsGPUModalOpen(false)}
         isDark={isDark}
       />
+
+      {/* Admin SOC Profile Modal */}
+      {isAdminOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl transition-all ${
+            isDark ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold font-mono text-sm">
+                  A
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm">FinTech SOC Lead Session</h3>
+                  <p className="text-xs text-slate-400 font-mono">auth_level: L3_AUTONOMOUS_ROOT</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAdminOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-800/60 text-slate-400 hover:text-white transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="py-4 space-y-3 text-xs font-mono">
+              <div className={`p-3 rounded-lg border ${isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="text-[10px] uppercase font-bold text-slate-500 mb-1">Active Corridors Under Protection</div>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {['Razorpay Gateway', 'HDFC Core', 'ICICI 3DS', 'SBI UPI', 'Axis Instant'].map(c => (
+                    <span key={c} className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className={`p-3 rounded-lg border grid grid-cols-2 gap-2 ${isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'}`}>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">CONFORMAL BOUND</span>
+                  <span className="font-bold text-emerald-400">q_hat = 0.00600 (95%)</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">CLUSTER COMPUTE</span>
+                  <span className="font-bold text-cyan-400">bd216server3 (CUDA:4)</span>
+                </div>
+              </div>
+
+              <div className={`p-3 rounded-lg border ${isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'}`}>
+                <span className="text-slate-500 block text-[10px] mb-1">QUICK ACTIONS</span>
+                <div className="grid grid-cols-2 gap-2 mt-1 font-sans">
+                  <button
+                    onClick={() => { setIsAdminOpen(false); setIsGPUModalOpen(true); }}
+                    className="px-2.5 py-1.5 rounded-lg font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5"
+                  >
+                    <Cpu size={12} /> GPU Cluster HUD
+                  </button>
+                  <button
+                    onClick={() => { setIsAdminOpen(false); setIsBenchmarkOpen(true); }}
+                    className="px-2.5 py-1.5 rounded-lg font-bold text-xs bg-amber-600 hover:bg-amber-500 text-white transition flex items-center justify-center gap-1.5"
+                  >
+                    <Zap size={12} /> Run Benchmark
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-800 flex justify-end">
+              <button
+                onClick={() => setIsAdminOpen(false)}
+                className="px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
+              >
+                Close Session Panel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
