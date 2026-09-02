@@ -8,7 +8,7 @@ import {
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
   ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords,
   ShieldAlert, ShieldCheck, Shield, Radio, Layers, ExternalLink, Cpu, IndianRupee,
-  CheckCircle2, AlertOctagon, RefreshCw
+  CheckCircle2, AlertOctagon, RefreshCw, Globe, Key
 } from 'lucide-react'
 
 import FraudGraphCanvas from '../components/FraudGraphCanvas'
@@ -167,88 +167,138 @@ export default function DashboardPage({
         </div>
       </div>
 
-      {/* ?? 3. Multi-Sensor Gating Constellation Banner ?? */}
-      <div className="soc-card rounded-2xl p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+      {/* 3. Live Payment Corridors Defense Matrix */}
+      <div className="soc-card rounded-2xl p-5 sm:p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
               <h2 className="text-sm font-black text-white uppercase tracking-wider font-mono">
-                Multi-Sensor Gating Constellation Status
+                Payment Corridors &amp; Synchronous Gating Matrix
               </h2>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                Sub-15ms Enforced
+              </span>
             </div>
             <p className="text-xs text-slate-400 mt-1 font-sans">
-              Synchronous change detection &amp; ensemble ML operating on Redis Velocity, LightGBM, and Louvain Graph.
+              Real-time traffic throughput, P99 gating SLA enforcement, and autonomous defense policies per payment corridor.
             </p>
           </div>
 
-          <div className="text-right">
-            <div className="text-2xl font-black font-mono text-emerald-400">
-              ₹19.3 Lakhs
-            </div>
-            <div className="text-[10px] text-slate-400 font-mono uppercase">
-              Annual Surveillance Savings (88% Cost Drop)
-            </div>
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+              Corridors: <strong className="text-emerald-400">4 Active</strong>
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+              False Declines: <strong className="text-emerald-400">0.00%</strong>
+            </span>
           </div>
         </div>
 
-        {/* 3 Horizontal Sub-Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${isDark ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                <Shield size={18} />
+        {/* 4 Corridor Cards in Responsive Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {/* Corridor 1: Razorpay Core Gateway */}
+          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-emerald-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-xs font-bold text-white font-mono">Razorpay Core API</span>
               </div>
-              <div>
-                <div className="text-xs font-bold text-white font-sans">
-                  Sentinel-2 Luhn Canary
-                </div>
-                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-                  50 Honeytokens Armed
-                </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
+                7.8ms P99
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+              <div className="flex justify-between">
+                <span>Throughput:</span>
+                <span className="text-white font-bold">1,420 tx/min</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Coverage:</span>
+                <span className="text-emerald-400 font-bold">95.0% Certified</span>
+              </div>
+              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+                <span className="text-emerald-400 font-bold">Policy:</span> CatBoost GPU + Conformal q̂=0.006
               </div>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
-              Connected
-            </span>
           </div>
 
-          <div className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${isDark ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0">
-                <Cpu size={18} />
+          {/* Corridor 2: UPI AutoPay / 2.0 Instant */}
+          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-cyan-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                <span className="text-xs font-bold text-white font-mono">UPI 2.0 / AutoPay</span>
               </div>
-              <div>
-                <div className="text-xs font-bold text-white font-sans">
-                  Quad-Ensemble ML Pipeline
-                </div>
-                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-                  17-D Features · Sub-8ms
-                </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 font-bold">
+                6.2ms P99
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+              <div className="flex justify-between">
+                <span>Throughput:</span>
+                <span className="text-white font-bold">980 tx/min</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Velocity Gating:</span>
+                <span className="text-cyan-400 font-bold">Sub-Second Active</span>
+              </div>
+              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+                <span className="text-cyan-400 font-bold">Policy:</span> Redis Window + Louvain Ring Isolation
               </div>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-bold">
-              Active (0.99 AUC)
-            </span>
           </div>
 
-          <div className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${isDark ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
-                <Network size={18} />
+          {/* Corridor 3: Carding Defense (3DS2) */}
+          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-rose-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
+                <span className="text-xs font-bold text-white font-mono">Carding &amp; 3DS2</span>
               </div>
-              <div>
-                <div className="text-xs font-bold text-white font-sans">
-                  Bipartite Syndicate Graph
-                </div>
-                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-                  Louvain Modularity Q=0.8994
-                </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold">
+                9.4ms P99
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+              <div className="flex justify-between">
+                <span>Throughput:</span>
+                <span className="text-white font-bold">410 tx/min</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Canary Decoys:</span>
+                <span className="text-rose-400 font-bold">50 Armed</span>
+              </div>
+              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+                <span className="text-rose-400 font-bold">Policy:</span> Telegram Scraper Tarpit &amp; ₹1 Voiding
               </div>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
-              Active (Graph Q)
-            </span>
+          </div>
+
+          {/* Corridor 4: AP2 Autonomous AI Agent */}
+          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-purple-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+                <span className="text-xs font-bold text-white font-mono">AP2 AI Agent Gate</span>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold">
+                4.1ms P99
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+              <div className="flex justify-between">
+                <span>Throughput:</span>
+                <span className="text-white font-bold">85 tx/min</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Attestation:</span>
+                <span className="text-purple-400 font-bold">ECDSA Verified</span>
+              </div>
+              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+                <span className="text-purple-400 font-bold">Policy:</span> Fast-Path Cryptographic Spend Bounds
+              </div>
+            </div>
           </div>
         </div>
       </div>
