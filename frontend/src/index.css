@@ -16,224 +16,152 @@
   }
 }
 
-/* ── Aura Gradient Atmosphere ("Moonlit" + Sentinel Multi-Layer Blend) ── */
+/* ?? Light Mode Overrides ?? */
+body.light-theme {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+body.light-theme .soc-card {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .text-slate-400 {
+  color: #64748b;
+}
+
+body.light-theme .text-slate-300 {
+  color: #334155;
+}
+
+body.light-theme .text-white {
+  color: #0f172a;
+}
+
+body.light-theme aside {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* ?? Atmospheric dispersion aura ?? */
 .aura-container {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
 }
 
-/* Layer 1: Cool celestial atmospheric dispersion (screen) */
 .aura-layer-1 {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 55% 48% at 78% 18%, rgba(99, 102, 241, 0.22) 0%, rgba(57, 79, 130, 0.08) 48%, transparent 78%),
-    radial-gradient(ellipse 45% 42% at 18% 38%, rgba(16, 185, 129, 0.12) 0%, rgba(13, 148, 136, 0.04) 45%, transparent 72%),
-    radial-gradient(ellipse 60% 55% at 50% 92%, rgba(244, 63, 94, 0.07) 0%, transparent 68%);
+    radial-gradient(ellipse 55% 48% at 78% 18%, rgba(99, 102, 241, 0.15) 0%, rgba(57, 79, 130, 0.05) 48%, transparent 78%),
+    radial-gradient(ellipse 45% 42% at 18% 38%, rgba(16, 185, 129, 0.08) 0%, rgba(13, 148, 136, 0.03) 45%, transparent 72%);
   mix-blend-mode: screen;
-  filter: blur(36px);
+  filter: blur(40px);
   transform: translateZ(0);
   will-change: transform;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Layer 2: Core luminous focal highlights (screen) */
-.aura-layer-2 {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 26% 26% at 76% 20%, rgba(180, 198, 255, 0.14) 0%, transparent 70%),
-    radial-gradient(ellipse 20% 20% at 20% 36%, rgba(52, 211, 153, 0.10) 0%, transparent 70%),
-    radial-gradient(ellipse 22% 22% at 52% 80%, rgba(244, 63, 94, 0.06) 0%, transparent 65%);
-  mix-blend-mode: screen;
-  filter: blur(54px);
-  opacity: 0.85;
-  transform: translateZ(0);
-  will-change: transform;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Film-grain overlay - SVG feTurbulence noise */
-.aura-grain {
-  position: fixed;
-  inset: 0;
-  mix-blend-mode: overlay;
-  opacity: 0.65;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ── Modern Floating Glassmorphic Navbar ── */
-.glass-nav {
-  background: rgba(10, 14, 26, 0.78);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-/* ── Depth & Surface Cards ── */
-.glass-panel {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.70) 0%, rgba(8, 12, 24, 0.85) 100%);
+/* ?? LandGuard Clean Card Surface ?? */
+.soc-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(51, 65, 85, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-}
-
-.panel {
-  @apply bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 transition-all duration-300;
-  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.panel:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 8px 26px -4px rgba(0, 0, 0, 0.65), 0 0 15px -3px rgba(99, 102, 241, 0.15);
-  transform: translateY(-1px);
-}
-
-.panel-primary {
-  @apply bg-slate-900/85 border border-indigo-500/30 rounded-xl p-4 transition-all duration-300;
-  border-top: 1.5px solid rgba(99, 102, 241, 0.6);
-  box-shadow: 0 8px 28px -4px rgba(99, 102, 241, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.panel-primary:hover {
-  border-color: rgba(99, 102, 241, 0.55);
-  box-shadow: 0 12px 32px -4px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transform: translateY(-1.5px);
-}
-
-
-.soc-card {
-  background: linear-gradient(165deg, rgba(15, 23, 42, 0.88) 0%, rgba(9, 13, 26, 0.96) 100%);
-  border: 1px solid rgba(30, 41, 59, 0.85);
-  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease-in-out;
 }
 
 .soc-card:hover {
-  border-color: rgba(51, 65, 85, 0.95);
-  box-shadow: 0 10px 28px -2px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
-.soc-card-indigo {
-  border-top: 1.5px solid rgba(99, 102, 241, 0.55);
-}
-.soc-card-indigo:hover {
-  box-shadow: 0 8px 24px -2px rgba(99, 102, 241, 0.2);
-  transform: translateY(-1px);
-}
-
-.soc-card-emerald {
-  border-top: 1.5px solid rgba(16, 185, 129, 0.55);
-}
-.soc-card-emerald:hover {
-  box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.2);
-  transform: translateY(-1px);
+/* ?? Soft Colored Icon Badges (LandGuard Style) ?? */
+.icon-badge-emerald {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.soc-card-rose {
-  border-top: 1.5px solid rgba(244, 63, 94, 0.55);
-}
-.soc-card-rose:hover {
-  box-shadow: 0 8px 24px -2px rgba(244, 63, 94, 0.2);
-  transform: translateY(-1px);
-}
-
-.soc-card-amber {
-  border-top: 1.5px solid rgba(245, 158, 11, 0.55);
-}
-.soc-card-amber:hover {
-  box-shadow: 0 8px 24px -2px rgba(245, 158, 11, 0.2);
-  transform: translateY(-1px);
+.icon-badge-cyan {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background-color: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-/* ── Luminous Glow Text ── */
-.glow-text-emerald { text-shadow: 0 0 20px rgba(16, 185, 129, 0.45); }
-.glow-text-rose { text-shadow: 0 0 20px rgba(244, 63, 94, 0.45); }
-.glow-text-indigo { text-shadow: 0 0 20px rgba(99, 102, 241, 0.45); }
-.glow-text-amber { text-shadow: 0 0 20px rgba(245, 158, 11, 0.45); }
-
-/* ── Tier Badges with Depth ── */
-.tier-safe { @apply bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 shadow-sm shadow-emerald-950/40; }
-.tier-soft_risk { @apply bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-sm shadow-amber-950/40; }
-.tier-elevated_review { @apply bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm shadow-amber-950/50; }
-.tier-high_confidence_bot { @apply bg-rose-500/15 text-rose-300 border border-rose-500/40 shadow-sm shadow-rose-950/40; }
-.tier-verified_agent { @apply bg-indigo-500/15 text-indigo-300 border border-indigo-500/40 shadow-sm shadow-indigo-950/40; }
-
-/* ── Smooth Pulse & Shimmer Animations ── */
-@keyframes subtle-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
+.icon-badge-rose {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background-color: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.animate-float {
-  animation: subtle-float 4s ease-in-out infinite;
+.icon-badge-amber {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.4)); }
-  50% { opacity: 1; filter: drop-shadow(0 0 14px rgba(99, 102, 241, 0.8)); }
+.icon-badge-indigo {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2.5s ease-in-out infinite;
+/* ?? Custom Thin Scrollbars ?? */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-.canary-flash {
-  animation: canary-pulse 0.5s ease-in-out 4;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
-
-@keyframes canary-pulse {
-  0%, 100% { background-color: transparent; }
-  50% { background-color: rgba(245, 158, 11, 0.22); }
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 4px;
 }
-
-@keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
 }
-
-.animate-cursor {
-  display: inline-block;
-  animation: cursor-blink 1s infinite;
-}
-
-/* ── Fluid Slide in and Scale transitions ── */
-@keyframes slide-in-right {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes scale-up {
-  from { transform: scale(0.96); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-scale-up {
-  animation: scale-up 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-fadeIn {
-  animation: fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* ── Custom Scrollbars ── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #334155; }
