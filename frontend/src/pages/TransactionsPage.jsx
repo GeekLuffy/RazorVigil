@@ -17,7 +17,8 @@ export default function TransactionsPage({
   tierMetaFn,
   isPaused,
   setIsPaused,
-  onOpenCopilot
+  onOpenCopilot,
+  isDark = true
 }) {
   const [filterTier, setFilterTier] = useState('ALL')
   const [filterLayer, setFilterLayer] = useState('ALL')
@@ -248,7 +249,7 @@ export default function TransactionsPage({
               className={`px-2.5 py-1 rounded-lg border transition font-bold text-[11px] ${
                 filterLayer === l.id
                   ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                  : isDark ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm'
               }`}
             >
               {l.label}
@@ -263,7 +264,7 @@ export default function TransactionsPage({
             <select
               value={methodFilter}
               onChange={e => setMethodFilter(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
+              className={`border rounded-lg px-2.5 py-1 font-mono text-xs focus:outline-none focus:border-indigo-500 ${isDark ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'}`}
             >
               <option value="ALL">All Methods</option>
               <option value="CARD">Card (Tokenized)</option>
@@ -274,7 +275,7 @@ export default function TransactionsPage({
             <select
               value={merchantFilter}
               onChange={e => setMerchantFilter(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
+              className={`border rounded-lg px-2.5 py-1 font-mono text-xs focus:outline-none focus:border-indigo-500 ${isDark ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'}`}
             >
               <option value="ALL">All Merchants</option>
               <option value="Zomato Gold Delivery">Zomato Gold</option>
@@ -294,7 +295,7 @@ export default function TransactionsPage({
               placeholder="Search TxID, Merchant, Bank, City, Layer..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-slate-200 font-mono text-xs w-56 sm:w-72 focus:outline-none focus:border-indigo-500 transition-all"
+              className={`border rounded-lg pl-8 pr-3 py-1.5 font-mono text-xs w-56 sm:w-72 focus:outline-none focus:border-indigo-500 transition-all ${isDark ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'}`}
             />
           </div>
         </div>
@@ -304,7 +305,8 @@ export default function TransactionsPage({
       <div className="soc-card rounded-2xl p-0 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-slate-950/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+            <thead className={`uppercase text-[10px] tracking-wider border-b transition-colors ${isDark ? 'bg-slate-950/90 text-slate-400 border-slate-800' : 'bg-slate-100/90 text-slate-600 border-slate-200'}`}>
+
               <tr>
                 <th className="py-3.5 px-4">Latency</th>
                 <th className="py-3.5 px-4">Decision Tier</th>
@@ -330,8 +332,8 @@ export default function TransactionsPage({
                     onClick={() => setSelectedTx(tx)}
                     className={`cursor-pointer transition ${
                       isSelected
-                        ? 'bg-indigo-950/50 text-white'
-                        : 'hover:bg-slate-800/40 text-slate-300'
+                        ? isDark ? 'bg-indigo-950/50 text-white' : 'bg-indigo-50 text-indigo-950 font-medium'
+                        : isDark ? 'hover:bg-slate-800/40 text-slate-300' : 'hover:bg-slate-100/80 text-slate-700'
                     }`}
                   >
                     <td className="py-3 px-4 font-bold text-slate-400">{fmtMs(tx.latency_ms)}</td>

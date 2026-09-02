@@ -44,7 +44,8 @@ export default function DashboardPage({
   onOpenCopilot,
   onOpenStore,
   tierMetaFn,
-  onNavigateTab
+  onNavigateTab,
+  isDark = true
 }) {
   const totalEvaluated = Object.values(tierCounts).reduce((a, b) => a + b, 0) || stats.total_evaluated || 1
   const botThreatsCount = tierCounts.high_confidence_bot || 312
@@ -193,7 +194,7 @@ export default function DashboardPage({
 
         {/* 3 Horizontal Sub-Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
+          <div className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${isDark ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
                 <Shield size={18} />
@@ -212,7 +213,7 @@ export default function DashboardPage({
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
+          <div className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${isDark ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0">
                 <Cpu size={18} />
@@ -231,7 +232,7 @@ export default function DashboardPage({
             </span>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
+          <div className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${isDark ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
                 <Network size={18} />
@@ -271,8 +272,8 @@ export default function DashboardPage({
             </span>
           </div>
 
-          <div className="w-full h-80 rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950/80">
-            <FraudGraphCanvas onSelectTransaction={setSelectedTx} />
+          <div className={`w-full h-80 rounded-xl overflow-hidden border transition-colors ${isDark ? 'border-slate-800/80 bg-slate-950/80' : 'border-slate-200 bg-slate-50/50 shadow-inner'}`}>
+            <FraudGraphCanvas onSelectTransaction={setSelectedTx} isDark={isDark} />
           </div>
         </div>
 
@@ -316,7 +317,7 @@ export default function DashboardPage({
                 className={`px-3 py-1 rounded-xl text-xs font-mono font-bold border transition flex items-center gap-1.5 cursor-pointer ${
                   isPaused
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                    : 'bg-slate-950 text-slate-300 hover:text-white border-slate-800'
+                    : isDark ? 'bg-slate-950 text-slate-300 hover:text-white border-slate-800' : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm'
                 }`}
               >
                 {isPaused ? <Play size={11} /> : <Pause size={11} />}
@@ -403,19 +404,19 @@ export default function DashboardPage({
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '11px', fontFamily: 'monospace' }}
+                  contentStyle={isDark ? { backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '11px', fontFamily: 'monospace', color: '#ffffff' } : { backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '12px', fontSize: '11px', fontFamily: 'monospace', color: '#0f172a', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
                 />
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute flex flex-col items-center pointer-events-none">
-              <span className="text-lg font-bold font-mono text-white">{totalEvaluated.toLocaleString()}</span>
+              <span className={`text-lg font-bold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>{totalEvaluated.toLocaleString()}</span>
               <span className="text-[10px] text-slate-400 uppercase font-mono">Total Tx</span>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs font-mono mt-2">
             {pieData.map((item, idx) => (
-              <div key={`${item.tier}-${idx}`} className="flex items-center justify-between p-1.5 rounded-lg bg-slate-950/60 border border-slate-800">
+              <div key={`${item.tier}-${idx}`} className={`flex items-center justify-between p-1.5 rounded-lg border transition-colors ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
                 <span className="flex items-center gap-1.5 text-slate-300 text-[11px] truncate">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PIE_COLORS[item.tier] }} />
                   {item.name}

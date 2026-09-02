@@ -277,7 +277,8 @@ export default function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#080a11] text-slate-100 flex flex-row overflow-x-hidden font-sans">
+    <div className={`min-h-screen flex flex-row overflow-x-hidden font-sans transition-colors duration-200 ${isDark ? 'bg-[#080a11] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+
       {/* ?? Fixed Left Sidebar (LandGuard Style) ?? */}
       <Sidebar
         activeTab={activeTab}
@@ -294,7 +295,7 @@ export default function App() {
       {/* ?? Main Workspace Scrollable Container ?? */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         {/* ?? Top Header Bar (LandGuard Breadcrumb + Admin Profile) ?? */}
-        <header className="sticky top-0 z-20 px-6 py-3.5 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 flex items-center justify-between gap-4 select-none">
+        <header className={`sticky top-0 z-20 px-6 py-3.5 backdrop-blur-md border-b flex items-center justify-between gap-4 select-none transition-colors duration-200 ${isDark ? 'bg-slate-950/80 border-slate-800/80' : 'bg-white/90 border-slate-200 shadow-sm'}`}>
           {/* Left: Active Surveillance Breadcrumb */}
           <div className="flex items-center gap-2 text-xs font-mono">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -309,7 +310,7 @@ export default function App() {
             {/* Quick Action Buttons */}
             <button
               onClick={() => setIsBenchmarkOpen(true)}
-              className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 flex items-center gap-1.5 transition"
+              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-amber-400 border-slate-800' : 'bg-amber-50 hover:bg-amber-100 text-amber-600 border-amber-200'}`}
               title="Run SLA Stress Benchmark (B)"
             >
               <Zap size={12} />
@@ -318,7 +319,7 @@ export default function App() {
 
             <button
               onClick={() => setIsExportOpen(true)}
-              className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-900 hover:bg-slate-800 text-cyan-400 border border-slate-800 flex items-center gap-1.5 transition"
+              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-cyan-400 border-slate-800' : 'bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border-cyan-200'}`}
               title="SDK & WAF Export (E)"
             >
               <Package size={12} />
@@ -327,7 +328,7 @@ export default function App() {
 
             <button
               onClick={() => setIsGuideOpen(true)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition"
+              className={`p-1.5 rounded-lg border transition ${isDark ? 'text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border-slate-800' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'}`}
               title="Guided Tour (?)"
             >
               <Sparkles size={13} className="text-indigo-400" />
@@ -336,7 +337,7 @@ export default function App() {
             {/* Dark / Light Toggle in Header */}
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition"
+              className={`p-1.5 rounded-lg border transition ${isDark ? 'text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border-slate-800' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'}`}
               title="Toggle Theme"
             >
               {isDark ? <Moon size={13} className="text-indigo-400" /> : <Sun size={13} className="text-amber-400" />}
@@ -368,9 +369,11 @@ export default function App() {
               isPaused={isPaused}
               setIsPaused={setIsPaused}
               onOpenCopilot={(tx) => { setSelectedTx(tx); setIsCopilotOpen(true); }}
+              isDark={isDark}
               onOpenStore={() => setIsStoreOpen(true)}
               tierMetaFn={tierMeta}
               onNavigateTab={handleSelectTab}
+              isDark={isDark}
             />
           )}
 
@@ -383,6 +386,7 @@ export default function App() {
               isPaused={isPaused}
               setIsPaused={setIsPaused}
               onOpenCopilot={(tx) => { setSelectedTx(tx); setIsCopilotOpen(true); }}
+              isDark={isDark}
             />
           )}
 

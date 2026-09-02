@@ -28,7 +28,7 @@ const INITIAL_EDGES = [
   { from: 'dev_gen', to: 'card_gen', isFraud: false },
 ]
 
-export default function FraudGraphCanvas({ latestTx }) {
+export default function FraudGraphCanvas({ latestTx, isDark = true }) {
   const canvasRef = useRef(null)
   const [nodes, setNodes] = useState(INITIAL_NODES)
   const [edges, setEdges] = useState(INITIAL_EDGES)
@@ -120,7 +120,7 @@ export default function FraudGraphCanvas({ latestTx }) {
     ctx.clearRect(0, 0, width, height)
 
     // Draw background grid lines
-    ctx.strokeStyle = 'rgba(30, 41, 59, 0.3)'
+    ctx.strokeStyle = isDark ? 'rgba(30, 41, 59, 0.3)' : 'rgba(226, 232, 240, 0.9)'
     ctx.lineWidth = 1
     for (let x = 0; x < width; x += 30) {
       ctx.beginPath()
@@ -215,7 +215,7 @@ export default function FraudGraphCanvas({ latestTx }) {
         ctx.fillText(node.type === 'dev' ? 'Device Hub' : 'PAN Hub', node.x, node.y + radius + 10)
       }
     })
-  }, [nodes, edges, pulsingNode, hoveredNode])
+  }, [nodes, edges, pulsingNode, hoveredNode, isDark])
 
   return (
     <div className="space-y-2 font-sans">
@@ -238,7 +238,7 @@ export default function FraudGraphCanvas({ latestTx }) {
         </div>
       </div>
 
-      <div className="relative rounded-xl overflow-hidden bg-slate-950 border border-slate-800/80">
+      <div className={`relative rounded-xl overflow-hidden transition-colors ${isDark ? 'bg-slate-950 border border-slate-800/80' : 'bg-slate-50 border border-slate-200'}`}>
         <canvas
           ref={canvasRef}
           width={520}
@@ -251,13 +251,14 @@ export default function FraudGraphCanvas({ latestTx }) {
         {/* Hover Tooltip Overlay (Collision-Free) */}
         {hoveredNode && (
           <div
-            className="absolute z-20 pointer-events-none bg-slate-900/95 border border-indigo-500/40 rounded-lg p-2 shadow-xl text-xs font-mono backdrop-blur-md animate-fade-in"
+            className={`absolute z-20 pointer-events-none rounded-lg p-2 shadow-xl text-xs font-mono backdrop-blur-md animate-fade-in border ${isDark ? 'bg-slate-900/95 border-indigo-500/40 text-white' : 'bg-white/95 border-slate-200 text-slate-900'}`}
             style={{
               left: Math.min(Math.max(mousePos.x + 12, 10), 360),
               top: Math.min(Math.max(mousePos.y - 45, 10), 160),
             }}
           >
-            <div className="flex items-center gap-1.5 font-bold text-white mb-0.5">
+            <div className={`flex items-center gap-1.5 font-bold mb-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+
               <span className={`w-2 h-2 rounded-full ${hoveredNode.isCanary ? 'bg-amber-400' : hoveredNode.isFraud ? 'bg-rose-500' : 'bg-emerald-500'}`} />
               <span>{hoveredNode.label}</span>
             </div>
@@ -271,7 +272,7 @@ export default function FraudGraphCanvas({ latestTx }) {
           </div>
         )}
 
-        <div className="absolute bottom-2 right-2 text-[9px] font-mono text-slate-500 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800 pointer-events-none">
+        <div className={`absolute bottom-2 right-2 text-[9px] font-mono px-2 py-0.5 rounded border pointer-events-none ${isDark ? 'text-slate-500 bg-slate-900/80 border-slate-800' : 'text-slate-600 bg-white/90 border-slate-200 shadow-sm'}`}>
           Hover node to inspect • Sub-5ms Ingestion
         </div>
       </div>
