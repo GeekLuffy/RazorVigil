@@ -2,7 +2,7 @@ import React from 'react'
 import {
   Shield, LayoutDashboard, Layers, Activity, BarChart3,
   Network, Flame, FileText, Scale, Moon, Sun,
-  Radio, CheckCircle2, ShoppingBag, Bot, Zap, Cpu
+  Radio, CheckCircle2, ShoppingBag, Bot, Zap, Cpu, X
 } from 'lucide-react'
 
 export const NAV_SECTIONS = [
@@ -31,7 +31,7 @@ export const NAV_SECTIONS = [
   }
 ]
 
-export default function Sidebar({
+function SidebarContent({
   activeTab,
   onSelectTab,
   isDark,
@@ -40,14 +40,19 @@ export default function Sidebar({
   onToggleLang,
   onOpenStore,
   onOpenCopilot,
-  quarantinedCount = 312
+  quarantinedCount = 312,
+  isMobile = false,
+  onCloseMobile
 }) {
+  const handleItemClick = (id) => {
+    onSelectTab(id)
+    if (onCloseMobile) onCloseMobile()
+  }
+
   return (
-    <aside className={`w-64 shrink-0 h-screen sticky top-0 flex flex-col justify-between border-r backdrop-blur-xl z-30 select-none transition-colors duration-200 ${
-      isDark ? 'bg-slate-950/90 border-slate-800/80 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-800 shadow-sm'
-    }`}>
-      {/* ?? 1. Brand Logo Header ?? */}
-      <div className={`p-5 border-b ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`}>
+    <div className="h-full flex flex-col justify-between">
+      {/* 1. Brand Logo Header */}
+      <div className={`p-4 sm:p-5 border-b flex items-center justify-between ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-indigo-600 p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <div className={`w-full h-full rounded-[10px] flex items-center justify-center ${isDark ? 'bg-slate-950' : 'bg-white'}`}>
@@ -70,10 +75,22 @@ export default function Sidebar({
             </div>
           </div>
         </div>
+
+        {isMobile && onCloseMobile && (
+          <button
+            onClick={onCloseMobile}
+            className={`p-1.5 rounded-lg border transition ${
+              isDark ? 'text-slate-400 hover:text-white bg-slate-900 border-slate-800' : 'text-slate-600 hover:text-slate-900 bg-slate-100 border-slate-200'
+            }`}
+            title="Close Menu"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
-      {/* ?? 2. Navigation Categories ?? */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 scrollbar-thin">
+      {/* 2. Navigation Categories */}
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5 scrollbar-thin">
         {NAV_SECTIONS.map((section, sIdx) => (
           <div key={section.category || sIdx} className="space-y-1">
             <div className={`px-3 text-[10px] font-extrabold font-mono tracking-wider uppercase ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>
@@ -86,7 +103,7 @@ export default function Sidebar({
                 return (
                   <button
                     key={item.id}
-                    onClick={() => onSelectTab(item.id)}
+                    onClick={() => handleItemClick(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all group ${
                       isActive
                         ? isDark
@@ -123,7 +140,7 @@ export default function Sidebar({
         {/* Quick Launch Short-actions */}
         <div className={`pt-2 border-t space-y-1.5 ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`}>
           <button
-            onClick={onOpenStore}
+            onClick={() => { onOpenStore(); if (onCloseMobile) onCloseMobile(); }}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition ${
               isDark
                 ? 'text-slate-300 hover:text-white bg-slate-900/40 hover:bg-slate-900 border-slate-800/60'
@@ -137,7 +154,7 @@ export default function Sidebar({
           </button>
 
           <button
-            onClick={onOpenCopilot}
+            onClick={() => { onOpenCopilot(); if (onCloseMobile) onCloseMobile(); }}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition shadow-sm ${
               isDark
                 ? 'text-pink-300 hover:text-white bg-pink-950/20 hover:bg-pink-950/40 border-pink-500/30'
@@ -152,7 +169,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* ?? 3. Sidebar Footer System Status & Controls ?? */}
+      {/* 3. Sidebar Footer System Status & Controls */}
       <div className={`p-3 border-t space-y-2.5 transition-colors ${isDark ? 'border-slate-800/60 bg-slate-950/95' : 'border-slate-200 bg-slate-50'}`}>
         {/* System Status Pill */}
         <div className={`p-2.5 rounded-xl border flex items-center justify-between transition-colors ${
@@ -202,6 +219,70 @@ export default function Sidebar({
           </div>
         </div>
       </div>
-    </aside>
+    </div>
+  )
+}
+
+export default function Sidebar({
+  activeTab,
+  onSelectTab,
+  isDark,
+  onToggleTheme,
+  lang,
+  onToggleLang,
+  onOpenStore,
+  onOpenCopilot,
+  quarantinedCount = 312,
+  isMobileOpen = false,
+  onCloseMobile = () => {}
+}) {
+  return (
+    <>
+      {/* Desktop Sidebar (lg and above) */}
+      <aside className={`hidden lg:flex w-64 shrink-0 h-screen sticky top-0 flex-col justify-between border-r backdrop-blur-xl z-30 select-none transition-colors duration-200 ${
+        isDark ? 'bg-slate-950/90 border-slate-800/80 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-800 shadow-sm'
+      }`}>
+        <SidebarContent
+          activeTab={activeTab}
+          onSelectTab={onSelectTab}
+          isDark={isDark}
+          onToggleTheme={onToggleTheme}
+          lang={lang}
+          onToggleLang={onToggleLang}
+          onOpenStore={onOpenStore}
+          onOpenCopilot={onOpenCopilot}
+          quarantinedCount={quarantinedCount}
+        />
+      </aside>
+
+      {/* Mobile & Tablet Drawer (<lg) */}
+      {isMobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop */}
+          <div
+            onClick={onCloseMobile}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+          />
+          {/* Drawer Panel */}
+          <div className={`relative w-72 max-w-[85vw] h-full flex flex-col justify-between border-r shadow-2xl z-10 transition-transform animate-in slide-in-from-left duration-200 ${
+            isDark ? 'bg-slate-950 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
+            <SidebarContent
+              activeTab={activeTab}
+              onSelectTab={onSelectTab}
+              isDark={isDark}
+              onToggleTheme={onToggleTheme}
+              lang={lang}
+              onToggleLang={onToggleLang}
+              onOpenStore={onOpenStore}
+              onOpenCopilot={onOpenCopilot}
+              quarantinedCount={quarantinedCount}
+              isMobile={true}
+              onCloseMobile={onCloseMobile}
+            />
+          </div>
+        </div>
+      )}
+    </>
   )
 }

@@ -3,7 +3,7 @@ import {
   Shield, Zap, AlertTriangle, CheckCircle, TrendingUp, Activity, Lock, Wifi,
   ShoppingBag, LayoutDashboard, FileText, Sparkles, Scale, BarChart3, Flame, Code2,
   ArrowRight, Search, Play, Pause, Clock, ChevronRight, Network, Bot, Package, Swords,
-  Layers, Percent, Moon, Sun, UserCheck, Cpu, Server, X
+  Layers, Percent, Moon, Sun, UserCheck, Cpu, Server, X, Menu
 } from 'lucide-react'
 
 // ?? Fixed Left Sidebar ??
@@ -92,6 +92,7 @@ export default function App() {
   const handleSelectTab = (tabId) => {
     setActiveTab(tabId)
     window.location.hash = tabId
+    setIsMobileNavOpen(false)
   }
 
   const toggleTheme = () => {
@@ -156,6 +157,7 @@ export default function App() {
   const [isExportOpen, setIsExportOpen] = useState(false)
   const [isGPUModalOpen, setIsGPUModalOpen] = useState(false)
   const [isAdminOpen, setIsAdminOpen] = useState(false)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const [copilotNotes, setCopilotNotes] = useState([])
 
   // ?? WebSocket Ingestion Stream Connection ??
@@ -255,6 +257,7 @@ export default function App() {
         setIsExportOpen(false)
         setIsGPUModalOpen(false)
         setIsAdminOpen(false)
+        setIsMobileNavOpen(false)
         setSelectedTx(null)
       }
     }
@@ -266,7 +269,7 @@ export default function App() {
   return (
     <div className={`min-h-screen flex flex-row overflow-x-hidden font-sans transition-colors duration-200 ${isDark ? 'bg-[#080a11] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
 
-      {/* ?? Fixed Left Sidebar (LandGuard Style) ?? */}
+      {/* ?? Fixed Left Sidebar & Mobile Drawer ?? */}
       <Sidebar
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
@@ -277,56 +280,77 @@ export default function App() {
         onOpenStore={() => setIsStoreOpen(true)}
         onOpenCopilot={() => setIsCopilotOpen(true)}
         quarantinedCount={tierCounts.high_confidence_bot || 312}
+        isMobileOpen={isMobileNavOpen}
+        onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
       {/* ?? Main Workspace Scrollable Container ?? */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         {/* ?? Top Header Bar (LandGuard Breadcrumb + Admin Profile) ?? */}
-        <header className={`sticky top-0 z-20 px-6 py-3.5 backdrop-blur-md border-b flex items-center justify-between gap-4 select-none transition-colors duration-200 ${isDark ? 'bg-slate-950/80 border-slate-800/80' : 'bg-white/90 border-slate-200 shadow-sm'}`}>
-          {/* Left: Active Surveillance Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-slate-400 font-medium">Surveillance Corridors:</span>
-            <span className="text-white font-bold truncate">
-              Razorpay Gateway · HDFC · ICICI · SBI · UPI 2.0 (Live)
-            </span>
+        <header className={`sticky top-0 z-20 px-3 sm:px-6 py-2.5 sm:py-3.5 backdrop-blur-md border-b flex items-center justify-between gap-2 sm:gap-4 select-none transition-colors duration-200 ${isDark ? 'bg-slate-950/80 border-slate-800/80' : 'bg-white/90 border-slate-200 shadow-sm'}`}>
+          {/* Left: Mobile Hamburger & Active Surveillance Breadcrumb */}
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={() => setIsMobileNavOpen(true)}
+              className={`lg:hidden p-1.5 sm:p-2 rounded-xl border transition shrink-0 ${
+                isDark ? 'border-slate-800 text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-900' : 'border-slate-200 text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200'
+              }`}
+              title="Open Navigation Menu"
+            >
+              <Menu size={18} />
+            </button>
+
+            <div className="hidden sm:flex items-center gap-2 text-xs font-mono min-w-0">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span className="text-slate-400 font-medium hidden md:inline shrink-0">Surveillance Corridors:</span>
+              <span className={`font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Razorpay Gateway · HDFC · ICICI · SBI · UPI 2.0 (Live)
+              </span>
+            </div>
+
+            <div className="flex sm:hidden items-center gap-1.5 text-xs font-bold font-mono text-emerald-400">
+              <Shield size={16} />
+              <span className="truncate font-extrabold">RazorShield</span>
+            </div>
           </div>
 
           {/* Right: Quick Tools & Admin Avatar */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Remote GPU Super-Cluster Status Button */}
             <button
               onClick={() => setIsGPUModalOpen(true)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${
+              className={`px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1 sm:gap-1.5 transition ${
                 isDark
                   ? 'bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-400 border-emerald-800/60 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
                   : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300'
               }`}
               title="Inspect bd216server3 GPU Super-Cluster (6x RTX 2080 Ti)"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <Cpu size={12} />
-              <span className="hidden md:inline">bd216server3</span>
-              <span className="text-[10px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-normal">6x GPU · 66GB</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <Cpu size={12} className="shrink-0" />
+              <span className="hidden xl:inline">bd216server3</span>
+              <span className="text-[10px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-normal">
+                <span className="hidden md:inline">6x GPU · </span>66GB
+              </span>
             </button>
 
             {/* Quick Action Buttons */}
             <button
               onClick={() => setIsBenchmarkOpen(true)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-amber-400 border-slate-800' : 'bg-amber-50 hover:bg-amber-100 text-amber-600 border-amber-200'}`}
+              className={`p-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-amber-400 border-slate-800' : 'bg-amber-50 hover:bg-amber-100 text-amber-600 border-amber-200'}`}
               title="Run SLA Stress Benchmark"
             >
               <Zap size={12} />
-              <span className="hidden sm:inline">Benchmark</span>
+              <span className="hidden md:inline">Benchmark</span>
             </button>
 
             <button
               onClick={() => setIsExportOpen(true)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-cyan-400 border-slate-800' : 'bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border-cyan-200'}`}
+              className={`p-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1.5 transition ${isDark ? 'bg-slate-900 hover:bg-slate-800 text-cyan-400 border-slate-800' : 'bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border-cyan-200'}`}
               title="SDK & WAF Export"
             >
               <Package size={12} />
-              <span className="hidden sm:inline">SDK Export</span>
+              <span className="hidden md:inline">SDK Export</span>
             </button>
 
             <button
@@ -349,13 +373,13 @@ export default function App() {
             {/* Admin Profile Avatar (LandGuard Style) */}
             <button
               onClick={() => setIsAdminOpen(prev => !prev)}
-              className="flex items-center gap-2.5 pl-2 border-l border-slate-800 hover:opacity-80 transition text-left cursor-pointer"
+              className="flex items-center gap-2 pl-1.5 sm:pl-2 border-l border-slate-800 hover:opacity-80 transition text-left cursor-pointer"
               title="View SOC Lead Session & Authority"
             >
-              <div className="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold font-mono text-xs">
+              <div className="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold font-mono text-xs shrink-0">
                 A
               </div>
-              <div className="hidden md:block text-left">
+              <div className="hidden lg:block text-left">
                 <div className={`text-xs font-bold leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>Administrator</div>
                 <div className="text-[10px] text-slate-400 leading-tight font-mono mt-0.5">FinTech SOC Lead</div>
               </div>
@@ -364,7 +388,7 @@ export default function App() {
         </header>
 
         {/* ?? Main Sub-Page Workspace Content ?? */}
-        <main className="flex-1 px-6 py-6 max-w-[1700px] w-full mx-auto space-y-6">
+        <main className="flex-1 px-3.5 py-4 sm:px-6 sm:py-6 max-w-[1700px] w-full mx-auto space-y-6 overflow-x-hidden">
           {activeTab === 'dashboard' && (
             <DashboardPage
               stats={stats}
