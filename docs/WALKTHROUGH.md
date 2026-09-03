@@ -47,7 +47,7 @@ Unlike traditional fraud systems that degrade merchant revenue through blunt fal
           LIVE SOC DASHBOARD (WebSockets)            RAZORPAY TEST WEBHOOKS
      • Real-time AreaChart risk stream           • POST /webhook/razorpay
      • Animated Recovered GMV counter            • HMAC-SHA256 Signature Verification
-     • 1-Click Interactive Attack Launchpad      • payment.captured → Live GMV update
+     • 1-Click Detection Test Harness (Sandbox) • payment.captured → Live GMV update
      • Autonomous WAF & Risk Rules Exporter
 ```
 
