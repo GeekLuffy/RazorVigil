@@ -438,11 +438,11 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
 
           // Louvain Modularity Header Chip inside canvas
           ctx.font = 'bold 10px monospace'
-          ctx.fillStyle = '#fda4af'
+          ctx.fillStyle = isDark ? '#fda4af' : '#9f1239'
           ctx.textAlign = 'center'
           ctx.fillText('LOUVAIN RING #1 - MODULARITY Q = 0.8994', cx, cy - radiusY + 18)
           ctx.font = '9px sans-serif'
-          ctx.fillStyle = '#f43f5e'
+          ctx.fillStyle = isDark ? '#f43f5e' : '#be123c'
           ctx.fillText('[ CARDING BOTNET SWARM - 100% QUARANTINED ]', cx, cy - radiusY + 32)
         }
 
@@ -454,8 +454,8 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
           const radiusY = Math.min(height * 0.42, 115)
 
           const grad2 = ctx.createRadialGradient(cx, cy, 10, cx, cy, radiusX)
-          grad2.addColorStop(0, 'rgba(16, 185, 129, 0.14)')
-          grad2.addColorStop(0.7, 'rgba(16, 185, 129, 0.04)')
+          grad2.addColorStop(0, isDark ? 'rgba(16, 185, 129, 0.14)' : 'rgba(16, 185, 129, 0.20)')
+          grad2.addColorStop(0.7, isDark ? 'rgba(16, 185, 129, 0.04)' : 'rgba(16, 185, 129, 0.08)')
           grad2.addColorStop(1, 'rgba(16, 185, 129, 0.0)')
 
           ctx.fillStyle = grad2
@@ -463,25 +463,25 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
           ctx.ellipse(cx, cy, radiusX, radiusY, 0, 0, Math.PI * 2)
           ctx.fill()
 
-          ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)'
+          ctx.strokeStyle = isDark ? 'rgba(16, 185, 129, 0.35)' : 'rgba(16, 185, 129, 0.50)'
           ctx.lineWidth = 1.2
           ctx.setLineDash([4, 4])
           ctx.stroke()
           ctx.setLineDash([])
 
           ctx.font = 'bold 10px monospace'
-          ctx.fillStyle = '#6ee7b7'
+          ctx.fillStyle = isDark ? '#6ee7b7' : '#065f46'
           ctx.textAlign = 'center'
           ctx.fillText('GENUINE CLUSTER #2', cx, cy - radiusY + 18)
           ctx.font = '9px sans-serif'
-          ctx.fillStyle = '#10b981'
+          ctx.fillStyle = isDark ? '#10b981' : '#047857'
           ctx.fillText('[ AUTHENTIC CONSUMER CORRIDOR ]', cx, cy - radiusY + 32)
         }
       } else {
         // Bipartite Flow Column Guides
         ctx.font = 'bold 10px monospace'
         ctx.textAlign = 'center'
-        ctx.fillStyle = '#94a3b8'
+        ctx.fillStyle = isDark ? '#94a3b8' : '#475569'
         ctx.fillText('TIER 1: PROXY NETWORKS / IPS', width * 0.15, 24)
         ctx.fillText('TIER 2: DEVICE FINGERPRINTS', width * 0.50, 24)
         ctx.fillText('TIER 3: PAYMENT CARDS & CANARIES', width * 0.85, 24)
@@ -590,23 +590,23 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
           : '#10b981'
         ctx.fill()
 
-        ctx.strokeStyle = isHovered || isSelected ? '#ffffff' : node.isAnchor ? '#ffffff' : 'rgba(255, 255, 255, 0.8)'
+        ctx.strokeStyle = isHovered || isSelected ? (isDark ? '#ffffff' : '#0f172a') : node.isAnchor ? (isDark ? '#ffffff' : '#0f172a') : (isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(15, 23, 42, 0.4)')
         ctx.lineWidth = isHovered || isSelected ? 2.5 : 1.5
         ctx.stroke()
 
         // Node Micro-Label below
         ctx.font = node.isAnchor ? 'bold 10px monospace' : '9px monospace'
         ctx.fillStyle = isHovered || isSelected
-          ? '#ffffff'
+          ? (isDark ? '#ffffff' : '#0f172a')
           : node.isFraud
-          ? '#fecdd3'
-          : '#a7f3d0'
+          ? (isDark ? '#fecdd3' : '#9f1239')
+          : (isDark ? '#a7f3d0' : '#047857')
         ctx.textAlign = 'center'
         ctx.fillText(node.label, cx, cy + radius + 11)
 
         // Sublabel
         ctx.font = '8px sans-serif'
-        ctx.fillStyle = '#94a3b8'
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b'
         ctx.fillText(node.sublabel || '', cx, cy + radius + 21)
       })
 
@@ -649,13 +649,15 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
 
         {/* Action Controls & Layout Mode Switcher */}
         <div className="flex items-center gap-2 font-mono text-xs">
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-0.5 flex items-center">
+          <div className={`rounded-lg p-0.5 flex items-center border ${
+            isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200 shadow-sm'
+          }`}>
             <button
               onClick={() => setLayoutMode('rings')}
               className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition ${
                 layoutMode === 'rings'
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
               title="Show Louvain community clusters"
             >
@@ -666,7 +668,7 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
               className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition ${
                 layoutMode === 'bipartite'
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
               title="Show 3-tier bipartite flow (IP -> Device -> Card)"
             >
@@ -678,18 +680,26 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
             onClick={() => setParticlesEnabled(prev => !prev)}
             className={`p-1.5 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
               particlesEnabled
-                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                : 'bg-slate-900 text-slate-400 border-slate-800'
+                ? isDark
+                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                  : 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-sm'
+                : isDark
+                  ? 'bg-slate-900 text-slate-400 border-slate-800'
+                  : 'bg-white text-slate-600 border-slate-200'
             }`}
             title="Toggle Live Edge Particle Flow"
           >
-            <Zap size={12} className={particlesEnabled ? 'text-emerald-400 animate-pulse' : ''} />
+            <Zap size={12} className={particlesEnabled ? (isDark ? 'text-emerald-400 animate-pulse' : 'text-emerald-600 animate-pulse') : ''} />
             <span className="hidden md:inline">{particlesEnabled ? 'Flow On' : 'Flow Off'}</span>
           </button>
 
           <button
             onClick={reCluster}
-            className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition"
+            className={`p-1.5 rounded-lg border transition ${
+              isDark
+                ? 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 hover:text-white'
+                : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 hover:text-slate-900 shadow-sm'
+            }`}
             title="Re-calculate Graph Physics"
           >
             <RefreshCw size={12} />
@@ -776,24 +786,24 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
 
       {/* 3. Educational Storytelling & Visual Proof Banner */}
       <div className={`p-2.5 rounded-xl border flex flex-wrap items-center justify-between gap-2 text-xs ${
-        isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+        isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700 shadow-sm'
       }`}>
         <div className="flex items-center gap-2 text-[11px] font-sans">
-          <ShieldAlert size={14} className="text-rose-400 shrink-0" />
+          <ShieldAlert size={14} className={isDark ? 'text-rose-400 shrink-0' : 'text-rose-600 shrink-0'} />
           <span>
-            <strong className="text-white font-mono">Topological Link Proof:</strong> 1 hardware device cycling across 3 rotating proxies to attack 3 stolen cards forms a closed clique. Louvain algorithm quarantines the ring in &lt;5ms before payment auth.
+            <strong className={isDark ? 'text-white font-mono' : 'text-slate-900 font-mono'}>Topological Link Proof:</strong> 1 hardware device cycling across 3 rotating proxies to attack 3 stolen cards forms a closed clique. Louvain algorithm quarantines the ring in &lt;5ms before payment auth.
           </span>
         </div>
 
         {/* Legend */}
         <div className="flex items-center gap-3 text-[10px] font-mono shrink-0">
-          <span className="flex items-center gap-1 text-rose-400 font-bold">
+          <span className={`flex items-center gap-1 font-bold ${isDark ? 'text-rose-400' : 'text-rose-700'}`}>
             <span className="w-2 h-2 rounded-full bg-rose-500" /> Carding Swarm
           </span>
-          <span className="flex items-center gap-1 text-amber-400 font-bold">
+          <span className={`flex items-center gap-1 font-bold ${isDark ? 'text-amber-400' : 'text-amber-800'}`}>
             <span className="w-2 h-2 rounded-full bg-amber-400" /> Canary Decoy
           </span>
-          <span className="flex items-center gap-1 text-emerald-400 font-bold">
+          <span className={`flex items-center gap-1 font-bold ${isDark ? 'text-emerald-400' : 'text-emerald-800'}`}>
             <span className="w-2 h-2 rounded-full bg-emerald-500" /> Genuine Shopper
           </span>
         </div>

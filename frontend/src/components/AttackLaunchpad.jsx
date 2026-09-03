@@ -3,7 +3,7 @@ import { Flame, ShieldAlert, Bot, Globe, CheckCircle2, Play, Loader2, Zap, Lock,
 
 import { API_BASE } from '../config'
 
-export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransaction, onTransactionEvaluated }) {
+export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransaction, onTransactionEvaluated, isDark = true }) {
   const [loadingAction, setLoadingAction] = useState(null)
   const [lastActionStatus, setLastActionStatus] = useState(null)
   const [interceptionEvent, setInterceptionEvent] = useState(null)
@@ -291,18 +291,34 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
   }
 
   return (
-    <div className="glass-panel rounded-2xl p-3.5 shadow-xl shadow-black/40 border border-slate-800 hover:border-indigo-500/30 transition-all duration-300">
+    <div className={`rounded-2xl p-3.5 shadow-xl transition-all duration-300 border ${
+      isDark
+        ? 'glass-panel shadow-black/40 border-slate-800 hover:border-indigo-500/30'
+        : 'bg-white shadow-slate-200/80 border-slate-200 hover:border-indigo-300'
+    }`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-blue-500/10 border border-indigo-500/30 rounded-xl text-indigo-400 shadow-md shadow-indigo-950/40">
+          <div className={`p-2 rounded-xl border shadow-md ${
+            isDark
+              ? 'bg-gradient-to-br from-indigo-500/20 to-blue-500/10 border-indigo-500/30 text-indigo-400 shadow-indigo-950/40'
+              : 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-indigo-100'
+          }`}>
             <Play size={16} />
           </div>
           <div>
-            <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <div className={`text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Interactive Attack Launchpad
-              <span className="text-[9px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-mono font-bold">1-CLICK DEMO</span>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold border ${
+                isDark
+                  ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+                  : 'bg-indigo-100 text-indigo-800 border-indigo-200'
+              }`}>
+                1-CLICK DEMO
+              </span>
             </div>
-            <div className="text-[11px] text-slate-400 font-sans">Trigger live threat vectors directly into the 9.2ms synchronous gateway</div>
+            <div className={`text-[11px] font-sans ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Trigger live threat vectors directly into the 9.2ms synchronous gateway
+            </div>
           </div>
         </div>
 
@@ -311,7 +327,11 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('tg_checker')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 hover:border-rose-400 text-rose-200 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-rose-950/30 cursor-pointer"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md cursor-pointer border ${
+              isDark
+                ? 'bg-rose-600/20 hover:bg-rose-600/30 border-rose-500/40 hover:border-rose-400 text-rose-200 shadow-rose-950/30'
+                : 'bg-rose-50 hover:bg-rose-100 border-rose-300 hover:border-rose-400 text-rose-800 shadow-rose-100/60'
+            }`}
           >
             {loadingAction === 'tg_checker' ? <Loader2 size={13} className="animate-spin" /> : <span>⚡</span>}
             Telegram ₹1 Checker
@@ -320,7 +340,11 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('burst')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 hover:border-red-400 text-red-300 rounded-xl text-xs font-medium transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-red-950/20 cursor-pointer"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md cursor-pointer border ${
+              isDark
+                ? 'bg-red-500/15 hover:bg-red-500/25 border-red-500/30 hover:border-red-400 text-red-300 shadow-red-950/20'
+                : 'bg-red-50 hover:bg-red-100 border-red-300 hover:border-red-400 text-red-800 shadow-red-100/60'
+            }`}
           >
             {loadingAction === 'burst' ? <Loader2 size={13} className="animate-spin" /> : <Flame size={13} />}
             15x Bot Burst
@@ -329,7 +353,11 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('canary')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 hover:border-amber-400 text-amber-300 rounded-xl text-xs font-medium transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-amber-950/20 cursor-pointer"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md cursor-pointer border ${
+              isDark
+                ? 'bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 hover:border-amber-400 text-amber-300 shadow-amber-950/20'
+                : 'bg-amber-50 hover:bg-amber-100 border-amber-300 hover:border-amber-400 text-amber-900 shadow-amber-100/60'
+            }`}
           >
             {loadingAction === 'canary' ? <Loader2 size={13} className="animate-spin" /> : <span>🐤</span>}
             Canary Honeytoken
@@ -338,7 +366,11 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('agent')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 hover:border-purple-400 text-purple-300 rounded-xl text-xs font-medium transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-purple-950/20 cursor-pointer"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md cursor-pointer border ${
+              isDark
+                ? 'bg-purple-500/15 hover:bg-purple-500/25 border-purple-500/30 hover:border-purple-400 text-purple-300 shadow-purple-950/20'
+                : 'bg-purple-50 hover:bg-purple-100 border-purple-300 hover:border-purple-400 text-purple-800 shadow-purple-100/60'
+            }`}
           >
             {loadingAction === 'agent' ? <Loader2 size={13} className="animate-spin" /> : <Bot size={13} />}
             AI Agent (AP2)
@@ -347,7 +379,11 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('proxy')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 hover:border-sky-400 text-sky-300 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-sky-950/20 cursor-pointer"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md cursor-pointer border ${
+              isDark
+                ? 'bg-sky-500/15 hover:bg-sky-500/25 border-sky-500/30 hover:border-sky-400 text-sky-300 shadow-sky-950/20'
+                : 'bg-sky-50 hover:bg-sky-100 border-sky-300 hover:border-sky-400 text-sky-800 shadow-sky-100/60'
+            }`}
           >
             {loadingAction === 'proxy' ? <Loader2 size={13} className="animate-spin" /> : <Globe size={13} />}
             6x Proxy Swarm
@@ -356,7 +392,11 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           <button
             disabled={loadingAction !== null}
             onClick={() => sendAttack('otp_relay')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 hover:border-emerald-400 text-emerald-300 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md shadow-emerald-950/20 cursor-pointer"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-md cursor-pointer border ${
+              isDark
+                ? 'bg-emerald-600/20 hover:bg-emerald-600/30 border-emerald-500/30 hover:border-emerald-400 text-emerald-300 shadow-emerald-950/20'
+                : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 hover:border-emerald-400 text-emerald-800 shadow-emerald-100/60'
+            }`}
           >
             {loadingAction === 'otp_relay' ? <Loader2 size={13} className="animate-spin" /> : <span>🔐</span>}
             3DS2 OTP Intercept
@@ -365,7 +405,11 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           {onTriggerStoreDemo && (
             <button
               onClick={onTriggerStoreDemo}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-400/50 text-emerald-200 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 shadow-md shadow-emerald-950/30 cursor-pointer"
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 shadow-md cursor-pointer border ${
+                isDark
+                  ? 'bg-emerald-500/25 hover:bg-emerald-500/35 border-emerald-400/50 text-emerald-200 shadow-emerald-950/30'
+                  : 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white shadow-emerald-200'
+              }`}
             >
               <CheckCircle2 size={13} />
               Live Store
@@ -376,25 +420,33 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
 
       {/* Exploit Interception HUD with Real-Time Verdict & SLA */}
       {interceptionEvent ? (
-        <div className="mt-2.5 p-3 rounded-xl border border-rose-500/40 bg-gradient-to-br from-rose-950/40 via-slate-900/90 to-slate-950/95 shadow-2xl text-xs font-mono animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-800/80">
+        <div className={`mt-2.5 p-3 rounded-xl border text-xs font-mono animate-in fade-in zoom-in-95 duration-200 shadow-xl ${
+          isDark
+            ? 'border-rose-500/40 bg-gradient-to-br from-rose-950/40 via-slate-900/90 to-slate-950/95'
+            : 'border-rose-300 bg-rose-50/70 shadow-rose-100'
+        }`}>
+          <div className={`flex items-center justify-between pb-1.5 mb-2 border-b ${isDark ? 'border-slate-800/80' : 'border-rose-200'}`}>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
-              <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+              <span className={`font-bold uppercase tracking-wider text-[11px] ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {interceptionEvent.title}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold border ${
                 interceptionEvent.tier === 'verified_agent'
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                  : 'bg-rose-500/25 text-rose-200 border-rose-500/50'
+                  ? isDark
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                  : isDark
+                    ? 'bg-rose-500/25 text-rose-200 border-rose-500/50'
+                    : 'bg-rose-100 text-rose-800 border-rose-300'
               }`}>
                 {interceptionEvent.verdict}
               </span>
               <button
                 onClick={() => setInterceptionEvent(null)}
-                className="text-slate-400 hover:text-white p-0.5 transition cursor-pointer"
+                className={`p-0.5 transition cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
                 title="Dismiss Interception Banner"
               >
                 <X size={13} />
@@ -403,71 +455,85 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-2 text-[10px]">
-            <div className="p-1.5 rounded-lg bg-slate-950/70 border border-slate-800">
-              <div className="text-[9px] text-slate-400">GATING LATENCY</div>
-              <div className="text-emerald-400 font-bold">{interceptionEvent.latencyMs}ms</div>
+            <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-white border-rose-200 shadow-sm'}`}>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>GATING LATENCY</div>
+              <div className={`font-bold ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{interceptionEvent.latencyMs}ms</div>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-950/70 border border-slate-800">
-              <div className="text-[9px] text-slate-400">RISK SCORE</div>
-              <div className="text-rose-400 font-bold">
+            <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-white border-rose-200 shadow-sm'}`}>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>RISK SCORE</div>
+              <div className={`font-bold ${isDark ? 'text-rose-400' : 'text-rose-700'}`}>
                 {typeof interceptionEvent.riskScore === 'number' ? interceptionEvent.riskScore.toFixed(3) : interceptionEvent.riskScore}
               </div>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-950/70 border border-slate-800 col-span-2">
-              <div className="text-[9px] text-slate-400">AUTONOMOUS ACTION</div>
-              <div className="text-amber-300 font-bold truncate">{interceptionEvent.payload}</div>
+            <div className={`p-1.5 rounded-lg border col-span-2 ${isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-white border-rose-200 shadow-sm'}`}>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>AUTONOMOUS ACTION</div>
+              <div className={`font-bold truncate ${isDark ? 'text-amber-300' : 'text-amber-800'}`}>{interceptionEvent.payload}</div>
             </div>
           </div>
 
-          <div className="text-[10px] text-slate-300 bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 mb-1.5">
-            <span className="text-indigo-400 font-bold">{interceptionEvent.layer}:</span>{' '}
+          <div className={`text-[10px] p-2 rounded-lg border mb-1.5 ${
+            isDark
+              ? 'text-slate-300 bg-slate-950/60 border-slate-800/80'
+              : 'text-slate-700 bg-white/80 border-rose-200'
+          }`}>
+            <span className={`font-bold ${isDark ? 'text-indigo-400' : 'text-indigo-700'}`}>{interceptionEvent.layer}:</span>{' '}
             {interceptionEvent.detail}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between text-[9px] text-slate-400 pt-0.5 gap-1.5">
-            <span className="truncate">TXID: <code className="text-slate-200 bg-slate-900 px-1 py-0.5 rounded">{interceptionEvent.txId}</code></span>
-            <span className="text-emerald-400 font-bold flex items-center gap-1">
+          <div className={`flex flex-wrap items-center justify-between text-[9px] pt-0.5 gap-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className="truncate">TXID: <code className={`px-1 py-0.5 rounded ${isDark ? 'text-slate-200 bg-slate-900' : 'text-slate-800 bg-rose-100'}`}>{interceptionEvent.txId}</code></span>
+            <span className={`font-bold flex items-center gap-1 ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
               <CheckCircle2 size={10} /> Live Gated
             </span>
           </div>
         </div>
       ) : (
-        /* Armed Defense Posture Telemetry when idle (eliminates empty space) */
-        <div className="mt-2.5 p-2.5 rounded-xl border border-slate-800/80 bg-slate-950/60 text-xs font-mono">
-          <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800/60">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-              <ShieldCheck size={12} className="text-emerald-400" />
+        /* Armed Defense Posture Telemetry when idle */
+        <div className={`mt-2.5 p-2.5 rounded-xl border text-xs font-mono transition-colors ${
+          isDark
+            ? 'border-slate-800/80 bg-slate-950/60'
+            : 'border-slate-200 bg-slate-50/80'
+        }`}>
+          <div className={`flex items-center justify-between pb-1.5 mb-1.5 border-b ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`}>
+            <div className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+              <ShieldCheck size={12} className={isDark ? 'text-emerald-400' : 'text-emerald-600'} />
               <span>Defense Posture: ZERO-TRUST ARMED</span>
             </div>
-            <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+            <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold border ${
+              isDark
+                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+            }`}>
               Autonomous
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-1.5 text-[10px]">
-            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
-              <div className="text-slate-400 text-[9px]">GATING SLA</div>
-              <div className="text-emerald-400 font-bold">Sub-15ms Enforced</div>
+            <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-900/60 border-slate-800/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>GATING SLA</div>
+              <div className={`font-bold ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>Sub-15ms Enforced</div>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
-              <div className="text-slate-400 text-[9px]">CANARY DECOYS</div>
-              <div className="text-amber-400 font-bold">50 Pre-Seeded BINs</div>
+            <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-900/60 border-slate-800/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>CANARY DECOYS</div>
+              <div className={`font-bold ${isDark ? 'text-amber-400' : 'text-amber-800'}`}>50 Pre-Seeded BINs</div>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
-              <div className="text-slate-400 text-[9px]">GRAPH SENTINEL</div>
-              <div className="text-indigo-300 font-bold">Louvain Q=0.8994</div>
+            <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-900/60 border-slate-800/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>GRAPH SENTINEL</div>
+              <div className={`font-bold ${isDark ? 'text-indigo-300' : 'text-indigo-700'}`}>Louvain Q=0.8994</div>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
-              <div className="text-slate-400 text-[9px]">CONFORMAL BOUND</div>
-              <div className="text-cyan-300 font-bold">95% Risk Certified</div>
+            <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-900/60 border-slate-800/60' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>CONFORMAL BOUND</div>
+              <div className={`font-bold ${isDark ? 'text-cyan-300' : 'text-cyan-700'}`}>95% Risk Certified</div>
             </div>
           </div>
         </div>
       )}
 
       {lastActionStatus && !interceptionEvent && (
-        <div className="mt-2 pt-2 border-t border-slate-800/80 text-[10px] font-mono text-emerald-400 flex items-center gap-1.5 animate-fadeIn">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div className={`mt-2 pt-2 border-t text-[10px] font-mono flex items-center gap-1.5 animate-fadeIn ${
+          isDark ? 'border-slate-800/80 text-emerald-400' : 'border-slate-200 text-emerald-700'
+        }`}>
+          <span className={`inline-block w-1.5 h-1.5 rounded-full animate-pulse ${isDark ? 'bg-emerald-400' : 'bg-emerald-600'}`}></span>
           {lastActionStatus}
         </div>
       )}

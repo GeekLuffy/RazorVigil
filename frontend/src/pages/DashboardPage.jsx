@@ -61,18 +61,26 @@ export default function DashboardPage({
       <div className="soc-card rounded-xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
+            <h1 className={`text-base sm:text-lg font-black tracking-tight flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               <span>RazorShield Surveillance Command Center</span>
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono border ${
+              isDark
+                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-ping ${isDark ? 'bg-emerald-400' : 'bg-emerald-600'}`} />
               Live Ingestion
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${
+              isDark
+                ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'
+                : 'bg-indigo-50 text-indigo-700 border-indigo-200'
+            }`}>
               Track 02 · AI Risk Manager (Defense-Only)
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 font-sans mt-0.5 max-w-4xl">
+          <p className={`text-[11px] font-sans mt-0.5 max-w-4xl ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             Autonomous multi-layered defense protecting merchant margins from carding abuse, syndicate mule rings, RTO return risk, and payment chargebacks with sub-15ms gating.
           </p>
         </div>
@@ -88,9 +96,13 @@ export default function DashboardPage({
 
           <button
             onClick={() => onNavigateTab && onNavigateTab('transactions')}
-            className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer"
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer border ${
+              isDark
+                ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border-rose-500/30'
+                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200 shadow-sm'
+            }`}
           >
-            <ShieldAlert size={13} className="text-rose-400" />
+            <ShieldAlert size={13} className={isDark ? 'text-rose-400' : 'text-rose-600'} />
             <span>Threats ({botThreatsCount})</span>
           </button>
         </div>
@@ -324,12 +336,13 @@ export default function DashboardPage({
             onTransactionEvaluated={onTransactionEvaluated}
             onSelectTransaction={setSelectedTx}
             onTriggerStoreDemo={onOpenStore}
+            isDark={isDark}
           />
 
           <div className="soc-card rounded-xl p-2.5 sm:p-3 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-white">Live Merchant Checkout</div>
-              <div className="text-[10px] text-slate-400">Test real payments with synthetic biometrics</div>
+              <div className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Live Merchant Checkout</div>
+              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Test real payments with synthetic biometrics</div>
             </div>
             <button
               onClick={onOpenStore}
