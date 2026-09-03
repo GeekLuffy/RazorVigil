@@ -7,8 +7,8 @@
   "catboost": {
     "iterations": 2500,
     "depth": 7,
-    "pr_auc": 0.99987,
-    "roc_auc": 0.99994,
+    "pr_auc": 0.9963,
+    "roc_auc": 0.9986,
     "f1": 0.99534,
     "train_time_s": 17.25
   },

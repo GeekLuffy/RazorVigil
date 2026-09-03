@@ -207,8 +207,8 @@ export default function GPUClusterModal({ isOpen, onClose, isDark }) {
                   <span>CatBoost GPU</span>
                   <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-[10px]">CUDA:4</span>
                 </div>
-                <p className="text-slate-400 text-[11px] mt-1">PR-AUC: {models.catboost_gpu?.pr_auc || 0.99987}</p>
-                <p className="text-slate-500 text-[10px]">ROC: {models.catboost_gpu?.roc_auc || 0.99994} (2.5k Trees)</p>
+                <p className="text-slate-400 text-[11px] mt-1">PR-AUC: {models.catboost_gpu?.pr_auc || 0.9963}</p>
+                <p className="text-slate-500 text-[10px]">ROC: {models.catboost_gpu?.roc_auc || 0.9986} (2.5k Trees)</p>
               </div>
 
               <div className={`p-3 rounded-lg border ${isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-white border-slate-200'}`}>

@@ -12,7 +12,7 @@
 
 > Defends the live payment authorization path against automated card-testing botnets, distributed proxy swarms, AiTM reverse proxies, and Telegram OTP relays — **synchronously, in under 15 ms**, with mathematically certified fraud detection guarantees.
 
-**[📖 Docs](docs/README.md)** · **[🚀 Quick Start](#-quick-start)** · **[📊 Benchmarks](#-key-verified-benchmarks)** · **[🏗️ Architecture](#-defense-architecture)** · **[🔬 Math](#-mathematical-foundations)**
+**[📖 Docs](docs/README.md)** · **[📑 Complete Project Dossier](PROJECT_SENTINEL_DEEP_DOSSIER.md)** · **[🚀 Quick Start](#-quick-start)** · **[📊 Benchmarks](#-key-verified-benchmarks)** · **[🏗️ Architecture](#-defense-architecture)** · **[🔬 Math](#-mathematical-foundations)**
 
 </div>
 

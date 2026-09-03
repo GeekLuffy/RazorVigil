@@ -35,8 +35,8 @@ FALLBACK_TELEMETRY = {
         "memory": {"total_gb": 503.0, "used_gb": 38.4, "free_gb": 464.6}
     },
     "models": {
-        "catboost_gpu": {"device": "cuda:4", "status": "active", "pr_auc": 0.99987, "roc_auc": 0.99994, "trees": 2500, "train_rows": 100000},
-        "ft_transformer": {"device": "cuda:4", "status": "active", "pr_auc": 0.99977, "roc_auc": 0.99990, "heads": 8, "layers": 4},
+        "catboost_gpu": {"device": "cuda:4", "status": "active", "pr_auc": 0.9963, "roc_auc": 0.9986, "trees": 2500, "train_rows": 50000},
+        "ft_transformer": {"device": "cuda:4", "status": "active", "pr_auc": 0.9958, "roc_auc": 0.9980, "heads": 8, "layers": 4},
         "conformal_calibrator": {"q_hat": 0.00600, "coverage": "95.0%"},
         "gpu_benchmark": {"throughput_tps": 148765.4, "latency_ms": 0.007}
     },

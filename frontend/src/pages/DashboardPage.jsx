@@ -138,7 +138,7 @@ export default function DashboardPage({
               99.57%
             </div>
             <div className="text-[10px] text-cyan-400 font-medium font-sans flex items-center gap-1">
-              <span>99.82% Prec · FPR 0.048% (100k Eval)</span>
+              <span>PR-AUC 0.9963 · FPR 0.09% (10k Held-Out)</span>
             </div>
           </div>
           <div className="w-9 h-9 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center border border-cyan-500/30">

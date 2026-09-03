@@ -24,7 +24,6 @@ backend/dataset/*.csv
 *.sqlite
 backend/data/*.db
 *.exe
-PROJECT_SENTINEL_DEEP_DOSSIER.md
 
 
 
