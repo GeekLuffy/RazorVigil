@@ -202,11 +202,14 @@ export default function DashboardPage({
           </div>
 
           <div className="flex items-center gap-2 font-mono text-[11px]">
-            <span className="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
-              Corridors: <strong className="text-emerald-400">4 Active</strong>
+            <span className={`px-2 py-0.5 rounded-lg border ${isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700 shadow-sm'}`}>
+              Corridors: <strong className={isDark ? 'text-emerald-400' : 'text-emerald-600'}>4 Active</strong>
             </span>
-            <span className="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
-              False Declines: <strong className="text-emerald-400">0.00%</strong>
+            <span className={`px-2 py-0.5 rounded-lg border ${isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700 shadow-sm'}`}>
+              Normal FPR: <strong className={isDark ? 'text-emerald-400' : 'text-emerald-600'}>0.09%</strong>
+            </span>
+            <span className={`hidden sm:inline px-2 py-0.5 rounded-lg border ${isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700 shadow-sm'}`}>
+              Edge FPR: <strong className={isDark ? 'text-amber-400' : 'text-amber-600'}>10.60%</strong>
             </span>
           </div>
         </div>
