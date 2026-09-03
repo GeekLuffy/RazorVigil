@@ -27,8 +27,8 @@ const INITIAL_NODES = [
     cluster: 1,
     isFraud: true,
     isAnchor: true,
-    ringPos: { normX: 0.32, normY: 0.50 },
-    bipartitePos: { normX: 0.50, normY: 0.42 },
+    ringPos: { normX: 0.32, normY: 0.48 },
+    bipartitePos: { normX: 0.50, normY: 0.38 },
     details: {
       asn: 'Fingerprint: Canvas+Audio+WebGL Hash',
       status: 'Quarantined Mule Anchor',
@@ -43,8 +43,8 @@ const INITIAL_NODES = [
     sublabel: 'Airtel Residential Proxy',
     cluster: 1,
     isFraud: true,
-    ringPos: { normX: 0.18, normY: 0.30 },
-    bipartitePos: { normX: 0.15, normY: 0.25 },
+    ringPos: { normX: 0.18, normY: 0.22 },
+    bipartitePos: { normX: 0.15, normY: 0.18 },
     details: {
       asn: 'AS45609 (Bharti Airtel)',
       status: 'Rotating Proxy Node',
@@ -59,8 +59,8 @@ const INITIAL_NODES = [
     sublabel: 'Datacenter ASN / Tor Exit',
     cluster: 1,
     isFraud: true,
-    ringPos: { normX: 0.32, normY: 0.22 },
-    bipartitePos: { normX: 0.15, normY: 0.45 },
+    ringPos: { normX: 0.32, normY: 0.14 },
+    bipartitePos: { normX: 0.15, normY: 0.38 },
     details: {
       asn: 'AS200052 (Datacenter Hosting)',
       status: 'Tor Exit Node / Datacenter',
@@ -75,8 +75,8 @@ const INITIAL_NODES = [
     sublabel: 'Jio 4G Rotating IP',
     cluster: 1,
     isFraud: true,
-    ringPos: { normX: 0.44, normY: 0.32 },
-    bipartitePos: { normX: 0.15, normY: 0.65 },
+    ringPos: { normX: 0.44, normY: 0.24 },
+    bipartitePos: { normX: 0.15, normY: 0.58 },
     details: {
       asn: 'AS55836 (Reliance Jio)',
       status: 'Carrier NAT Proxy Cycle',
@@ -91,8 +91,8 @@ const INITIAL_NODES = [
     sublabel: 'Mastercard Gold',
     cluster: 1,
     isFraud: true,
-    ringPos: { normX: 0.20, normY: 0.70 },
-    bipartitePos: { normX: 0.85, normY: 0.25 },
+    ringPos: { normX: 0.18, normY: 0.74 },
+    bipartitePos: { normX: 0.85, normY: 0.18 },
     details: {
       asn: 'Bank: ICICI Bank / Stolen Dump',
       status: 'Micro-auth Velocity Target',
@@ -107,8 +107,8 @@ const INITIAL_NODES = [
     sublabel: 'Mastercard Platinum',
     cluster: 1,
     isFraud: true,
-    ringPos: { normX: 0.32, normY: 0.76 },
-    bipartitePos: { normX: 0.85, normY: 0.45 },
+    ringPos: { normX: 0.32, normY: 0.82 },
+    bipartitePos: { normX: 0.85, normY: 0.38 },
     details: {
       asn: 'Bank: Axis Bank / Stolen Dump',
       status: 'Quarantined Carding Target',
@@ -124,8 +124,8 @@ const INITIAL_NODES = [
     cluster: 1,
     isFraud: true,
     isCanary: true,
-    ringPos: { normX: 0.44, normY: 0.68 },
-    bipartitePos: { normX: 0.85, normY: 0.65 },
+    ringPos: { normX: 0.44, normY: 0.74 },
+    bipartitePos: { normX: 0.85, normY: 0.58 },
     details: {
       asn: 'Pre-seeded Sentinel-2 Decoy',
       status: 'Zero-Tolerance Canary Trap',
@@ -143,8 +143,8 @@ const INITIAL_NODES = [
     cluster: 2,
     isFraud: false,
     isAnchor: true,
-    ringPos: { normX: 0.78, normY: 0.50 },
-    bipartitePos: { normX: 0.50, normY: 0.82 },
+    ringPos: { normX: 0.76, normY: 0.48 },
+    bipartitePos: { normX: 0.50, normY: 0.80 },
     details: {
       asn: 'Device: Apple iPhone 15 Pro',
       status: 'Verified Consumer Device',
@@ -159,8 +159,8 @@ const INITIAL_NODES = [
     sublabel: 'Airtel Broadband Mumbai',
     cluster: 2,
     isFraud: false,
-    ringPos: { normX: 0.70, normY: 0.32 },
-    bipartitePos: { normX: 0.15, normY: 0.85 },
+    ringPos: { normX: 0.70, normY: 0.20 },
+    bipartitePos: { normX: 0.15, normY: 0.80 },
     details: {
       asn: 'AS45609 (Bharti Airtel Residential)',
       status: 'Normal Dynamic ISP IP',
@@ -175,8 +175,8 @@ const INITIAL_NODES = [
     sublabel: 'Visa Signature Card',
     cluster: 2,
     isFraud: false,
-    ringPos: { normX: 0.86, normY: 0.68 },
-    bipartitePos: { normX: 0.85, normY: 0.85 },
+    ringPos: { normX: 0.84, normY: 0.76 },
+    bipartitePos: { normX: 0.85, normY: 0.80 },
     details: {
       asn: 'Bank: HDFC Bank / 3DS2 Enrolled',
       status: 'Authenticated Cardholder',
@@ -241,8 +241,8 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
     const updateDimensions = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect()
-        const w = Math.max(380, Math.floor(rect.width))
-        const h = Math.max(380, Math.floor(rect.height || 440))
+        const w = Math.max(340, Math.floor(rect.width))
+        const h = Math.floor(rect.height) || 280
         setViewport({ width: w, height: h })
       }
     }
@@ -417,8 +417,8 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
         if (cluster1Anchor) {
           const cx = cluster1Anchor.currentX
           const cy = cluster1Anchor.currentY
-          const radiusX = Math.min(width * 0.26, 175)
-          const radiusY = Math.min(height * 0.36, 150)
+          const radiusX = Math.min(width * 0.24, 150)
+          const radiusY = Math.min(height * 0.44, 120)
 
           const grad1 = ctx.createRadialGradient(cx, cy, 10, cx, cy, radiusX)
           grad1.addColorStop(0, 'rgba(244, 63, 94, 0.16)')
@@ -450,8 +450,8 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
         if (cluster2Anchor) {
           const cx = cluster2Anchor.currentX
           const cy = cluster2Anchor.currentY
-          const radiusX = Math.min(width * 0.18, 125)
-          const radiusY = Math.min(height * 0.32, 130)
+          const radiusX = Math.min(width * 0.18, 115)
+          const radiusY = Math.min(height * 0.42, 115)
 
           const grad2 = ctx.createRadialGradient(cx, cy, 10, cx, cy, radiusX)
           grad2.addColorStop(0, 'rgba(16, 185, 129, 0.14)')
@@ -697,10 +697,10 @@ export default function FraudGraphCanvas({ onSelectTransaction, latestTx, isDark
         </div>
       </div>
 
-      {/* 2. Responsive Canvas Viewport (Auto-Fills Available Height with ZERO Dead Space) */}
+      {/* 2. Responsive Canvas Viewport (Zero Dead Space) */}
       <div
         ref={containerRef}
-        className={`relative flex-1 min-h-[420px] rounded-xl overflow-hidden border transition-all ${
+        className={`relative w-full h-[275px] sm:h-[290px] rounded-xl overflow-hidden border transition-all ${
           isDark ? 'bg-slate-950 border-slate-800/90' : 'bg-slate-50 border-slate-200 shadow-inner'
         }`}
       >

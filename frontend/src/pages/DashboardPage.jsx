@@ -56,163 +56,163 @@ export default function DashboardPage({
     .map(([k, v]) => ({ name: tierMetaFn(k).label, value: v, tier: k }))
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-3.5 sm:space-y-4 font-sans">
       {/* 1. Hero Title Banner with Track 02 Focus */}
-      <div className="soc-card rounded-2xl p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="soc-card rounded-xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
               <span>RazorShield Surveillance Command Center</span>
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               Live Ingestion
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
               Track 02 · AI Risk Manager (Defense-Only)
             </span>
           </div>
-          <p className="text-xs text-slate-400 font-sans mt-1 max-w-4xl">
+          <p className="text-[11px] text-slate-400 font-sans mt-0.5 max-w-4xl">
             Autonomous multi-layered defense protecting merchant margins from carding abuse, syndicate mule rings, RTO return risk, and payment chargebacks with sub-15ms gating.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => onNavigateTab && onNavigateTab('simulator')}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-sans transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-sans transition-all flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer"
           >
-            <Flame size={14} />
-            <span>Launch Attack Simulator</span>
+            <Flame size={13} />
+            <span>Attack Simulator</span>
           </button>
 
           <button
             onClick={() => onNavigateTab && onNavigateTab('transactions')}
-            className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold font-mono transition-all flex items-center gap-2 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <ShieldAlert size={14} className="text-rose-400" />
-            <span>Active Threats ({botThreatsCount})</span>
+            <ShieldAlert size={13} className="text-rose-400" />
+            <span>Threats ({botThreatsCount})</span>
           </button>
         </div>
       </div>
 
       {/* 2. Track 02 Aligned 4 KPI Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         {/* KPI 1: Synchronous Gating SLA */}
-        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+        <div className="soc-card rounded-xl p-3.5 flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
               Synchronous Gating SLA
             </div>
-            <div className="text-2xl font-black font-mono text-white transition-all duration-300">
+            <div className="text-xl sm:text-2xl font-black font-mono text-white transition-all duration-300">
               {fmtMs(stats.p99_latency_ms || 8.4)}
             </div>
-            <div className="text-[11px] text-emerald-400 font-medium font-sans flex items-center gap-1">
+            <div className="text-[10px] text-emerald-400 font-medium font-sans flex items-center gap-1">
               <span>Sub-15ms fast-path · 0 friction</span>
             </div>
           </div>
-          <div className="icon-badge-emerald">
-            <Zap size={20} />
+          <div className="w-9 h-9 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+            <Zap size={18} />
           </div>
         </div>
 
         {/* KPI 2: Held-Out Test Set Recall */}
-        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+        <div className="soc-card rounded-xl p-3.5 flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
               Held-Out Test Set Recall
             </div>
-            <div className="text-2xl font-black font-mono text-white">
+            <div className="text-xl sm:text-2xl font-black font-mono text-white">
               99.57%
             </div>
-            <div className="text-[11px] text-cyan-400 font-medium font-sans flex items-center gap-1">
-              <span>99.82% Prec · FPR: 0.048% (100k Eval)</span>
+            <div className="text-[10px] text-cyan-400 font-medium font-sans flex items-center gap-1">
+              <span>99.82% Prec · FPR 0.048% (100k Eval)</span>
             </div>
           </div>
-          <div className="icon-badge-cyan">
-            <ShieldCheck size={20} />
+          <div className="w-9 h-9 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
+            <ShieldCheck size={18} />
           </div>
         </div>
 
         {/* KPI 3: Quarantined Threats */}
-        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+        <div className="soc-card rounded-xl p-3.5 flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
               Quarantined Threats
             </div>
-            <div className="text-2xl font-black font-mono text-rose-400 transition-all duration-300">
+            <div className="text-xl sm:text-2xl font-black font-mono text-rose-400 transition-all duration-300">
               {botThreatsCount}
             </div>
-            <div className="text-[11px] text-rose-400/90 font-medium font-sans flex items-center gap-1">
+            <div className="text-[10px] text-rose-400/90 font-medium font-sans flex items-center gap-1">
               <span>Carding rings, mule swarms &amp; bursts</span>
             </div>
           </div>
-          <div className="icon-badge-rose">
-            <ShieldAlert size={20} />
+          <div className="w-9 h-9 rounded-lg bg-rose-500/15 text-rose-400 flex items-center justify-center border border-rose-500/30">
+            <ShieldAlert size={18} />
           </div>
         </div>
 
         {/* KPI 4: Net Protected Value */}
-        <div className="soc-card rounded-2xl p-5 flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+        <div className="soc-card rounded-xl p-3.5 flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
               Net Protected Value
             </div>
-            <div className="text-2xl font-black font-mono text-emerald-400 transition-all duration-300">
+            <div className="text-xl sm:text-2xl font-black font-mono text-emerald-400 transition-all duration-300">
               {fmtRupees(stats.total_blocked_inr || 1930500)}
             </div>
-            <div className="text-[11px] text-amber-400 font-medium font-sans flex items-center gap-1">
+            <div className="text-[10px] text-amber-400 font-medium font-sans flex items-center gap-1">
               <span>Fraud, RTO &amp; chargebacks saved</span>
             </div>
           </div>
-          <div className="icon-badge-amber">
-            <IndianRupee size={20} />
+          <div className="w-9 h-9 rounded-lg bg-amber-500/15 text-amber-400 flex items-center justify-center border border-amber-500/30">
+            <IndianRupee size={18} />
           </div>
         </div>
       </div>
 
       {/* 3. Live Payment Corridors Defense Matrix */}
-      <div className="soc-card rounded-2xl p-5 sm:p-6 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="soc-card rounded-xl p-3.5 sm:p-4 space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <h2 className="text-sm font-black text-white uppercase tracking-wider font-mono">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <h2 className="text-xs sm:text-sm font-black text-white uppercase tracking-wider font-mono">
                 Payment Corridors &amp; Synchronous Gating Matrix
               </h2>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 Sub-15ms Enforced
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1 font-sans">
+            <p className="text-[11px] text-slate-400 mt-0.5 font-sans">
               Real-time traffic throughput, P99 gating SLA enforcement, and autonomous defense policies per payment corridor.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+          <div className="flex items-center gap-2 font-mono text-[11px]">
+            <span className="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
               Corridors: <strong className="text-emerald-400">4 Active</strong>
             </span>
-            <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+            <span className="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
               False Declines: <strong className="text-emerald-400">0.00%</strong>
             </span>
           </div>
         </div>
 
         {/* 4 Corridor Cards in Responsive Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
           {/* Corridor 1: Razorpay Core Gateway */}
-          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-emerald-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span className="text-xs font-bold text-white font-mono">Razorpay Core API</span>
+          <div className={`p-2.5 sm:p-3 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-emerald-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-[11px] font-bold text-white font-mono">Razorpay Core API</span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
                 7.8ms P99
               </span>
             </div>
-            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+            <div className="text-[10px] text-slate-400 font-mono space-y-0.5">
               <div className="flex justify-between">
                 <span>Throughput:</span>
                 <span className="text-white font-bold">1,420 tx/min</span>
@@ -221,24 +221,24 @@ export default function DashboardPage({
                 <span>Coverage:</span>
                 <span className="text-emerald-400 font-bold">95.0% Certified</span>
               </div>
-              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+              <div className="pt-1 border-t border-slate-800/60 text-[9px] text-slate-400">
                 <span className="text-emerald-400 font-bold">Policy:</span> CatBoost GPU + Conformal q̂=0.006
               </div>
             </div>
           </div>
 
           {/* Corridor 2: UPI AutoPay / 2.0 Instant */}
-          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-cyan-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                <span className="text-xs font-bold text-white font-mono">UPI 2.0 / AutoPay</span>
+          <div className={`p-2.5 sm:p-3 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-cyan-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                <span className="text-[11px] font-bold text-white font-mono">UPI 2.0 / AutoPay</span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 font-bold">
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 font-bold">
                 6.2ms P99
               </span>
             </div>
-            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+            <div className="text-[10px] text-slate-400 font-mono space-y-0.5">
               <div className="flex justify-between">
                 <span>Throughput:</span>
                 <span className="text-white font-bold">980 tx/min</span>
@@ -247,24 +247,24 @@ export default function DashboardPage({
                 <span>Velocity Gating:</span>
                 <span className="text-cyan-400 font-bold">Sub-Second Active</span>
               </div>
-              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+              <div className="pt-1 border-t border-slate-800/60 text-[9px] text-slate-400">
                 <span className="text-cyan-400 font-bold">Policy:</span> Redis Window + Louvain Ring Isolation
               </div>
             </div>
           </div>
 
           {/* Corridor 3: Carding Defense (3DS2) */}
-          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-rose-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
-                <span className="text-xs font-bold text-white font-mono">Carding &amp; 3DS2</span>
+          <div className={`p-2.5 sm:p-3 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-rose-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+                <span className="text-[11px] font-bold text-white font-mono">Carding &amp; 3DS2</span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold">
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold">
                 9.4ms P99
               </span>
             </div>
-            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+            <div className="text-[10px] text-slate-400 font-mono space-y-0.5">
               <div className="flex justify-between">
                 <span>Throughput:</span>
                 <span className="text-white font-bold">410 tx/min</span>
@@ -273,24 +273,24 @@ export default function DashboardPage({
                 <span>Canary Decoys:</span>
                 <span className="text-rose-400 font-bold">50 Armed</span>
               </div>
-              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+              <div className="pt-1 border-t border-slate-800/60 text-[9px] text-slate-400">
                 <span className="text-rose-400 font-bold">Policy:</span> Telegram Scraper Tarpit &amp; ₹1 Voiding
               </div>
             </div>
           </div>
 
           {/* Corridor 4: AP2 Autonomous AI Agent */}
-          <div className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-purple-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-                <span className="text-xs font-bold text-white font-mono">AP2 AI Agent Gate</span>
+          <div className={`p-2.5 sm:p-3 rounded-xl border transition-all ${isDark ? 'bg-slate-950/60 border-slate-800/80 hover:border-purple-500/40' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping" />
+                <span className="text-[11px] font-bold text-white font-mono">AP2 AI Agent Gate</span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold">
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold">
                 4.1ms P99
               </span>
             </div>
-            <div className="text-[11px] text-slate-400 font-mono space-y-1">
+            <div className="text-[10px] text-slate-400 font-mono space-y-0.5">
               <div className="flex justify-between">
                 <span>Throughput:</span>
                 <span className="text-white font-bold">85 tx/min</span>
@@ -299,7 +299,7 @@ export default function DashboardPage({
                 <span>Attestation:</span>
                 <span className="text-purple-400 font-bold">ECDSA Verified</span>
               </div>
-              <div className="pt-1.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+              <div className="pt-1 border-t border-slate-800/60 text-[9px] text-slate-400">
                 <span className="text-purple-400 font-bold">Policy:</span> Fast-Path Cryptographic Spend Bounds
               </div>
             </div>
@@ -307,10 +307,10 @@ export default function DashboardPage({
         </div>
       </div>
 
-      {/* ?? 4. Central War Room Stage: Graph + Threat Simulator ?? */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      {/* 4. Central War Room Stage: Graph + Threat Simulator */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 items-stretch">
         {/* Left 2 Cols: Interactive Bipartite Syndicate Graph */}
-        <div className="soc-card rounded-2xl p-5 lg:col-span-2 flex flex-col h-full">
+        <div className="soc-card rounded-xl p-3 sm:p-3.5 lg:col-span-2 flex flex-col justify-between">
           <FraudGraphCanvas
             onSelectTransaction={setSelectedTx}
             latestTx={transactions[0]}
@@ -319,21 +319,21 @@ export default function DashboardPage({
         </div>
 
         {/* Right 1 Col: Attack Simulator Launchpad + Store */}
-        <div className="space-y-4">
+        <div className="space-y-2.5 flex flex-col justify-between">
           <AttackLaunchpad
             onTransactionEvaluated={onTransactionEvaluated}
             onSelectTransaction={setSelectedTx}
             onTriggerStoreDemo={onOpenStore}
           />
 
-          <div className="soc-card rounded-2xl p-4 flex items-center justify-between">
+          <div className="soc-card rounded-xl p-2.5 sm:p-3 flex items-center justify-between">
             <div>
               <div className="text-xs font-bold text-white">Live Merchant Checkout</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Test real payments with synthetic biometrics</div>
+              <div className="text-[10px] text-slate-400">Test real payments with synthetic biometrics</div>
             </div>
             <button
               onClick={onOpenStore}
-              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20 cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20 cursor-pointer"
             >
               <ShoppingBag size={12} />
               <span>Launch Store</span>
@@ -342,24 +342,24 @@ export default function DashboardPage({
         </div>
       </div>
 
-      {/* ?? 5. Live Telemetry Stream & Decision Tiers ?? */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      {/* 5. Live Telemetry Stream & Decision Tiers */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
         {/* Left 2 Cols: Live Feed Ticker */}
-        <div className="soc-card rounded-2xl p-5 lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
+        <div className="soc-card rounded-xl p-3.5 sm:p-4 lg:col-span-2">
+          <div className="flex items-center justify-between mb-2.5">
             <div>
               <h3 className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                <Radio size={14} className="text-emerald-400 animate-pulse" />
+                <Radio size={13} className="text-emerald-400 animate-pulse" />
                 Live Ingestion Stream ({transactions.length} Screened)
               </h3>
-              <p className="text-xs text-slate-400 font-sans mt-0.5">
+              <p className="text-[11px] text-slate-400 font-sans mt-0.5">
                 Click any real-time transaction to inspect 17-dimensional ML vector &amp; conformal bounds
               </p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsPaused(!isPaused)}
-                className={`px-3 py-1 rounded-xl text-xs font-mono font-bold border transition flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border transition flex items-center gap-1.5 cursor-pointer ${
                   isPaused
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                     : isDark ? 'bg-slate-950 text-slate-300 hover:text-white border-slate-800' : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 shadow-sm'
@@ -371,7 +371,7 @@ export default function DashboardPage({
             </div>
           </div>
 
-          <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+          <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
             {transactions.slice(0, 15).map((tx, idx) => {
               const meta = tierMetaFn(tx.tier)
               const isSelected = selectedTx?.transaction_id === tx.transaction_id
@@ -379,40 +379,40 @@ export default function DashboardPage({
                 <div
                   key={tx.transaction_id ? `${tx.transaction_id}-${idx}` : `live-tx-${idx}`}
                   onClick={() => setSelectedTx(tx)}
-                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-wrap items-center justify-between gap-3 text-xs font-mono ${
+                  className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex flex-wrap items-center justify-between gap-2.5 text-xs font-mono ${
                     isSelected
                       ? 'border-indigo-500 bg-indigo-950/40 shadow-md'
                       : 'border-slate-800/80 bg-slate-950/60 hover:bg-slate-900/60 hover:border-slate-700'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     <span
-                      className="px-2 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1"
+                      className="px-2 py-0.5 rounded text-[9px] font-bold inline-flex items-center gap-1"
                       style={{ color: meta.color, backgroundColor: meta.bg, border: `1px solid ${meta.color}33` }}
                     >
                       {meta.icon} {meta.label}
                     </span>
                     <div>
-                      <div className="font-bold text-white flex items-center gap-1.5">
+                      <div className="font-bold text-white flex items-center gap-1.5 text-[11px]">
                         <span>{tx.merchant_name || 'Razorpay Merchant'}</span>
                         <span className="text-slate-400 font-normal">· ₹{tx.amount?.toLocaleString('en-IN') || '0'}</span>
                       </div>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-2 font-sans mt-0.5">
+                      <div className="text-[10px] text-slate-400 flex items-center gap-2 font-sans mt-0.5">
                         <span>{tx.customer_name || 'Customer'} ({tx.user_city?.split(',')[0] || 'India'})</span>
                         <span>·</span>
-                        <span className="font-mono text-[10px] text-indigo-300">{tx.layer_triggered || 'Layer 4: Quad-Ensemble'}</span>
+                        <span className="font-mono text-[9px] text-indigo-300">{tx.layer_triggered || 'Layer 4: Quad-Ensemble'}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-right">
+                  <div className="flex items-center gap-3 text-right">
                     <div>
-                      <div className="font-bold font-mono" style={{ color: meta.color }}>
+                      <div className="font-bold font-mono text-xs" style={{ color: meta.color }}>
                         Risk {fmt(tx.risk_score)}
                       </div>
-                      <div className="text-[10px] text-slate-400">{fmtMs(tx.latency_ms)}</div>
+                      <div className="text-[9px] text-slate-400">{fmtMs(tx.latency_ms)}</div>
                     </div>
-                    <ChevronRight size={14} className="text-slate-600" />
+                    <ChevronRight size={13} className="text-slate-600" />
                   </div>
                 </div>
               )
@@ -421,13 +421,13 @@ export default function DashboardPage({
         </div>
 
         {/* Right 1 Col: Decision Tier Distribution Donut */}
-        <div className="soc-card rounded-2xl p-5 flex flex-col justify-between">
+        <div className="soc-card rounded-xl p-3.5 sm:p-4 flex flex-col justify-between">
           <div>
-            <h3 className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
-              <PieChart size={14} className="text-indigo-400" />
+            <h3 className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-0.5">
+              <PieChart size={13} className="text-indigo-400" />
               Decision Tier Breakdown
             </h3>
-            <p className="text-xs text-slate-400 font-sans">
+            <p className="text-[11px] text-slate-400 font-sans">
               Semantic classification across 5 autonomous triage tiers
             </p>
           </div>

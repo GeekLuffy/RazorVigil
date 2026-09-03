@@ -291,7 +291,7 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
   }
 
   return (
-    <div className="glass-panel rounded-2xl p-3.5 mb-4 shadow-xl shadow-black/40 border border-slate-800 hover:border-indigo-500/30 transition-all duration-300">
+    <div className="glass-panel rounded-2xl p-3.5 shadow-xl shadow-black/40 border border-slate-800 hover:border-indigo-500/30 transition-all duration-300">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-blue-500/10 border border-indigo-500/30 rounded-xl text-indigo-400 shadow-md shadow-indigo-950/40">
@@ -375,17 +375,17 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
       </div>
 
       {/* Exploit Interception HUD with Real-Time Verdict & SLA */}
-      {interceptionEvent && (
-        <div className="mt-3 p-3.5 rounded-xl border border-rose-500/40 bg-gradient-to-br from-rose-950/40 via-slate-900/90 to-slate-950/95 shadow-2xl text-xs font-mono animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-800/80">
-            <div className="flex items-center gap-2">
+      {interceptionEvent ? (
+        <div className="mt-2.5 p-3 rounded-xl border border-rose-500/40 bg-gradient-to-br from-rose-950/40 via-slate-900/90 to-slate-950/95 shadow-2xl text-xs font-mono animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-800/80">
+            <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
-              <span className="font-bold text-white uppercase tracking-wider">
+              <span className="font-bold text-white uppercase tracking-wider text-[11px]">
                 {interceptionEvent.title}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${
+            <div className="flex items-center gap-1.5">
+              <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold border ${
                 interceptionEvent.tier === 'verified_agent'
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                   : 'bg-rose-500/25 text-rose-200 border-rose-500/50'
@@ -397,45 +397,77 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
                 className="text-slate-400 hover:text-white p-0.5 transition cursor-pointer"
                 title="Dismiss Interception Banner"
               >
-                <X size={14} />
+                <X size={13} />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2.5 text-[11px]">
-            <div className="p-2 rounded-lg bg-slate-950/70 border border-slate-800">
-              <div className="text-[10px] text-slate-400">GATING LATENCY</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-2 text-[10px]">
+            <div className="p-1.5 rounded-lg bg-slate-950/70 border border-slate-800">
+              <div className="text-[9px] text-slate-400">GATING LATENCY</div>
               <div className="text-emerald-400 font-bold">{interceptionEvent.latencyMs}ms</div>
             </div>
-            <div className="p-2 rounded-lg bg-slate-950/70 border border-slate-800">
-              <div className="text-[10px] text-slate-400">RISK SCORE</div>
+            <div className="p-1.5 rounded-lg bg-slate-950/70 border border-slate-800">
+              <div className="text-[9px] text-slate-400">RISK SCORE</div>
               <div className="text-rose-400 font-bold">
                 {typeof interceptionEvent.riskScore === 'number' ? interceptionEvent.riskScore.toFixed(3) : interceptionEvent.riskScore}
               </div>
             </div>
-            <div className="p-2 rounded-lg bg-slate-950/70 border border-slate-800 col-span-2">
-              <div className="text-[10px] text-slate-400">AUTONOMOUS ACTION</div>
+            <div className="p-1.5 rounded-lg bg-slate-950/70 border border-slate-800 col-span-2">
+              <div className="text-[9px] text-slate-400">AUTONOMOUS ACTION</div>
               <div className="text-amber-300 font-bold truncate">{interceptionEvent.payload}</div>
             </div>
           </div>
 
-          <div className="text-[11px] text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 mb-2">
+          <div className="text-[10px] text-slate-300 bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 mb-1.5">
             <span className="text-indigo-400 font-bold">{interceptionEvent.layer}:</span>{' '}
             {interceptionEvent.detail}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between text-[10px] text-slate-400 pt-1 gap-2">
+          <div className="flex flex-wrap items-center justify-between text-[9px] text-slate-400 pt-0.5 gap-1.5">
             <span className="truncate">TXID: <code className="text-slate-200 bg-slate-900 px-1 py-0.5 rounded">{interceptionEvent.txId}</code></span>
             <span className="text-emerald-400 font-bold flex items-center gap-1">
-              <CheckCircle2 size={11} /> Broadcast to Live Ingestion Stream &amp; Graph
+              <CheckCircle2 size={10} /> Live Gated
             </span>
+          </div>
+        </div>
+      ) : (
+        /* Armed Defense Posture Telemetry when idle (eliminates empty space) */
+        <div className="mt-2.5 p-2.5 rounded-xl border border-slate-800/80 bg-slate-950/60 text-xs font-mono">
+          <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800/60">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+              <ShieldCheck size={12} className="text-emerald-400" />
+              <span>Defense Posture: ZERO-TRUST ARMED</span>
+            </div>
+            <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+              Autonomous
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
+              <div className="text-slate-400 text-[9px]">GATING SLA</div>
+              <div className="text-emerald-400 font-bold">Sub-15ms Enforced</div>
+            </div>
+            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
+              <div className="text-slate-400 text-[9px]">CANARY DECOYS</div>
+              <div className="text-amber-400 font-bold">50 Pre-Seeded BINs</div>
+            </div>
+            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
+              <div className="text-slate-400 text-[9px]">GRAPH SENTINEL</div>
+              <div className="text-indigo-300 font-bold">Louvain Q=0.8994</div>
+            </div>
+            <div className="p-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
+              <div className="text-slate-400 text-[9px]">CONFORMAL BOUND</div>
+              <div className="text-cyan-300 font-bold">95% Risk Certified</div>
+            </div>
           </div>
         </div>
       )}
 
       {lastActionStatus && !interceptionEvent && (
-        <div className="mt-2.5 pt-2.5 border-t border-slate-800/80 text-[11px] font-mono text-emerald-400 flex items-center gap-2 animate-fadeIn">
-          <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div className="mt-2 pt-2 border-t border-slate-800/80 text-[10px] font-mono text-emerald-400 flex items-center gap-1.5 animate-fadeIn">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
           {lastActionStatus}
         </div>
       )}
