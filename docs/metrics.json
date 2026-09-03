@@ -12,7 +12,10 @@
       },
       "held_out_test_count": 10000,
       "bootstrap_resamples": 1000,
-      "confidence_level": 0.95
+      "confidence_level": 0.95,
+      "split_methodology": "Entity-disjoint stratified 3-way partition. Card SHA-256 hashes, IP subnet CIDRs, and device fingerprints are first clustered by entity group ID; groups are then randomly assigned to Train/Val/Test with no entity appearing across split boundaries. A transaction-hash disjointness audit (scripts/leakage_audit.py) confirms zero cross-split card_hash collisions, strictly monotonic timestamps (dt>=0), and max feature-target correlation < 0.85.",
+      "entity_disjoint": true,
+      "entity_disjoint_note": "Same physical card, IP, or device fingerprint never appears in both train and test partitions. Splits are computed on entity group level, not transaction level, preventing entity-level leakage even when the same entity generates multiple transactions with distinct transaction hashes."
     }
   },
   "global_test_metrics": {

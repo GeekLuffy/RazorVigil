@@ -408,11 +408,10 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
             </div>
 
             <h2 className="text-xl font-bold text-white tracking-tight font-sans">
-              Adversarial Attack Launchpad &amp; Automated Pipeline Runner
+              Threat Replay Lab &amp; Detection Pipeline Runner
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
-              Trigger real-world Telegram carding bots, rotating proxy swarms, canary honeytoken probes,
-              and AI agent checkouts to test RazorShield Sentinel's synchronous sub-50ms defenses in real-time.
+              Replay known fraud patterns — Telegram carding micro-auths, rotating proxy swarms, canary honeytoken probes — exclusively against RazorShield Sentinel's own sandboxed gateway to measure real-time defense performance.
             </p>
           </div>
 

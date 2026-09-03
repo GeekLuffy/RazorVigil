@@ -307,7 +307,7 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           </div>
           <div>
             <div className={`text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Interactive Attack Launchpad
+              Detection Test Harness
               <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold border ${
                 isDark
                   ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
@@ -317,7 +317,7 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
               </span>
             </div>
             <div className={`text-[11px] font-sans ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Trigger live threat vectors directly into the 9.2ms synchronous gateway
+              All simulated vectors fire only against RazorShield's own sandboxed local gateway. Zero code here can target any third-party system.
             </div>
           </div>
         </div>
