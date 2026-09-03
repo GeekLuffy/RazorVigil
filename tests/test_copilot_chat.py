@@ -4,8 +4,14 @@ Verifies real-time conversational reasoning across live transactions,
 NetworkX Louvain cluster topology, and RBI Sovereign Regulatory Directives.
 """
 
+import pytest
 from fastapi.testclient import TestClient
 from backend.main import app
+
+
+@pytest.fixture(autouse=True)
+def deterministic_copilot_env(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "")
 
 
 def test_copilot_transaction_interrogation():

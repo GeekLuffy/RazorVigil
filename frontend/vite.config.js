@@ -11,7 +11,7 @@ export default defineConfig({
     proxy: {
       '/api': { target: 'http://localhost:8000', changeOrigin: true },
       '/checkout': { target: 'http://localhost:8000', changeOrigin: true },
-      '/model': { target: 'http://localhost:8000', changeOrigin: true },
+      '/model/governance': { target: 'http://localhost:8000', changeOrigin: true },
       '/canary': { target: 'http://localhost:8000', changeOrigin: true },
       '/recovery': { target: 'http://localhost:8000', changeOrigin: true },
       '/config': { target: 'http://localhost:8000', changeOrigin: true },

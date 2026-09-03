@@ -181,7 +181,7 @@ class RiskScorer:
 
         # IsolationForest: anomaly score ? normalized to [0, 1]
         if self._iso_forest is not None:
-            raw_if = float(self._iso_forest.decision_function(row)[0])
+            raw_if = float(self._iso_forest.score_samples(row)[0])
             norm = (raw_if - self._if_score_min) / (self._if_score_range + 1e-9)
             norm = float(np.clip(norm, 0.0, 1.0))
             normalized_if = 1.0 - norm

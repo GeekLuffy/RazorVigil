@@ -78,14 +78,39 @@ const INITIAL_SEED_TRANSACTIONS = [
 ]
 
 export default function App() {
-  // ?? URL Hash Routing ??
-  const getInitialRoute = () => {
-    const hash = window.location.hash.replace('#', '').trim()
-    const valid = ALL_TABS.find(t => t.id === hash)
+  // ── URL Hash & Pathname Routing with Aliases ──
+  const ROUTE_ALIASES = {
+    ledger: 'transactions',
+    transactions: 'transactions',
+    graph: 'syndicates',
+    syndicate: 'syndicates',
+    syndicates: 'syndicates',
+    intelligence: 'risk-intelligence',
+    'risk-intelligence': 'risk-intelligence',
+    models: 'model-evaluation',
+    model: 'model-evaluation',
+    'model-evaluation': 'model-evaluation',
+    simulator: 'simulator',
+    disputes: 'audit-log',
+    dispute: 'audit-log',
+    cases: 'audit-log',
+    'audit-log': 'audit-log',
+    architecture: 'architecture',
+    dashboard: 'dashboard',
+  }
+
+  const resolveRoute = () => {
+    const hash = window.location.hash.replace('#', '').trim().toLowerCase()
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, '').trim().toLowerCase()
+    const candidate = hash || path
+    if (ROUTE_ALIASES[candidate]) {
+      return ROUTE_ALIASES[candidate]
+    }
+    const valid = ALL_TABS.find(t => t.id === candidate)
     return valid ? valid.id : 'dashboard'
   }
 
-  const [activeTab, setActiveTab] = useState(getInitialRoute)
+  const [activeTab, setActiveTab] = useState(resolveRoute)
   const [isDark, setIsDark] = useState(true)
   const [lang, setLang] = useState('EN')
 
@@ -109,13 +134,16 @@ export default function App() {
 
   // Sync back/forward browser navigation
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '').trim()
-      const valid = ALL_TABS.find(t => t.id === hash)
-      if (valid) setActiveTab(valid.id)
+    const handleNavigation = () => {
+      const target = resolveRoute()
+      setActiveTab(target)
     }
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
+    window.addEventListener('hashchange', handleNavigation)
+    window.addEventListener('popstate', handleNavigation)
+    return () => {
+      window.removeEventListener('hashchange', handleNavigation)
+      window.removeEventListener('popstate', handleNavigation)
+    }
   }, [])
 
   // ?? Telemetry & Ingestion Stream State ??

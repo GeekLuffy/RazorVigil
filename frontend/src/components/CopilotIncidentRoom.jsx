@@ -243,7 +243,7 @@ export default function CopilotIncidentRoom({ isOpen, onClose, pinnedTx, onSelec
                     h2: ({ node, ...props }) => <h4 className="text-xs font-bold text-indigo-300 mt-2.5 mb-1" {...props} />,
                     h3: ({ node, ...props }) => <h5 className="text-xs font-bold text-slate-100 mt-2 mb-1 flex items-center gap-1.5" {...props} />,
                     h4: ({ node, ...props }) => <h6 className="text-xs font-semibold text-indigo-300/90 mt-1.5 mb-0.5" {...props} />,
-                    p: ({ node, ...props }) => <p className="text-slate-300 mb-2 last:mb-0" {...props} />,
+                    p: ({ node, children, ...props }) => <div className="text-slate-300 mb-2 last:mb-0" {...props}>{children}</div>,
                     strong: ({ node, ...props }) => <strong className="font-semibold text-white" {...props} />,
                     em: ({ node, ...props }) => <em className="text-indigo-200 not-italic" {...props} />,
                     ul: ({ node, ...props }) => <ul className="list-disc pl-4 space-y-1 my-1.5 text-slate-300" {...props} />,

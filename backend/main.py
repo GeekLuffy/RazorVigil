@@ -65,10 +65,9 @@ canary_cards: CanaryCards
 otp_defense: OTPRelayDefenseEngine = OTPRelayDefenseEngine()
 three_ds_verifier: ThreeDSAntiBypassEngine = ThreeDSAntiBypassEngine()
 
-agent_validator: AgentAttestationValidator
-
-razorpay_client: RazorpayClient
-anti_checker: AntiCheckerGuard
+agent_validator: AgentAttestationValidator = AgentAttestationValidator()
+razorpay_client: RazorpayClient = RazorpayClient()
+anti_checker: AntiCheckerGuard = AntiCheckerGuard(enable_tarpit_poisoning=True)
 
 # Real-time In-Memory SRE & Telemetry State
 _eval_counts: dict[str, int] = {

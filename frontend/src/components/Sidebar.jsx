@@ -31,6 +31,26 @@ export const NAV_SECTIONS = [
   }
 ]
 
+const HINDI_MAP = {
+  'SURVEILLANCE & DEFENSE': 'निगरानी और रक्षा',
+  'INTELLIGENCE & MODELS': 'इंटेलिजेंस और मॉडल',
+  'GOVERNANCE & AUDIT': 'गवर्नेंस और ऑडिट',
+  'Command Center': 'कमांड सेंटर',
+  'Live Ledger HUD': 'लाइव लेजर HUD',
+  'Syndicate Graph': 'सिंडिकेट ग्राफ',
+  'Risk Intelligence': 'जोखिम इंटेलिजेंस',
+  'Model Studio': 'मॉडल स्टूडियो',
+  'Attack Simulator': 'हमला सिम्युलेटर',
+  'Dispute Cases': 'विवाद मामले',
+  'RBI Architecture': 'आरबीआई आर्किटेक्चर',
+  'Merchant Storefront': 'मर्चेंट स्टोरफ्रंट',
+  'Forensic Copilot': 'फोरेंसिक कोपायलट',
+  'ML Engine & Redis': 'एमएल इंजन और रेडिस',
+  'P99: 8.4ms · Active': 'P99: 8.4ms · सक्रिय',
+  'Dark': 'डार्क',
+  'Light': 'लाइट',
+}
+
 function SidebarContent({
   activeTab,
   onSelectTab,
@@ -44,6 +64,7 @@ function SidebarContent({
   isMobile = false,
   onCloseMobile
 }) {
+  const t = (text) => (lang === 'HI' && HINDI_MAP[text] ? HINDI_MAP[text] : text)
   const handleItemClick = (id) => {
     onSelectTab(id)
     if (onCloseMobile) onCloseMobile()
@@ -61,28 +82,17 @@ function SidebarContent({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className={`font-extrabold text-sm tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                RazorShield
-              </span>
-              <span className={`text-[10px] font-bold font-mono px-1.5 py-0.2 rounded-md border ${
-                isDark ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border-emerald-300'
-              }`}>
-                v2.0
-              </span>
+              <span className="font-extrabold text-sm tracking-tight text-white font-mono">RazorShield</span>
+              <span className="px-1.5 py-0.2 text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/30">v2.0</span>
             </div>
-            <div className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Autonomous Risk Engine
-            </div>
+            <p className="text-[11px] text-slate-400 font-sans">Autonomous Risk Engine</p>
           </div>
         </div>
 
-        {isMobile && onCloseMobile && (
+        {isMobile && (
           <button
             onClick={onCloseMobile}
-            className={`p-1.5 rounded-lg border transition ${
-              isDark ? 'text-slate-400 hover:text-white bg-slate-900 border-slate-800' : 'text-slate-600 hover:text-slate-900 bg-slate-100 border-slate-200'
-            }`}
-            title="Close Menu"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
           >
             <X size={18} />
           </button>
@@ -94,7 +104,7 @@ function SidebarContent({
         {NAV_SECTIONS.map((section, sIdx) => (
           <div key={section.category || sIdx} className="space-y-1">
             <div className={`px-3 text-[10px] font-extrabold font-mono tracking-wider uppercase ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>
-              {section.category}
+              {t(section.category)}
             </div>
             <div className="space-y-0.5 mt-1">
               {section.items.map((item) => {
@@ -120,7 +130,7 @@ function SidebarContent({
                           ? isDark ? 'text-emerald-400' : 'text-emerald-600'
                           : isDark ? 'text-slate-500 group-hover:text-slate-300' : 'text-slate-500 group-hover:text-slate-900'
                       }`} />
-                      <span>{item.label}</span>
+                      <span>{t(item.label)}</span>
                     </div>
 
                     {item.badge && (
@@ -140,7 +150,7 @@ function SidebarContent({
         {/* Quick Launch Short-actions */}
         <div className={`pt-2 border-t space-y-1.5 ${isDark ? 'border-slate-800/60' : 'border-slate-200'}`}>
           <button
-            onClick={() => { onOpenStore(); if (onCloseMobile) onCloseMobile(); }}
+            onClick={() => { if (onOpenStore) onOpenStore(); if (onCloseMobile) onCloseMobile(); }}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition ${
               isDark
                 ? 'text-slate-300 hover:text-white bg-slate-900/40 hover:bg-slate-900 border-slate-800/60'
@@ -149,12 +159,12 @@ function SidebarContent({
           >
             <div className="flex items-center gap-2.5">
               <ShoppingBag className="w-4 h-4 text-indigo-500" />
-              <span>Merchant Storefront</span>
+              <span>{t('Merchant Storefront')}</span>
             </div>
           </button>
 
           <button
-            onClick={() => { onOpenCopilot(); if (onCloseMobile) onCloseMobile(); }}
+            onClick={() => { if (onOpenCopilot) onOpenCopilot(); if (onCloseMobile) onCloseMobile(); }}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition shadow-sm ${
               isDark
                 ? 'text-pink-300 hover:text-white bg-pink-950/20 hover:bg-pink-950/40 border-pink-500/30'
@@ -163,7 +173,7 @@ function SidebarContent({
           >
             <div className="flex items-center gap-2.5">
               <Bot className="w-4 h-4 text-pink-500 animate-pulse" />
-              <span>Forensic Copilot</span>
+              <span>{t('Forensic Copilot')}</span>
             </div>
           </button>
         </div>
