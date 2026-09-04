@@ -294,6 +294,10 @@ Full documentation follows the [Diataxis framework](https://diataxis.fr):
 6. Reserve Bank of India — *Authentication Mechanisms for Digital Payment Transactions Directions, 2025* (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026), September 25, 2025. Effective April 1, 2026.
 7. LexisNexis Risk Solutions / Forrester Consulting — *True Cost of Fraud Study, Asia-Pacific*, 2024 — ₹4.00 total cost per ₹1 fraud for Indian enterprises.
 8. "Data Leakage and Deceptive Performance: A Critical Examination of Credit Card Fraud Detection Methodologies" — arXiv:2506.02703, June 2025.
+9. Häkli et al. (University of Cambridge) — *Measuring Cybercrime on Telegram: Ecosystems, Trust, and Market Dynamics*, 2025 — empirical taxonomy of Telegram carding channels, checker botnets, and credential-broker supply chains.
+10. Han et al. — *Evaluating Cyber Deception: A Comprehensive Survey*, IEEE/arXiv:2104.03594, 2021 — foundational theory for asymmetric computational costs, deceptive latency tarpits, and response code oracle collapsing.
+11. Thinkst Applied Research — *Credit Card Canarytokens*, Dec 2024 — industrial precedent for 0.00% FPR synthetic card honeypots deployed in decoy checkout forms.
+12. "Scalable Bipartite Graph Clustering for Enterprise Fraud Rings" — arXiv:2512.19061, Dec 2025 — hard/soft link graph transformation for sub-second Louvain community detection across 25M accounts.
 
 ---
 

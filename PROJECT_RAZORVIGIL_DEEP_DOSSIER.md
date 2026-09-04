@@ -29,11 +29,14 @@
 
 ### 1.1 The E-Commerce Risk Challenge
 Modern payment infrastructure faces sophisticated, automated fraud patterns that bypass traditional rules-based defenses:
-1. **Automated Card Testing & Micro-Auth Botnets**: Distributed script engines test thousands of leaked PANs via ₹1–₹2 authorization requests to validate stolen credit card batches.
-2. **Rotating Residential Proxy Swarms**: Attackers route traffic across millions of residential IP addresses, completely circumventing simple IP-based velocity limits.
-3. **Synthetic Kinetic Biometrics**: Headless automation frameworks (Puppeteer, Playwright) spoof basic user behavior, generating synthetic mouse movements and timing delays.
-4. **Adversarial AiTM Reverse Proxies & OTP Relays**: Reverse-proxy frameworks (Evilginx, Modlishka) intercept session tokens and one-time passwords during 3DS flows in real time.
-5. **The False Decline Tax**: Conventional fixed-threshold risk scoring disproportionately rejects legitimate high-value customers. The LexisNexis True Cost of Fraud Study (Asia-Pacific, 2024) found Indian organizations incur **₹4.00 in total cost for every ₹1.00 lost to actual fraud** — making false decline losses the dominant economic threat, not the fraud itself.
+1. **The Telegram Carding Ecosystem & Infostealer Supply Chain**: A 2025 University of Cambridge measurement study (Häkli et al.) identified six distinct market segments within Telegram's cybercrime economy, documenting how infostealers (RedLine, LummaC2) extract Chromium SQLite credential stores (`%LOCALAPPDATA%\Google\Chrome\User Data\Default\Web Data`) and stream decrypted PANs and Fullz directly to Telegram C2 channels in minutes, collapsing time-to-exposure from days to minutes.
+2. **Automated Card Testing & Micro-Auth Botnets**: Distributed script engines (e.g. `telegram-card-checker-bot`, headless Playwright, SilverBullet) test thousands of leaked PANs via ₹1–₹2 authorization requests to validate stolen card batches against live merchant checkouts before conducting large-scale fraudulent purchases.
+3. **Response-Code Oracle Exploitation**: Gateways that return granular ISO 8583 error strings inadvertently serve as a free validation oracle for carding bots. Checkers parse error codes to sort cards into **Live** (`00` Approved, or `51` Insufficient Funds confirming active account limits), **CCN** (`82 / N7` CVV mismatch routed to distributed guessing scripts), and **Die** (`05` Do Not Honor, `14` Invalid PAN). Defenses must collapse response granularity to deny carders this oracle.
+4. **Rotating Residential Proxy Swarms ($5–$15/GB)**: Threat actors route requests across millions of residential IP addresses (BrightData, Oxylabs, Webshare), completely circumventing simple IP-based velocity limits and perimeter WAF rules.
+5. **The Newcastle Distributed Guessing Attack**: Attackers exploit the lack of cross-merchant authorization correlation, systematically guessing CVV and expiration dates in under six seconds across multiple websites (Ali et al., *IEEE Security & Privacy*, 2017).
+6. **Synthetic Kinetic Biometrics**: Headless automation frameworks (Puppeteer-Extra-Stealth, Camoufox) spoof basic user behavior, generating synthetic mouse movements and timing delays.
+7. **Adversarial AiTM Reverse Proxies & OTP Relays**: Reverse-proxy frameworks (Evilginx, Modlishka) and automated VoIP OTP grabbers intercept session tokens and one-time passwords during 3DS flows in real time.
+8. **The False Decline Tax**: Conventional fixed-threshold risk scoring disproportionately rejects legitimate high-value customers. The LexisNexis True Cost of Fraud Study (Asia-Pacific, 2024) found Indian organizations incur **₹4.00 in total cost for every ₹1.00 lost to actual fraud** — making false decline losses the dominant economic threat, not the fraud itself.
 
 ### 1.2 Core Architectural Principles & Technical Approach
 RazorVigil is engineered as a synchronous, in-line payment defense engine operating within strict gateway latency budgets:
@@ -229,7 +232,7 @@ The graph engine partitions communities via Louvain optimization of Newman-Girva
 
 $$Q = \frac{1}{2m} \sum_{i,j} \left[ A_{ij} - \frac{k_i k_j}{2m} \right] \delta(c_i, c_j)$$
 
-**Measured Modularity**: In the active network topology, RazorVigil maintains **$Q = 0.8994$**, cleanly isolating distributed carding swarms into discrete topological clusters. When a single node inside a cluster triggers a canary or velocity violation, the entire connected ring's risk score escalates immediately.
+**Measured Modularity**: In the active network topology, RazorVigil maintains **$Q = 0.8994$**, cleanly isolating distributed carding swarms into discrete topological clusters. When a single node inside a cluster triggers a canary or velocity violation, the entire connected ring's risk score escalates immediately. This design aligns with recent empirical fraud network literature (e.g. arXiv:2512.19061), which demonstrated that transforming hard transaction links and soft behavioral connections into weighted bipartite graphs enables Louvain modularity to scale across tens of millions of financial accounts while preserving sub-second ring boundary resolution.
 
 ---
 
@@ -315,6 +318,16 @@ The Copilot produces actionable, 1-click incident responses:
 4. **ISO 8583 Audit Trails**:
    - Flags authorization attempts with structured 5-domain evidentiary records suitable for formal dispute representation.
 
+5. **Merchant Contractual De-Platforming Thresholds in India**:
+   - **Razorpay Master Terms of Service** (cl 9.3 & 16.1; Part B cl 5): Empowers the payment aggregator to immediately suspend merchant processing upon receiving card-network fraud notifications, pass through 100% of network fines, and enforce up to 120 days of settlement withholding. Internal risk monitors trigger remediation alerts at just 0.5% fraud-to-sales ratios.
+   - **Cashfree Merchant Agreement** (cl 16.3.7 & 07): Mandates immediate termination and up to 180 days of escrow settlement freezes if chargeback or fraud ratios cross the 1.0% threshold in any 30-day window.
+   - **Financial Survival Implication**: A single unmitigated Telegram card-checking botnet burst generating 5,000 micro-auth disputes can trigger immediate gateway termination and cashflow insolvency for an Indian D2C merchant within 48 hours.
+
+6. **Visa Acquirer Monitoring Program (VAMP) & VAAI (Effective April 1, 2026)**:
+   - Replaces the legacy Visa Dispute Monitoring Program (VDMP) and Visa Fraud Monitoring Program (VFMP) with an integrated metric combining fraud and dispute ratios into a single threshold (Standard: 0.9%, Excessive: 1.5%).
+   - Violations incur mandatory non-compliance penalties of $8 to $50 per transaction alongside operational assessment surcharges.
+   - Under the Visa Account Attack Intelligence (VAAI) system, card enumeration attack bursts exceeding 300,000 requests or a 20% decline ratio trigger automated issuer-side BIN freezing and heavy network-level fines passed directly through to the acquiring merchant.
+
 ---
 
 ## 9. Edge Defense, Anti-Checker & Active Canary Honeypots
@@ -333,7 +346,23 @@ Extracts TLS Client Hello cipher suites, extension orders, and elliptic curve id
 ### 9.3 50 Armed Dynamic Canary Honeytokens
 - **Architecture**: 50 pre-seeded, Luhn-valid synthetic credit card numbers deployed exclusively in decoy honeypots and dark-web trap endpoints.
 - **Escape False Positive Rate**: Strictly **0.00% FPR** on the canary layer (these cards are never issued to genuine consumers).
+- **Industrial Precedent**: This architecture operationalizes the concept proven by Thinkst Canarytokens (Credit Card Canarytoken, released December 2024), where synthetic cards seeded into internal docs or scraped test forms trigger high-fidelity alerts the instant an adversary attempts payment authorization, eliminating false alarms without burdening genuine checkouts.
 - **Deterministic Action**: Any authorization attempt using a Canary card instantly triggers a 7-day global quarantine across the originating IP, /24 subnet, and device fingerprint.
+
+### 9.4 Layer 0 Deceptive Tarpitting & Response Oracle Collapsing
+- **Academic Grounding**: Cyber deception theory establishes that imposing asymmetric computational and temporal costs on automated attackers degrades their economic viability (Han et al., arXiv:2104.03594, surveying 180+ deception mechanisms).
+- **Endlessh-Style Concurrency Exhaustion**: Rather than immediately severing connections with an HTTP 403 or gateway drop, RazorVigil's Layer 0 engine holds incoming suspicious connections in a synthetic 3,000–8,000ms socket tarpit. This ties up worker threads in automated checker suites (e.g. SilverBullet, Telegram bot pools) without incurring Razorpay or card-network authorization processing fees.
+- **Oracle Denial via Error Granularity Collapsing**: As formalized in underground threat intelligence, carders rely on granular decline codes (`51: Insufficient Funds` confirming a valid Live card vs. `82: Incorrect CVV` confirming a CCN card). RazorVigil completely collapses response granularity for flagged checker probes, returning a deceptive generic decline:
+  ```json
+  {
+    "status": "failed",
+    "error_code": "ERR_CARD_INVALID_STATUS",
+    "iso_8583": "05",
+    "message": "Do Not Honor - Card authentication rejected by issuer network.",
+    "oracle_suppressed": true
+  }
+  ```
+  By returning deceptive `05` (Do Not Honor) instead of informative decline reasons, attacker automated bots mark valid cards as dead (`Die`), systematically poisoning the adversary's inventory.
 
 ---
 

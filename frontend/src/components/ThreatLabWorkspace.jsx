@@ -478,7 +478,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 font-sans max-w-xl">
-                  Automated headless scraper testing stolen card BIN 411773 via ₹1 micro-auth. Triggers Anti-Checker deceptive tarpit poisoning.
+                  Simulates LummaC2/RedLine exfiltrated BIN 411773 micro-auth via rotating proxy. Trapped by Layer 0 Tarpit with deceptive ISO 8583 decline (05: Do Not Honor), poisoning attacker database.
                 </p>
               </div>
               <button

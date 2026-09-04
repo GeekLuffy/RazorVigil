@@ -89,14 +89,16 @@ class AntiCheckerGuard:
             }
 
         # 3. Micro-Auth Enumeration (Telegram ₹1.00 / ₹2.00 Checker Signature)
+        # Catches both datacenter scrapers and rotating residential proxy swarms ($5–$15/GB)
         is_datacenter = asn_type in ("datacenter", "tor")
         zero_biometrics = keystroke_entropy < 0.1 and mouse_jitter < 0.05 and time_on_page_s < 1.0
         
         if amount <= 10.0 and (is_datacenter or zero_biometrics):
             self.blocked_attempts_count += 1
+            source_desc = "datacenter IP" if is_datacenter else "rotating residential proxy"
             return True, "MICRO_AUTH_ENUMERATION", {
-                "defense": "Micro-Charge Velocity Guard",
-                "detail": f"Testing minimum amount (Rs.{amount:.2f}) from automated/datacenter session",
+                "defense": "Micro-Charge Tarpit Guard",
+                "detail": f"Testing minimum amount (Rs.{amount:.2f}) via {source_desc} with scripted automation",
                 "confidence": 0.98,
             }
 
@@ -136,8 +138,9 @@ class AntiCheckerGuard:
     def generate_poisoned_honeypot_response(self, card_hash: str) -> Dict[str, Any]:
         """
         Synthesizes a deceptive bank decline response.
-        Deceives automated Telegram bots into marking live stolen cards as 'DEAD ❌' in their logs,
-        poisoning the adversary's stolen database and neutralizing future attacks.
+        Collapses response-code granularity to deny carders an oracle (Han et al. 2021, arXiv:2104.03594).
+        Deceives automated Telegram bots into marking live stolen cards as 'DEAD ❌' (ISO 8583 code 05: Do Not Honor)
+        in their logs, poisoning the adversary's stolen database and neutralizing future cash-out attempts.
         """
         self.poisoned_responses_count += 1
         return {
@@ -146,12 +149,15 @@ class AntiCheckerGuard:
             "action": "honeypot",
             "risk_score": 0.99,
             "honeypot_poisoning": True,
+            "oracle_suppressed": True,
             "error": {
                 "code": "BAD_REQUEST_ERROR",
                 "description": "Payment failed: The issuing bank declined the transaction (ERR_CARD_INVALID_STATUS).",
                 "source": "issuing_bank_simulator",
                 "step": "payment_authentication",
                 "reason": "payment_failed",
+                "decline_code": "do_not_honor",
+                "iso_response_code": "05",
             },
             "card_hash_masked": f"{card_hash[:6]}******{card_hash[-4:]}" if len(card_hash) >= 10 else card_hash,
             "latency_ms": 8.5,
