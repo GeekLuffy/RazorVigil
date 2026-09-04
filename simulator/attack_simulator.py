@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Attack Simulator
+RazorVigil — Attack Simulator
 Phase 2: Live demo script for the 5-minute pitch.
 
 Three modes (all hit the live /checkout API):
@@ -43,7 +43,7 @@ if sys.stdout.encoding != "utf-8":
 # ---------------------------------------------------------------------------
 # DEFENSE-ONLY SAFETY DECLARATION & LOCAL ENDPOINT GUARDRAILS
 # ---------------------------------------------------------------------------
-# RazorVigil Sentinel attack simulators are designed and hardcoded STRICTLY
+# RazorVigil attack simulators are designed and hardcoded STRICTLY
 # for local defensive evaluation, live pitching, and automated test pipelines.
 # In compliance with the Razorpay AI Buildathon safety rules, this tool CANNOT
 # target external endpoints or live payment gateways.
@@ -322,7 +322,7 @@ async def run_genuine() -> None:
 
 async def main(mode: str, burst_n: int, burst_rps: float, slow_workers: int,
                slow_attempts: int, slow_interval: float) -> None:
-    print(f"\n{_CYAN}{_BOLD}RazorVigil Sentinel — Attack Simulator{_RESET}")
+    print(f"\n{_CYAN}{_BOLD}RazorVigil — Attack Simulator{_RESET}")
     print(f"{_DIM}API: {API_BASE}{_RESET}")
 
     # Verify API is reachable
@@ -450,7 +450,7 @@ async def run_agent() -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="RazorVigil Sentinel -- Attack Simulator (demo script)"
+        description="RazorVigil -- Attack Simulator (demo script)"
     )
     parser.add_argument(
         "--mode", choices=["burst", "slow", "genuine", "canary", "agent", "all"],

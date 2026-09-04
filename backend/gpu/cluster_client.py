@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel ? Remote GPU Super-Cluster Client (bd216server3).
+RazorVigil ? Remote GPU Super-Cluster Client (bd216server3).
 Communicates with bd216server3 (104 cores, 503GB RAM, 6x RTX 2080 Ti GPUs)
 via authenticated Jupyter Kernel WebSocket/REST API for live telemetry and GPU stats.
 """

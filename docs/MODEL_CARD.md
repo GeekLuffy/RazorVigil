@@ -1,4 +1,4 @@
-# Model Card: RazorVigil Sentinel Anti-Carding Engine
+# Model Card: RazorVigil Anti-Carding Engine
 
 > **Model Identifier**: `RazorVigil-Ensemble-v2.4`  
 > **Model Type**: Multi-Modal Persistence-Gated Stacked Ensemble (LightGBM + CatBoost + Isolation Forest + Graph Topology)  
@@ -92,6 +92,6 @@
 
 ## 7. Strict Defense-Only Safety Declaration
 
-> **IMPORTANT REGULATORY & SAFETY NOTICE**: RazorVigil Sentinel is designed, built, and licensed **strictly and exclusively for defensive fraud prevention, security operations, and compliance auditing**.
+> **IMPORTANT REGULATORY & SAFETY NOTICE**: RazorVigil is designed, built, and licensed **strictly and exclusively for defensive fraud prevention, security operations, and compliance auditing**.
 > * All simulation scripts (`simulator/attack_simulator.py`, `backend/governance/coevolution.py`) are hardcoded to target only the local sandbox (`http://localhost:8000/checkout`).
 > * The codebase contains zero network egress capabilities to external payment endpoints and zero weaponizable payloads.

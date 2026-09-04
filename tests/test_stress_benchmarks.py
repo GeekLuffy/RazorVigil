@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — High-Concurrency Stress & Boundary Test Suite.
+RazorVigil — High-Concurrency Stress & Boundary Test Suite.
 Verifies gateway stability under extreme concurrent load, edge-case feature bounds,
 Bayesian loss singularities, and dynamic sliding-window velocity boundaries.
 """

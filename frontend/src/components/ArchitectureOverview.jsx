@@ -73,7 +73,7 @@ export default function ArchitectureOverview() {
                 </span>
               </div>
               <h2 className="text-xl font-bold text-white tracking-tight font-sans mt-1">
-                RazorVigil Sentinel — System Architecture &amp; Mathematical Specification
+                RazorVigil — System Architecture &amp; Mathematical Specification
               </h2>
               <p className="text-xs text-slate-400 font-sans">
                 Autonomous 5-Layer Defense Stack, Conformal Prediction Proofs &amp; RBI Compliance

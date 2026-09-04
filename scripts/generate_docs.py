@@ -193,7 +193,7 @@ def generate_model_card(m: dict) -> str:
     d_m01 = drift.get("month_01_tradeoff", {})
     d_edge = drift.get("edge_case_genuine_hard_negative_fpr", {})
 
-    card = f"""# Model Card: RazorVigil Sentinel Anti-Carding Engine
+    card = f"""# Model Card: RazorVigil Anti-Carding Engine
 
 > **Model Identifier**: `RazorVigil-Ensemble-v2.4`  
 > **Model Type**: Multi-Modal Persistence-Gated Stacked Ensemble (LightGBM + CatBoost + Isolation Forest + Graph Topology)  
@@ -287,7 +287,7 @@ def generate_model_card(m: dict) -> str:
 
 ## 7. Strict Defense-Only Safety Declaration
 
-> **IMPORTANT REGULATORY & SAFETY NOTICE**: RazorVigil Sentinel is designed, built, and licensed **strictly and exclusively for defensive fraud prevention, security operations, and compliance auditing**.
+> **IMPORTANT REGULATORY & SAFETY NOTICE**: RazorVigil is designed, built, and licensed **strictly and exclusively for defensive fraud prevention, security operations, and compliance auditing**.
 > * All simulation scripts (`simulator/attack_simulator.py`, `backend/governance/coevolution.py`) are hardcoded to target only the local sandbox (`http://localhost:8000/checkout`).
 > * The codebase contains zero network egress capabilities to external payment endpoints and zero weaponizable payloads.
 """
@@ -325,8 +325,8 @@ def update_readme(m: dict) -> None:
         "**Track 02: Next-Gen Carding & Bot-Abuse Mitigation Engine**"
     )
     content = content.replace(
-        "# RazorVigil Sentinel: Next-Gen Carding & Account Takeover Defense Engine",
-        "# RazorVigil Sentinel: Next-Gen Carding & Bot-Abuse Mitigation Engine"
+        "# RazorVigil: Next-Gen Carding & Account Takeover Defense Engine",
+        "# RazorVigil: Next-Gen Carding & Bot-Abuse Mitigation Engine"
     )
 
     content = inject_template(content, "BENCHMARK", generate_benchmark_table(m))

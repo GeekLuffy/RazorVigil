@@ -1,5 +1,5 @@
 """
-External Validation Pipeline — RazorVigil Sentinel
+External Validation Pipeline — RazorVigil
 =====================================================
 Cold-transfer evaluation of the existing trained ensemble against two
 independently-labeled real-world fraud datasets:
@@ -324,7 +324,7 @@ def build_ieee_entity_graph(df: pd.DataFrame) -> dict:
 # --------------------------------------------------------------------------
 def main():
     print("=" * 60)
-    print("RAZORVIGIL SENTINEL — EXTERNAL OOD VALIDATION")
+    print("RAZORVIGIL — EXTERNAL OOD VALIDATION")
     print("=" * 60)
 
     if not LGBM_PATH.exists() or not IF_PATH.exists():

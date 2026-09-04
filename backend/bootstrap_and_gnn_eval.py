@@ -137,7 +137,7 @@ class HeteroGraphSAGE(nn.Module):
 
 def main():
     print("=" * 70)
-    print("RAZORVIGIL SENTINEL — OOD BENCHMARK & GNN TRAINING")
+    print("RAZORVIGIL — OOD BENCHMARK & GNN TRAINING")
     print("=" * 70)
 
     # -------------------------------------------------------------

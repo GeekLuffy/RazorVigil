@@ -411,7 +411,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               Threat Replay Lab &amp; Detection Pipeline Runner
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
-              Replay known fraud patterns — Telegram carding micro-auths, rotating proxy swarms, canary honeytoken probes — exclusively against RazorVigil Sentinel's own sandboxed gateway to measure real-time defense performance.
+              Replay known fraud patterns — Telegram carding micro-auths, rotating proxy swarms, canary honeytoken probes — exclusively against RazorVigil's own sandboxed gateway to measure real-time defense performance.
             </p>
           </div>
 

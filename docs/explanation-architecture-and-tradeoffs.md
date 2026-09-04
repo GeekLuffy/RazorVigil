@@ -1,6 +1,6 @@
 # 🧠 Architecture Design Decisions & Trade-Offs
 
-This document explains **why** RazorVigil Sentinel is designed the way it is — the fundamental engineering trade-offs, security philosophy, and operational guarantees.
+This document explains **why** RazorVigil is designed the way it is — the fundamental engineering trade-offs, security philosophy, and operational guarantees.
 
 ---
 

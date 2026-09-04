@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Adversarial & Concurrency Test Suite.
+RazorVigil — Adversarial & Concurrency Test Suite.
 Tests race conditions, circuit breakers, model inversion bounds, honeytoken isolation,
 and shadow-mode evaluation under hostile conditions.
 """

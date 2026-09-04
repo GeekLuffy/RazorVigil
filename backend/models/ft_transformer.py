@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Feature Tokenizer Transformer (FT-Transformer).
+RazorVigil — Feature Tokenizer Transformer (FT-Transformer).
 Deep tabular neural architecture for multi-hop non-linear payment fraud representation learning.
 Supports high-throughput GPU training (PyTorch CUDA DDP) and quantized inference.
 """

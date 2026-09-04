@@ -1,4 +1,4 @@
-# 🏆 RazorVigil Sentinel — Grand Prize Submission Kit
+# 🏆 RazorVigil — Grand Prize Submission Kit
 **Razorpay AI Buildathon 2026**
 *Track 02: AI Risk Manager (Primary) + Track 03: Revenue Recovery (Bridge Feature)*
 
@@ -6,7 +6,7 @@
 
 ## 📌 1. Project Title & Tagline
 
-- **Project Name**: **RazorVigil Sentinel**
+- **Project Name**: **RazorVigil**
 - **Tagline**: Specialist Carding & Bot-Abuse Sub-Agent for Razorpay Agent Studio — Exposed via MCP, Built on the Same Claude Agent SDK Stack
 - **Tracks**: **Track 02 (AI Risk Manager)** & **Track 03 (Revenue Recovery)**
 
@@ -18,7 +18,7 @@
 > Carding attacks, BIN enumeration, and credential-stuffing botnets from Telegram and underground communities cause massive financial damage to Indian merchants and payment gateways through chargebacks and processor penalties. Traditional defenses rely on blunt IP rate-limiting, which easily fails against distributed residential proxy rings while inadvertently blocking high-value genuine customers (false declines). Furthermore, emerging AI shopping agents (e.g., Google AP2 protocol) are often misclassified and blocked as headless scrapers.
 
 ### Solution & Architecture (How does it work?)
-> RazorVigil Sentinel is a multi-layered autonomous risk engine designed for a **strict <50ms synchronous decision budget** (averaging ~10ms p99):
+> RazorVigil is a multi-layered autonomous risk engine designed for a **strict <50ms synchronous decision budget** (averaging ~10ms p99):
 > 1. **4-Way Stacked Ensemble Scoring**: LightGBM + CatBoost + Calibrated Isolation Forest + Graph Neural Network trained on a strict 3-way split (60% Train / 20% Val / 20% Held-Out Test), achieving **PR-AUC 0.9985 `[0.9976, 0.9992]`** and **ROC-AUC 0.9993 `[0.9988, 0.9997]`** with 1,000 bootstrap resamples on the held-out test partition.
 > 2. **Sliding-Window Velocity & Graph Clustering**: Real-time Redis counters paired with an asynchronous NetworkX Louvain / PyG HeteroGraphSAGE community detection engine to identify coordinated carding rings across rotating proxies.
 > 3. **50 Luhn-Valid Canary Honeytokens**: Synthetic PANs seeded exclusively within our own decoy inventory and honeytoken check endpoint — discoverable only via BIN-enumeration or scraping directed at our own system. Any match triggers a deterministic 1.0-confidence block. The **0.00% FPR guarantee applies strictly to the canary detection layer**, not the ML layer.
@@ -63,7 +63,7 @@
 
 ## 🤖 3. Razorpay Agent Studio Integration (MCP Sub-Agent Positioning)
 
-**Positioning**: RazorVigil Sentinel is **not** an alternative to Razorpay's native Agent Studio (launched March 12, 2026 at FTX'26) — Razorpay already ships a native transaction-monitoring fraud agent and a Dispute Responder agent. RazorVigil is the **specialist carding/bot-abuse sub-agent** that Razorpay's own agents can delegate to for deep-forensic investigation — exposed using the same MCP protocol and Claude Agent SDK stack that Agent Studio is built on.
+**Positioning**: RazorVigil is **not** an alternative to Razorpay's native Agent Studio (launched March 12, 2026 at FTX'26) — Razorpay already ships a native transaction-monitoring fraud agent and a Dispute Responder agent. RazorVigil is the **specialist carding/bot-abuse sub-agent** that Razorpay's own agents can delegate to for deep-forensic investigation — exposed using the same MCP protocol and Claude Agent SDK stack that Agent Studio is built on.
 
 ### MCP Tool Schema (4 Tools)
 ```python

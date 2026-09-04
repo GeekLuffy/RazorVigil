@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Compliance Approval Dossier PDF Generator.
+RazorVigil — Compliance Approval Dossier PDF Generator.
 
 Compiles an auditable PDF compliance report containing the cryptographic payment contract,
 forensic loss autopsy, adversarial co-evolution trace, 6-gate verification proofs,
@@ -50,7 +50,7 @@ def build_compliance_dossier_pdf(reviewer_id: str = "SecOps_Lead_01") -> bytes:
     story = []
 
     # Title Banner
-    story.append(Paragraph("RazorVigil Sentinel — Autonomous Risk Policy Compliance Readiness Dossier", styles["DocTitle"]))
+    story.append(Paragraph("RazorVigil — Autonomous Risk Policy Compliance Readiness Dossier", styles["DocTitle"]))
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     story.append(Paragraph(
         f"Generated at {ts} | Auditor: <b>{reviewer_id}</b> | Status: <b>RBI COMPLIANCE READINESS REFERENCE</b>",
@@ -74,7 +74,7 @@ def build_compliance_dossier_pdf(reviewer_id: str = "SecOps_Lead_01") -> bytes:
     # Section 1: Executive & Regulatory Summary
     story.append(Paragraph("1. Executive Summary & Regulatory Framework", styles["SectionTitle"]))
     summary_text = (
-        "RazorVigil Sentinel is an autonomous real-time carding and abuse prevention engine. "
+        "RazorVigil is an autonomous real-time carding and abuse prevention engine. "
         "This dossier documents policy evaluation readiness against the <i>Reserve Bank of India (Authentication Mechanisms "
         "for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)</i>, incorporating Card-on-File "
         "Tokenization (CoFT) and constant-time HMAC-SHA256 signature contracts. "

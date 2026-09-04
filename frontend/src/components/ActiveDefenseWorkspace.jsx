@@ -281,7 +281,7 @@ export default function ActiveDefenseWorkspace({ copilotNotes = [] }) {
             </div>
             <p className="text-xs text-slate-300 leading-relaxed font-sans max-w-2xl">
               When Telegram scrapers (e.g. BIN 411773 ₹1 tests) or Playwright CDP headless browsers hit the checkout gateway,
-              RazorVigil Sentinel intercepts the request at Layer 0, injects an artificial 3,000ms tarpit delay, and serves a deceptive
+              RazorVigil intercepts the request at Layer 0, injects an artificial 3,000ms tarpit delay, and serves a deceptive
               <code className="bg-slate-800 text-rose-300 px-1 py-0.5 rounded mx-1 text-[11px] font-mono">ERR_CARD_INVALID_STATUS</code> response.
               This poisons the attacker's card-checker database without incurring gateway transaction costs.
             </p>

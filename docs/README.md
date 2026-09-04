@@ -1,6 +1,6 @@
-# 📚 RazorVigil Sentinel Documentation Hub
+# 📚 RazorVigil Documentation Hub
 
-Welcome to the official documentation for **RazorVigil Sentinel** — the autonomous real-time AI risk manager and payment defense engine engineered for sub-15ms synchronous gateway authorization.
+Welcome to the official documentation for **RazorVigil** — the autonomous real-time AI risk manager and payment defense engine engineered for sub-15ms synchronous gateway authorization.
 
 This documentation is organized according to the **Diataxis Framework** into four distinct quadrants based on your needs:
 

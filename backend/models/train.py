@@ -1,5 +1,5 @@
 """
-Model Training Pipeline for RazorVigil Sentinel.
+Model Training Pipeline for RazorVigil.
 
 Strict 3-Way Split:
   - 60% Train:      LightGBM + CatBoost + IsolationForest (SMOTE on train only)
@@ -160,7 +160,7 @@ def _engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 
 def train(data_path: Path = _DATA_PATH) -> None:
     print("=" * 80)
-    print("RAZORVIGIL SENTINEL — CORE MODEL TRAINING & RIGOROUS 3-WAY EVALUATION")
+    print("RAZORVIGIL — CORE MODEL TRAINING & RIGOROUS 3-WAY EVALUATION")
     print("STRICT 3-WAY SPLIT: Train (60%) -> Validation (20%) -> Test (20% held-out)")
     print("=" * 80)
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ RazorVigil Sentinel
+# 🛡️ RazorVigil
 
 ### Autonomous Real-Time AI Risk Manager & Payment Defense Engine
 
@@ -18,9 +18,9 @@
 
 ---
 
-## 🎯 What Is RazorVigil Sentinel?
+## 🎯 What Is RazorVigil?
 
-RazorVigil Sentinel is an **eight-layer, synchronous AI risk gateway** that sits directly on the live checkout authorization path. Every transaction is evaluated by a persistence-gated quad-ensemble ML engine — LightGBM + CatBoost + Isolation Forest + GraphSAGE — and a Split Conformal Prediction calibrator, producing a certified fraud decision in **under 15 ms** with a 95% statistical coverage guarantee.
+RazorVigil is an **eight-layer, synchronous AI risk gateway** that sits directly on the live checkout authorization path. Every transaction is evaluated by a persistence-gated quad-ensemble ML engine — LightGBM + CatBoost + Isolation Forest + GraphSAGE — and a Split Conformal Prediction calibrator, producing a certified fraud decision in **under 15 ms** with a 95% statistical coverage guarantee.
 
 Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph partitioning, adversarial coevolution simulation, and automated RBI-compliant dispute evidence packaging in the background — without adding a single millisecond to the checkout latency budget.
 

@@ -24,7 +24,7 @@ To provide context on model capacity on raw tabular/identity e-commerce fraud da
 
 | Benchmark Level | Documented ROC-AUC Range | Source / Methodology |
 |---|---|---|
-| **RazorVigil Sentinel Native LightGBM** | **0.9152** `[0.9102, 0.9198]` | Single GBDT model on 100 native engineered features + chronological split |
+| **RazorVigil Native LightGBM** | **0.9152** `[0.9102, 0.9198]` | Single GBDT model on 100 native engineered features + chronological split |
 | **Standard Public Baseline GBDT** | $0.9100 - 0.9300$ | Baseline single-model LightGBM scripts on Kaggle public kernels |
 | **Top 10% Private Leaderboard** | $\approx 0.9450$ | Multi-model feature engineering + pseudo-labeling / adversarial validation |
 | **Top 1% Private Leaderboard** | $\approx 0.9600$ | 20+ model ensembles combining CatBoost, XGBoost, NN embeddings |
@@ -47,4 +47,4 @@ To provide context on model capacity on raw tabular/identity e-commerce fraud da
 ---
 
 ## ⏱️ Timebox & Benchmark Scope Boundary
-This in-domain benchmark was executed under a strict 2-day timebox to verify tabular learning capacity on standard e-commerce fraud benchmarks. We do not chase multi-week Kaggle leaderboard parity, as RazorVigil Sentinel's primary production value lies in **real-time sub-15ms carding ring prevention, client-side behavioral biometrics, and autonomous SOC chargeback mitigation (Track A)**.
+This in-domain benchmark was executed under a strict 2-day timebox to verify tabular learning capacity on standard e-commerce fraud benchmarks. We do not chase multi-week Kaggle leaderboard parity, as RazorVigil's primary production value lies in **real-time sub-15ms carding ring prevention, client-side behavioral biometrics, and autonomous SOC chargeback mitigation (Track A)**.

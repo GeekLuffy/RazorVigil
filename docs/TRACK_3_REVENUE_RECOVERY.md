@@ -1,11 +1,11 @@
-# 💸 RazorVigil Sentinel — Track 3: Revenue Recovery & Chargeback Automation
+# 💸 RazorVigil — Track 3: Revenue Recovery & Chargeback Automation
 
 ## 1. Executive Summary
 Traditional fraud systems operate with a blunt binary hammer: **Approve or Hard Block**.
 - A false decline on an innocent customer destroys **15% to 40% of merchant margin** and inflicts permanent Customer Lifetime Value (LTV) churn.
 - A missed fraud attack inflicts full **GMV loss + ₹1,200 payment network chargeback fines**.
 
-**RazorVigil Sentinel Track 3 Engine** introduces:
+**RazorVigil Track 3 Engine** introduces:
 1. **Bayesian Minimum Expected Loss (MEL) Routing**: Mathematical trade-off matrix between Gross Margin, Customer LTV, and Chargeback Fine.
 2. **Out-of-Band UPI QR Recovery Bridge**: Soft-risk transactions ($0.15 \le \text{Risk} \le 0.75$) are instantly converted into cryptographically signed UPI QR recovery links, rescuing legitimate revenue while deflecting card fraud.
 3. **5-Domain Verifiable Dispute Evidence Package**: Eliminates manual chargeback representation by autonomously compiling forensic proofs for Razorpay dispute representments.

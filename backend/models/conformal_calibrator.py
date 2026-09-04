@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Split Conformal Prediction Calibrator.
+RazorVigil — Split Conformal Prediction Calibrator.
 Provides finite-sample, distribution-free mathematical coverage guarantees (1 - alpha)
 for fraud probability estimates, transforming raw point predictions into calibrated risk intervals.
 """

@@ -18,7 +18,7 @@ import uvicorn
 os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-app = FastAPI(title="RazorVigil Sentinel GPU Inference Daemon", version="2.0.0")
+app = FastAPI(title="RazorVigil GPU Inference Daemon", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,

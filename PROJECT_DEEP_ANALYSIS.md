@@ -1,4 +1,4 @@
-# 🛡️ RazorVigil Sentinel — Comprehensive Deep-Analysis Master Report
+# 🛡️ RazorVigil — Comprehensive Deep-Analysis Master Report
 ### Autonomous Real-Time AI Risk Manager & Payment Defense Engine
 **Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager**
 *Document Generated for Deep Project Audit, Regulatory Review & Executive Evaluation*
@@ -39,8 +39,8 @@ Modern e-commerce checkout is besieged by distributed automation:
 - **AiTM Reverse Proxies & OTP Relays (Evilginx/Modlishka)**: Intercepting session cookies and 2FA credentials in real-time.
 - **False Declines on Edge-Case Genuine Shoppers**: The persistence-gated configuration validated a **10.6% Edge-Case Genuine FPR** (VPN/traveler segment) — a real, hard-won trade-off, not zero.
 
-### The RazorVigil Sentinel Solution:
-**RazorVigil Sentinel** is an enterprise-grade autonomous AI Risk Manager that operates **synchronously on the live checkout path** ($p50 = 9.08\text{ms}, p99 = 13.86\text{ms}$ sequential). It deploys a **4-way stacked ML ensemble** (LightGBM + CatBoost + Isolation Forest + GraphSAGE) with **persistence-gating** and **Split Conformal Calibration** to deliver **99.57–99.60% full-funnel fraud catch rate** with independently audited Bootstrap 95% CIs.
+### The RazorVigil Solution:
+**RazorVigil** is an enterprise-grade autonomous AI Risk Manager that operates **synchronously on the live checkout path** ($p50 = 9.08\text{ms}, p99 = 13.86\text{ms}$ sequential). It deploys a **4-way stacked ML ensemble** (LightGBM + CatBoost + Isolation Forest + GraphSAGE) with **persistence-gating** and **Split Conformal Calibration** to deliver **99.57–99.60% full-funnel fraud catch rate** with independently audited Bootstrap 95% CIs.
 
 ---
 
@@ -233,7 +233,7 @@ $$\hat{V}_{\text{DR}}(\pi) = \frac{1}{N} \sum_{i=1}^N \left[ \hat{Q}(x_i, \pi(x_
 - Citations from RBI and EMVCo legal documentation surfaced inline.
 
 ### 3. 📦 1-Click Merchant Export & Multi-Language SDK Snippets
-- Drop-in SDK snippets for Node.js (`@geekluffy/razorvigil`), Python (`razorvigil_sentinel`), Go (`github.com/GeekLuffy/razorvigil/sdk/go`), and Java (`com.github.geekluffy:razorvigil`).
+- Drop-in SDK snippets for Node.js (`@geekluffy/razorvigil`), Python (`razorvigil`), Go (`github.com/GeekLuffy/razorvigil/sdk/go`), and Java (`com.github.geekluffy:razorvigil`).
 - 1-Click export to Cloudflare WAF Expression, Razorpay Risk Rules JSON, and AWS WAF Rule Groups.
 
 ### 4. 🤖 Autonomous Red-Team Adversary Simulator (5-Round Arms Race)

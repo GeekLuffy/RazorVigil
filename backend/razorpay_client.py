@@ -64,7 +64,7 @@ class RazorpayClient:
             "currency": "INR",
             "receipt": receipt_id,
             "notes": {
-                "risk_engine": "RazorVigil Sentinel",
+                "risk_engine": "RazorVigil",
                 "decision": "safe"
             }
         }
@@ -101,7 +101,7 @@ class RazorpayClient:
             "reminder_enable": False,
             "notes": {
                 "tier": "soft_risk_recovered",
-                "risk_engine": "RazorVigil Sentinel"
+                "risk_engine": "RazorVigil"
             }
         }
 

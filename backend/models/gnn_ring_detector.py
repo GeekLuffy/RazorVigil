@@ -1,6 +1,6 @@
 ﻿"""
 Heterogeneous Graph Neural Network (Hetero-GraphSAGE) for Carding Ring Detection.
-GPU-Accelerated PyTorch / PyTorch Geometric Architecture for RazorVigil Sentinel.
+GPU-Accelerated PyTorch / PyTorch Geometric Architecture for RazorVigil.
 
 Graph Schema:
   - Node types: 'transaction', 'card', 'address', 'email'

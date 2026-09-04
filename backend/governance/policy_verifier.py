@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Strict 6-Gate Policy Verification Suite.
+RazorVigil — Strict 6-Gate Policy Verification Suite.
 
 Every candidate risk policy must pass all six independent, deterministic gates before
 being considered for human approval. The gates are evaluated in a gates-first sequence.

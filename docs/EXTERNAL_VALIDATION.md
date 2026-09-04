@@ -1,6 +1,6 @@
 # Out-of-Distribution (OOD) External Validation Study
 
-> Rigorous cold-transfer evaluation of RazorVigil Sentinel against two real-world, independently-labeled fraud datasets (402,915 total evaluated holdout transactions) with **1,000-resample 95% Bootstrap Confidence Intervals** and **Heterogeneous Graph Neural Network (HeteroGraphSAGE)** relational benchmarking.
+> Rigorous cold-transfer evaluation of RazorVigil against two real-world, independently-labeled fraud datasets (402,915 total evaluated holdout transactions) with **1,000-resample 95% Bootstrap Confidence Intervals** and **Heterogeneous Graph Neural Network (HeteroGraphSAGE)** relational benchmarking.
 
 ---
 

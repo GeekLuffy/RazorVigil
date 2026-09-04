@@ -1,6 +1,6 @@
 # 🛡️ How to Export & Deploy Synthesized WAF and Razorpay Rules
 
-RazorVigil Sentinel automatically generates perimeter edge firewall rules from live botnet swarm detections. This guide explains how to export and deploy these rules to **Cloudflare WAF** and **Razorpay Thirdwatch AI**.
+RazorVigil automatically generates perimeter edge firewall rules from live botnet swarm detections. This guide explains how to export and deploy these rules to **Cloudflare WAF** and **Razorpay Thirdwatch AI**.
 
 ---
 

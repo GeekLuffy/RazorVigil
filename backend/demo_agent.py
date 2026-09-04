@@ -1,8 +1,8 @@
 """
-RazorVigil Sentinel - Demo Agent for Razorpay Agent Studio Integration.
+RazorVigil - Demo Agent for Razorpay Agent Studio Integration.
 
 Demonstrates how Razorpay's Agent Studio (or any Claude Agent SDK agent) can
-delegate specialist carding/bot-abuse investigation to RazorVigil Sentinel
+delegate specialist carding/bot-abuse investigation to RazorVigil
 via MCP tool calls.
 
 This minimal demo shows the delegation pattern:
@@ -102,12 +102,12 @@ async def call_compile_dispute_evidence(transaction_id: str) -> dict:
 
 async def run_demo_agent(transaction_id: str):
     print("=" * 70)
-    print("RAZORVIGIL SENTINEL — AGENT STUDIO MCP DEMO")
+    print("RAZORVIGIL — AGENT STUDIO MCP DEMO")
     print("Simulates Razorpay native agent delegating to RazorVigil via MCP")
     print("(HTTP simulation — backend endpoints are the same ones MCP tools call)")
     print("=" * 70)
     print(f"\n[Agent] Received suspicious transaction for investigation: {transaction_id}")
-    print("[Agent] Delegating to RazorVigil Sentinel specialist sub-agent...\n")
+    print("[Agent] Delegating to RazorVigil specialist sub-agent...\n")
 
     # Tool call 1: investigate_transaction — full 8-layer forensic pipeline
     print(f"[MCP Tool Call 1/4] investigate_transaction('{transaction_id}')")

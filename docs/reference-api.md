@@ -1,6 +1,6 @@
 # 📋 REST & WebSocket API Reference
 
-Complete technical specification for all RazorVigil Sentinel HTTP and WebSocket endpoints.
+Complete technical specification for all RazorVigil HTTP and WebSocket endpoints.
 
 **Base URL**: `http://127.0.0.1:8000`  
 **Frontend Proxy**: All endpoints are also accessible via Vite at `http://localhost:5173/`

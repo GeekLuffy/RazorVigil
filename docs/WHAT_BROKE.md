@@ -2,7 +2,7 @@
 
 > *"A robust defense system is not one that claims perfection on day one, but one that systematically catches and corrects its own failure modes."*
 
-This document provides a transparent, unvarnished record of the real engineering, statistical, and architectural bugs discovered during the development of **RazorVigil Sentinel**, how each was detected, and the rigorous fixes applied.
+This document provides a transparent, unvarnished record of the real engineering, statistical, and architectural bugs discovered during the development of **RazorVigil**, how each was detected, and the rigorous fixes applied.
 
 ---
 

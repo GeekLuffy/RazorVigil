@@ -1,6 +1,6 @@
 # ⚡ How to Run Live Parallel Stress Benchmarks
 
-This guide shows how to run high-concurrency stress benchmarks against RazorVigil Sentinel to mathematically prove sub-15ms synchronous SLA compliance ($p99 < 15.0\text{ms}$).
+This guide shows how to run high-concurrency stress benchmarks against RazorVigil to mathematically prove sub-15ms synchronous SLA compliance ($p99 < 15.0\text{ms}$).
 
 ---
 

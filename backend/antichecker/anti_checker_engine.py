@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Anti-Checker & Anti-Carding Engine.
+RazorVigil — Anti-Checker & Anti-Carding Engine.
 High-performance defense against Telegram carding bots, Browserless CDP scrapers,
 curl_cffi TLS impersonation, and micro-auth enumeration.
 """

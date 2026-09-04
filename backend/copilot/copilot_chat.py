@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel ? Autonomous Threat Memory & Copilot Incident Room Engine.
+RazorVigil ? Autonomous Threat Memory & Copilot Incident Room Engine.
 Provides interactive conversational interrogation over live transaction telemetry,
 NetworkX Louvain cluster topology, and RBI Sovereign Regulatory Compliance.
 Features:
@@ -298,7 +298,7 @@ class CopilotIncidentEngine:
             gpu_breakdown = gpus_info if gpus_info else "  - 6x NVIDIA GeForce RTX 2080 Ti (66GB Total VRAM, 104 cores, 503GB RAM)\n"
 
             context_summary = f"""
-RazorVigil Sentinel Live Operational Telemetry Context:
+RazorVigil Live Operational Telemetry Context:
 - Host & Super-Cluster: bd216server3 (104 CPU Cores, 503GB RAM, 6x RTX 2080 Ti GPUs)
 - Cluster Live GPU Breakdown:
 {gpu_breakdown}
@@ -321,7 +321,7 @@ Current Pinned Transaction:
 - Conformal Set: {sig.get('conformal_prediction_set', ['safe'])}
 """
 
-            system_prompt = f"""You are the Forensic AI Copilot for RazorVigil Sentinel, an autonomous enterprise fraud intelligence system protecting Indian payment corridors (Razorpay, UPI 2.0, HDFC, ICICI, SBI).
+            system_prompt = f"""You are the Forensic AI Copilot for RazorVigil, an autonomous enterprise fraud intelligence system protecting Indian payment corridors (Razorpay, UPI 2.0, HDFC, ICICI, SBI).
 You provide mathematically rigorous, legally sound (RBI Master Directions 2025/2026, EMVCo 3DS 2.2), and forensic explanations of fraud vectors, syndicate graph rings, super-cluster hardware telemetry, and real-time defense actions.
 Keep responses formatted cleanly in markdown with headings, bullets, and actionable code/WAF blocks.
 Context:
@@ -505,7 +505,7 @@ Context:
                 "2. **Kinetic Keystroke Exemption (?7.2)**:\n"
                 "   - Transactions with high typing entropy ($H > 2.50$) and zero JA3 mismatch qualify for **Frictionless Low-Risk Exemption**, allowing sub-15ms checkout approval.\n"
                 "3. **Zero False Decline Mandate**:\n"
-                "   - Merely blocking suspicious transactions breaches merchant SLA. RazorVigil Sentinel bridges ambiguous transactions into an **Out-of-Band Dynamic UPI QR Hold** (5-minute TTL), ensuring genuine shoppers never face false declines.\n\n"
+                "   - Merely blocking suspicious transactions breaches merchant SLA. RazorVigil bridges ambiguous transactions into an **Out-of-Band Dynamic UPI QR Hold** (5-minute TTL), ensuring genuine shoppers never face false declines.\n\n"
                 "**Action Available**: You can export an RBI-compliant forensic dispute dossier PDF with SHA-256 evidence anchoring directly from the Disputes tab."
             )
             actions.append(CopilotAction(

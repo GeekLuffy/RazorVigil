@@ -1,6 +1,6 @@
-# 🎓 Tutorial: Getting Started with RazorVigil Sentinel
+# 🎓 Tutorial: Getting Started with RazorVigil
 
-This tutorial walks you through setting up **RazorVigil Sentinel** locally, starting both the backend ML risk engine and the SOC Command Center frontend, and executing your first live threat evaluation in **under 3 minutes**.
+This tutorial walks you through setting up **RazorVigil** locally, starting both the backend ML risk engine and the SOC Command Center frontend, and executing your first live threat evaluation in **under 3 minutes**.
 
 ---
 
@@ -97,7 +97,7 @@ curl -X POST http://localhost:8000/checkout \
 
 ## 🏆 What You Built & Explored
 
-You now have a fully operational local instance of RazorVigil Sentinel with:
+You now have a fully operational local instance of RazorVigil with:
 - **8-Layer Risk Pipeline**: LightGBM + CatBoost + Isolation Forest + GraphSAGE (persistence-gated P2 ensemble).
 - **Real-Time SOC Command Center**: Live WebSocket streaming at 60 FPS.
 - **Threat Memory Copilot RAG**: Ready to interrogate in the chat drawer.

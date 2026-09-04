@@ -1,6 +1,6 @@
 # Production Roadmap & Architectural Scope Boundaries
 
-> Technical scope boundaries, production hardening roadmap, and multi-tenant scaling considerations for RazorVigil Sentinel.
+> Technical scope boundaries, production hardening roadmap, and multi-tenant scaling considerations for RazorVigil.
 
 ---
 

@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Policy Blast Radius & Differential Inspector.
+RazorVigil — Policy Blast Radius & Differential Inspector.
 
 Performs transaction-level differential analysis between the baseline policy and
 a proposed candidate policy, categorizing decision flips and ranking them by financial impact.

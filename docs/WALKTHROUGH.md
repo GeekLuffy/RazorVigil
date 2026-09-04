@@ -1,11 +1,11 @@
-# 🏆 RazorVigil Sentinel — Hackathon Walkthrough & System Architecture
+# 🏆 RazorVigil — Hackathon Walkthrough & System Architecture
 **Razorpay AI Buildathon 2026**
 *Track 02 (AI Risk Manager) + Track 03 (Revenue Recovery)*
 
 ---
 
 ## 🌟 Executive Overview
-**RazorVigil Sentinel** is an autonomous anti-carding and bot abuse defense engine built to solve high-velocity Telegram carding rings, distributed residential proxy attacks, and zero-day BIN enumeration—all operating within a strict **<50ms synchronous decision budget** (averaging ~12ms p99).
+**RazorVigil** is an autonomous anti-carding and bot abuse defense engine built to solve high-velocity Telegram carding rings, distributed residential proxy attacks, and zero-day BIN enumeration—all operating within a strict **<50ms synchronous decision budget** (averaging ~12ms p99).
 
 Unlike traditional fraud systems that degrade merchant revenue through blunt false declines, RazorVigil bridges into a **Track 03 Zero-False-Decline Recovery Loop**: borderline genuine anomalies (e.g. travelers, VPN users) are issued out-of-band single-use signed UPI QR recovery links that rescue up to 55%+ of otherwise lost GMV.
 
@@ -21,7 +21,7 @@ Unlike traditional fraud systems that degrade merchant revenue through blunt fal
                     Mouse Tremor Variance, Device & IP Fingerprints
                                             │
                                             ▼
-                           RAZORVIGIL SENTINEL PIPELINE (<50ms)
+                           RAZORVIGIL PIPELINE (<50ms)
        ┌──────────────────────────────────────────────────────────────────────────┐
        │ 1. [L0] Agent-Aware Gate: Check X-Agent-Attestation (AP2 Protocol)       │
        │    └── Valid Token + Clean Velocity → tier: verified_agent (<3ms path)   │
@@ -59,7 +59,7 @@ Unlike traditional fraud systems that degrade merchant revenue through blunt fal
 - **High-Confidence Bots & Canary Triggered**: **Strictly quarantined at RazorVigil's local edge**. Blocked transactions **never touch or leak to the Razorpay API**, saving merchants gateway processing overhead and preventing automated card enumeration from reaching payment processors.
 - **Webhook Ingestion**: Real-time webhook listener at `POST /webhook/razorpay` verifies `X-Razorpay-Signature` via HMAC-SHA256 and updates the dashboard GMV counter dynamically upon successful settlement.
 
-> **⚠️ Pre-Gateway Boundary Guarantee**: The tarpit-poisoning and deceptive-decline response (Layer 0 `AntiCheckerGuard`) operates **exclusively within RazorVigil Sentinel's own pre-gateway screening layer**. These synthetic delay and decline responses are synthesized locally, fire *before* any real Razorpay API call is made, and are **never attributed to or originating from Razorpay's actual API or payment infrastructure**. Real Razorpay API calls (`/v1/orders`, `/v1/payment_links`) are only made for `safe` and `soft_risk` tiers that have already cleared all pre-screening layers.
+> **⚠️ Pre-Gateway Boundary Guarantee**: The tarpit-poisoning and deceptive-decline response (Layer 0 `AntiCheckerGuard`) operates **exclusively within RazorVigil's own pre-gateway screening layer**. These synthetic delay and decline responses are synthesized locally, fire *before* any real Razorpay API call is made, and are **never attributed to or originating from Razorpay's actual API or payment infrastructure**. Real Razorpay API calls (`/v1/orders`, `/v1/payment_links`) are only made for `safe` and `soft_risk` tiers that have already cleared all pre-screening layers.
 
 
 ---
@@ -106,7 +106,7 @@ Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
 ## 🤖 Razorpay Agent Studio MCP Integration
 
-RazorVigil Sentinel is positioned as a **specialist sub-agent** for [Razorpay Agent Studio](https://razorpay.com/agent-studio) (launched March 12, 2026 at FTX'26, built on Anthropic's Claude Agent SDK). Rather than competing with Razorpay's native fraud and dispute agents, it plugs into the same MCP tooling layer.
+RazorVigil is positioned as a **specialist sub-agent** for [Razorpay Agent Studio](https://razorpay.com/agent-studio) (launched March 12, 2026 at FTX'26, built on Anthropic's Claude Agent SDK). Rather than competing with Razorpay's native fraud and dispute agents, it plugs into the same MCP tooling layer.
 
 ### MCP Server (`backend/mcp_server.py`)
 

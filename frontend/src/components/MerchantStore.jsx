@@ -1001,7 +1001,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
                 <div>
                   <h3 className="text-lg font-bold text-white font-sans">Payment Verified &amp; Captured</h3>
                   <p className="text-xs text-emerald-400 font-mono mt-0.5">
-                    Cleared by RazorVigil Sentinel AI Hot Path (&lt;15ms SLA)
+                    Cleared by RazorVigil AI Hot Path (&lt;15ms SLA)
                   </p>
                 </div>
 

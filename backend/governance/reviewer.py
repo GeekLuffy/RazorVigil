@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Independent Policy Review Agent.
+RazorVigil — Independent Policy Review Agent.
 
 Structurally isolated from the Autonomous Engineer. Holds a frozen validation
 slice (last VALIDATION_FRAC of the dataset by row index) that is NEVER exposed

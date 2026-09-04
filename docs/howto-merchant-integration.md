@@ -1,11 +1,11 @@
 # 🛠️ How to Integrate RazorVigil SDK in Under 5 Lines of Code
 
-This guide shows how to drop RazorVigil Sentinel into your existing checkout flow across **Node.js, Python FastAPI, Go, and Java Spring Boot** to block carding attacks before charges hit Razorpay.
+This guide shows how to drop RazorVigil into your existing checkout flow across **Node.js, Python FastAPI, Go, and Java Spring Boot** to block carding attacks before charges hit Razorpay.
 
 ---
 
 ## 📋 Prerequisites
-- A running RazorVigil Sentinel gateway at `http://127.0.0.1:8000` (or your cloud endpoint).
+- A running RazorVigil gateway at `http://127.0.0.1:8000` (or your cloud endpoint).
 - Your `RAZORVIGIL_API_KEY` (optional for local development).
 
 ---
@@ -20,10 +20,10 @@ npm install @geekluffy/razorvigil
 ### Step 2: Add Middleware to Your Checkout Route
 ```typescript
 import express from 'express'
-import { RazorVigilSentinel } from '@geekluffy/razorvigil'
+import { RazorVigil } from '@geekluffy/razorvigil'
 
 const app = express()
-const sentinel = new RazorVigilSentinel({ apiKey: process.env.RAZORVIGIL_API_KEY })
+const sentinel = new RazorVigil({ apiKey: process.env.RAZORVIGIL_API_KEY })
 
 app.post('/api/checkout', async (req, res) => {
   const decision = await sentinel.evaluate(req.body)
@@ -47,7 +47,7 @@ pip install git+https://github.com/GeekLuffy/razorvigil.git#subdirectory=sdk/pyt
 ```python
 import os
 from fastapi import FastAPI, Response, status
-from razorvigil_sentinel import RazorVigilClient, CheckoutPayload
+from razorvigil import RazorVigilClient, CheckoutPayload
 
 app = FastAPI()
 sentinel = RazorVigilClient(api_key=os.getenv("RAZORVIGIL_API_KEY"))

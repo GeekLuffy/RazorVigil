@@ -1,5 +1,5 @@
 """
-3DS2 & OTP Relay Bypass Defense Engine — RazorVigil Sentinel.
+3DS2 & OTP Relay Bypass Defense Engine — RazorVigil.
 Neutralizes modern Telegram OTP interception bots, reverse proxy relays (Modlishka/Evilginx),
 SIM-swap automated input attacks, and 3DS2 frictionless downgrade exploits.
 """

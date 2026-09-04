@@ -1,5 +1,5 @@
 """
-3DS2 Cryptographic & Anti-Bypass Verification Engine — RazorVigil Sentinel.
+3DS2 Cryptographic & Anti-Bypass Verification Engine — RazorVigil.
 Neutralizes automated 3DS solver scripts, synthetic devicePrint spoofing (random canvas/webgl),
 fake CAVV/ECI injections, and Python requests TLS Client Hello impersonation.
 """

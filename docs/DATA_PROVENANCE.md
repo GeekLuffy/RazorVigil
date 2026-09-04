@@ -1,7 +1,7 @@
 # 📊 Data Provenance & Leakage Audit
 
 ## 1. Data Source & Generation Methodology
-RazorVigil Sentinel was evaluated using a rigorous benchmark partition modeling Indian e-commerce checkout distributions (UPI, CoFT RuPay/Visa/Mastercard, NetBanking, and Wallets) under active bot and carding pressure.
+RazorVigil was evaluated using a rigorous benchmark partition modeling Indian e-commerce checkout distributions (UPI, CoFT RuPay/Visa/Mastercard, NetBanking, and Wallets) under active bot and carding pressure.
 
 - **Baseline Fraud Rate**: **3.20%** (matching RBI & Indian payments industry benchmarks for high-risk digital commerce).
 - **Temporal Span**: 90 days of synthetic checkout activity partitioned into **chronological, non-overlapping train/validation/test splits** (70% Train, 15% Validation, 15% Held-Out Test, $N=10,000$).

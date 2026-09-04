@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel - MCP Server for Razorpay Agent Studio Integration.
+RazorVigil - MCP Server for Razorpay Agent Studio Integration.
 
 Exposes 4 MCP tools callable by any Claude Agent SDK agent:
   1. check_canary_status(transaction_id)
@@ -161,7 +161,7 @@ async def tool_compile_dispute_evidence(transaction_id: str) -> dict[str, Any]:
 server = MCPServer(
     name="razorvigil",
     version="1.2.0",
-    title="RazorVigil Sentinel",
+    title="RazorVigil",
     description=(
         "Specialist MCP sub-agent for carding ring detection, Louvain graph clustering, "
         "canary honeytoken forensics, and chargeback evidence dossier compilation. "

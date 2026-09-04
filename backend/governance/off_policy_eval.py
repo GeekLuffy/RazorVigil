@@ -1,5 +1,5 @@
 """
-RazorVigil Sentinel — Doubly-Robust Off-Policy Evaluation (OPE) Engine.
+RazorVigil — Doubly-Robust Off-Policy Evaluation (OPE) Engine.
 
 Evaluates candidate risk policies against historical logged decision datasets using
 the Doubly-Robust (DR) estimator (Dudík, Langford & Li 2011), combining Direct Method (DM)

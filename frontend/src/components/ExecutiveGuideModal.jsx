@@ -72,7 +72,7 @@ export default function ExecutiveGuideModal({
 
             <div className="bg-slate-950/80 p-3.5 rounded-xl border border-indigo-500/30 shadow-inner">
               <div className="text-indigo-400 font-bold flex items-center gap-1.5 mb-1.5">
-                <Sparkles size={14} className="text-amber-400" /> RazorVigil Sentinel
+                <Sparkles size={14} className="text-amber-400" /> RazorVigil
               </div>
               <p className="text-[11px] text-slate-400 leading-normal">
                 Evaluates a <strong>17-dimensional vector</strong> in <strong>9.2ms</strong> using Split Conformal Prediction, Louvain Graph clustering, and kinetic keystroke telemetry.

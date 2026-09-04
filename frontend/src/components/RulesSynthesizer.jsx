@@ -129,7 +129,7 @@ export default function RulesSynthesizer() {
               report_id: `RBI-AUDIT-${Date.now()}`,
               timestamp: new Date().toISOString(),
               framework: 'Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)',
-              system: 'RazorVigil Sentinel Autonomous Risk Engine v1.0',
+              system: 'RazorVigil Autonomous Risk Engine v1.0',
               active_threat_clusters: rulesData.active_clusters_detected,
               monitored_entities: rulesData.entities_tracked,
               synthesized_rules: {

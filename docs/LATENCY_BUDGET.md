@@ -1,7 +1,7 @@
-# ⏱️ RazorVigil Sentinel — Synchronous Latency Budget & Circuit Breakers
+# ⏱️ RazorVigil — Synchronous Latency Budget & Circuit Breakers
 
 ## 1. Gateway SLA Context
-Razorpay specifies a **<50ms latency SLA** for synchronous checkout risk evaluation. RazorVigil Sentinel executes a complete 7-layer defense and ML pipeline well within this envelope, averaging **9.08ms (p50)** and **13.86ms (p99)** under live high-throughput traffic.
+Razorpay specifies a **<50ms latency SLA** for synchronous checkout risk evaluation. RazorVigil executes a complete 7-layer defense and ML pipeline well within this envelope, averaging **9.08ms (p50)** and **13.86ms (p99)** under live high-throughput traffic.
 
 ---
 
