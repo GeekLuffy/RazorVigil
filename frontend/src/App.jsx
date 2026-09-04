@@ -357,24 +357,6 @@ export default function App() {
 
           {/* Right: Quick Tools & Admin Avatar */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Remote GPU Super-Cluster Status Button */}
-            <button
-              onClick={() => setIsGPUModalOpen(true)}
-              className={`px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold border flex items-center gap-1 sm:gap-1.5 transition ${
-                isDark
-                  ? 'bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-400 border-emerald-800/60 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
-                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300'
-              }`}
-              title="Inspect bd216server3 GPU Super-Cluster (6x RTX 2080 Ti)"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <Cpu size={12} className="shrink-0" />
-              <span className="hidden xl:inline">bd216server3</span>
-              <span className="text-[10px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-normal">
-                <span className="hidden md:inline">6x GPU · </span>66GB
-              </span>
-            </button>
-
             {/* Quick Action Buttons */}
             <button
               onClick={() => setIsBenchmarkOpen(true)}
@@ -587,8 +569,8 @@ export default function App() {
                   <span className="font-bold text-emerald-400">q_hat = 0.00600 (95%)</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">CLUSTER COMPUTE</span>
-                  <span className="font-bold text-cyan-400">bd216server3 (CUDA:4)</span>
+                  <span className="text-slate-500 block text-[10px]">GATEWAY ENGINE</span>
+                  <span className="font-bold text-cyan-400">FastAPI In-Memory (&lt;15ms)</span>
                 </div>
               </div>
 
@@ -596,10 +578,10 @@ export default function App() {
                 <span className="text-slate-500 block text-[10px] mb-1">QUICK ACTIONS</span>
                 <div className="grid grid-cols-2 gap-2 mt-1 font-sans">
                   <button
-                    onClick={() => { setIsAdminOpen(false); setIsGPUModalOpen(true); }}
+                    onClick={() => { setIsAdminOpen(false); handleSelectTab('simulator'); }}
                     className="px-2.5 py-1.5 rounded-lg font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5"
                   >
-                    <Cpu size={12} /> GPU Cluster HUD
+                    <Flame size={12} /> Threat Replay Lab
                   </button>
                   <button
                     onClick={() => { setIsAdminOpen(false); setIsBenchmarkOpen(true); }}

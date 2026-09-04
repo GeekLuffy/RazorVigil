@@ -593,16 +593,16 @@ export default function ModelGovernanceStudio() {
                   <div className="text-[9px] text-slate-600">4 Attention Heads</div>
                 </div>
                 <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                  <div className="text-[10px] text-slate-500">GPU Cluster PR-AUC</div>
-                  <div className="text-base font-bold text-emerald-400">0.999902</div>
-                  <div className="text-[9px] text-slate-600">Cosine Annealing AMP</div>
+                  <div className="text-[10px] text-slate-500">Offline Test PR-AUC</div>
+                  <div className="text-base font-bold text-emerald-400">0.9963</div>
+                  <div className="text-[9px] text-slate-600">Audited Held-Out (N=10k)</div>
                 </div>
               </div>
 
               <div className="bg-slate-950/80 p-3 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1.5 font-mono">
                 <div className="flex justify-between text-slate-400 text-[10px]">
-                  <span>Cluster Hardware Utilization:</span>
-                  <span className="text-purple-400 font-bold">bd216server3 (6x RTX 2080 Ti)</span>
+                  <span>Offline Compute Infrastructure:</span>
+                  <span className="text-purple-400 font-bold">PyTorch 2.5 DDP / CUDA</span>
                 </div>
                 <div className="text-[10px] text-slate-400 leading-relaxed">
                   Extracts non-linear multi-hop fraud representations, passing dense 64-dimensional [CLS] latent embeddings into the stacked persistence-consistent GBDT gate.
