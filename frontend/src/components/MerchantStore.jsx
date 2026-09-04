@@ -242,6 +242,8 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
         body: JSON.stringify({
           transaction_id: threeDsModal.transaction_id || `tx_3ds_${Date.now()}`,
           order_id: threeDsModal.order_id,
+          card_number: cardNumber.replace(/\s+/g, '') || '4111111111111111',
+          amount: selectedProduct.price || 0.0,
           three_ds_version: '2.2.0',
           cavv: 'AAABBIIFmQAAAAAAAQUWJgAAAAA=',
           eci: '05',

@@ -19,18 +19,25 @@ from pydantic import BaseModel, Field
 
 class ThreeDSAuthPayload(BaseModel):
     transaction_id: str
-    card_number: str
-    amount: float
+    card_number: str = "4111XXXXXXXX1111"
+    amount: float = 0.0
     currency: str = "INR"
+    order_id: Optional[str] = None
     xid: str = ""
     cavv: str = ""
-    eci: str = "07"  # 05=Authenticated, 06=Attempted, 07=Non-3DS
+    eci: str = "05"  # 05=Authenticated, 06=Attempted, 07=Non-3DS
     three_ds_version: str = "2.2.0"
     device_print_raw: Optional[str] = None
     user_agent: str = ""
     ja3_fingerprint: str = ""
     is_tls_mismatch: bool = False
     time_on_challenge_s: float = 0.0
+    device_channel: Optional[str] = "02"
+    client_challenge_origin: Optional[str] = None
+    acs_challenge_origin: Optional[str] = None
+    session_resumed: bool = False
+    tls_handshake_latency_ms: float = 0.0
+    synthetic_canvas_noise: bool = False
 
 
 @dataclass
