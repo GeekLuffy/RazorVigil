@@ -1071,6 +1071,18 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
                       required
                     />
+                    {(cardNumber.replace(/\s+/g, '').startsWith('4242') || cardNumber.replace(/\s+/g, '').startsWith('4111')) && (
+                      <div className="mt-1.5 p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[11px] font-mono text-amber-300 flex items-center justify-between gap-2">
+                        <span>⚠️ International card (Razorpay rejects if international cards is off).</span>
+                        <button
+                          type="button"
+                          onClick={() => { setCardNumber('4012 0000 0000 0002'); setCvv('123'); }}
+                          className="shrink-0 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 px-2 py-0.5 rounded text-[10px] font-bold transition"
+                        >
+                          Use Indian Test Card
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
