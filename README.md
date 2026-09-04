@@ -18,17 +18,26 @@
 
 ---
 
-## 🎯 What Is RazorVigil?
+## 🎯 The Problem: Telegram Carding Syndicates & Gateway Abuse
 
-In Indian digital commerce, **conventional fraud detection is broken in two directions**:
-1. **The ₹4:1 False Decline Tax**: For every ₹1 lost to actual fraud, merchants lose **₹4 in legitimate revenue from false declines** (Forrester / LexisNexis APAC 2024). Traditional binary risk scoring ("Approve or Block") treats any unusual behavioral signal—travelers, corporate VPNs, new devices—as hostile, burning customer lifetime value and customer acquisition cost (CAC).
-2. **The Visa VAMP 2026 Denominator Trap**: Under the Visa Acquirer Monitoring Program (effective April 1, 2025, with excessive threshold tightened to **1.5% from April 1, 2026**), dropping good customers shrinks the valid sales denominator while the fraud numerator remains constant. Over-blocking literally pushes merchants into \$8/transaction fines with zero grace period.
-3. **RBI 2025/2026 Regulatory Mandate**: RBI Master Directions (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026, effective April 1, 2026) mandate dynamic Risk-Based Authentication (RBA) assessing behavioral telemetry, device risk, and velocity—rendering static rule engines non-compliant.
+Modern payment infrastructure in India is under active attack from organized **Telegram carding communities** using automated scripts to exploit merchant gateways:
 
-**RazorVigil solves this with an 8-layer, synchronous AI risk gateway (<15ms) featuring Split Conformal Soft-Risk Recovery**:
+1. **Telegram ₹1–₹2 Micro-Auth Checkers**: Underground carding rings deploy automated Python/Node.js bots (e.g., CC Checker scripts, headless Playwright runners) that hammer checkout endpoints with thousands of ₹1.00–₹2.00 authorizations per minute to filter leaked BIN dumps into "Live" vs "Die" cards before conducting large fraudulent purchases.
+2. **Rotating Residential Proxy Swarms ($5–$15/GB)**: Carders route each check through millions of residential IPs, rendering traditional IP rate-limiting and simple velocity counters completely useless.
+3. **The Newcastle Distributed Guessing Attack**: Attackers exploit the lack of cross-merchant velocity correlation to guess CVV and expiration dates in seconds across multiple checkout sites (Ali et al., *IEEE Security & Privacy*).
+4. **The ₹4:1 False Decline Tax**: When merchants react by turning on blunt fraud filters, they destroy their own business. For every ₹1 lost to actual fraud, merchants lose **₹4 in legitimate revenue from false declines** (Forrester / LexisNexis APAC 2024). High-value travelers, corporate VPN users, and new devices get falsely blocked.
+5. **The Visa VAMP 2026 Denominator Trap**: Under the Visa Acquirer Monitoring Program (effective April 1, 2025, with excessive threshold tightened to **1.5% from April 1, 2026**), dropping good customers shrinks the valid sales denominator while the fraud numerator remains constant. Over-blocking literally pushes merchants into \$8/transaction fines with zero grace period.
+6. **RBI 2025/2026 Regulatory Mandate**: RBI Master Directions (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026, effective April 1, 2026) mandate dynamic Risk-Based Authentication (RBA) assessing behavioral telemetry, device risk, and velocity—rendering static rule engines non-compliant.
+
+---
+
+## 🛡️ The Solution: RazorVigil Autonomous Defense & Recovery Gateway
+
+RazorVigil sits directly on the live checkout authorization path, executing an **8-layer synchronous defense grid in under 15 ms**:
+
 - **Tier 1 (Instant Pass · <12ms)**: Certified clean transactions approve with zero checkout friction.
 - **Tier 2 (Soft-Risk UPI QR Step-Up · 0% False Decline Loss)**: Ambiguous transactions (conformal set = `{"genuine", "fraud"}`) are **not declined**. Instead, RazorVigil dynamically steps down to an Out-of-Band UPI QR. Automated carding bots cannot scan Indian UPI apps; legitimate humans scan and pay in 5 seconds. This recovers borderline revenue and preserves the merchant's Visa VAMP denominator.
-- **Tier 3 (Anti-Checker Tarpit & Poison)**: High-confidence botnets (Telegram carding, proxy swarms) are quarantined with synthetic latency delays and poisoned status codes, draining attacker infrastructure without consuming payment gateway authorization fees.
+- **Tier 3 (Anti-Checker Tarpit & Poison)**: High-confidence botnets (Telegram carding, proxy swarms) are trapped at Layer 0 with synthetic 3,000ms latency delays and poisoned status codes (`ERR_CARD_INVALID_STATUS`). This breaks the bot's multithreaded workers and poisons the attacker's BIN database without consuming payment gateway authorization fees.
 
 Simultaneously, an **asynchronous intelligence plane** runs Louvain bipartite graph partitioning ($Q = 0.8994$), adversarial coevolution simulation, and automated RBI-compliant dispute evidence packaging in the background — without adding a single millisecond to the live checkout latency budget.
 
