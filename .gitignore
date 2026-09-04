@@ -22,6 +22,7 @@ backend/dataset/*.csv
 backend/dataset/*.gz
 docs/screenshots/
 docs/verification_results.json
+SUBMISSION_KIT.md
 
 *.db
 *.sqlite
