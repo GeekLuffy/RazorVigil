@@ -1,6 +1,6 @@
-# 🎓 Tutorial: Getting Started with RazorShield Sentinel
+# 🎓 Tutorial: Getting Started with RazorVigil Sentinel
 
-This tutorial walks you through setting up **RazorShield Sentinel** locally, starting both the backend ML risk engine and the SOC Command Center frontend, and executing your first live threat evaluation in **under 3 minutes**.
+This tutorial walks you through setting up **RazorVigil Sentinel** locally, starting both the backend ML risk engine and the SOC Command Center frontend, and executing your first live threat evaluation in **under 3 minutes**.
 
 ---
 
@@ -18,8 +18,8 @@ Clone the repository and install the backend and frontend requirements:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/GeekLuffy/razorshield-sentinel.git
-cd razorshield-sentinel
+git clone https://github.com/GeekLuffy/razorvigil.git
+cd razorvigil
 
 # 2. Install Python backend dependencies
 pip install -r requirements.txt
@@ -97,7 +97,7 @@ curl -X POST http://localhost:8000/checkout \
 
 ## 🏆 What You Built & Explored
 
-You now have a fully operational local instance of RazorShield Sentinel with:
+You now have a fully operational local instance of RazorVigil Sentinel with:
 - **8-Layer Risk Pipeline**: LightGBM + CatBoost + Isolation Forest + GraphSAGE (persistence-gated P2 ensemble).
 - **Real-Time SOC Command Center**: Live WebSocket streaming at 60 FPS.
 - **Threat Memory Copilot RAG**: Ready to interrogate in the chat drawer.
@@ -106,6 +106,6 @@ You now have a fully operational local instance of RazorShield Sentinel with:
 
 ## 📚 Next Steps & Deep Dives
 
-* **[Integrate into Your Merchant App (<5 Lines of Code)](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/howto-merchant-integration.md)**
-* **[Run Parallel SLA Stress Benchmarks](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/howto-stress-benchmarks.md)**
-* **[Explore the Full REST API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/reference-api.md)**
+* **[Integrate into Your Merchant App (<5 Lines of Code)](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/howto-merchant-integration.md)**
+* **[Run Parallel SLA Stress Benchmarks](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/howto-stress-benchmarks.md)**
+* **[Explore the Full REST API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/reference-api.md)**

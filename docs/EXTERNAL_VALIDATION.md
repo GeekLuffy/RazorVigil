@@ -1,6 +1,6 @@
 # Out-of-Distribution (OOD) External Validation Study
 
-> Rigorous cold-transfer evaluation of RazorShield Sentinel against two real-world, independently-labeled fraud datasets (402,915 total evaluated holdout transactions) with **1,000-resample 95% Bootstrap Confidence Intervals** and **Heterogeneous Graph Neural Network (HeteroGraphSAGE)** relational benchmarking.
+> Rigorous cold-transfer evaluation of RazorVigil Sentinel against two real-world, independently-labeled fraud datasets (402,915 total evaluated holdout transactions) with **1,000-resample 95% Bootstrap Confidence Intervals** and **Heterogeneous Graph Neural Network (HeteroGraphSAGE)** relational benchmarking.
 
 ---
 
@@ -74,7 +74,7 @@ The tabular baseline's 95% confidence interval includes 0.50 ROC-AUC (no signifi
 
 ## Feature Alignment
 
-| RazorShield Feature | ULB Source | IEEE-CIS Source | Available? |
+| RazorVigil Feature | ULB Source | IEEE-CIS Source | Available? |
 |---------------------|------------|-----------------|-----------|
 | `amount` | `Amount` | `TransactionAmt` | ✅ Both |
 | `amount_zscore` | Derived | Derived | ✅ Both |

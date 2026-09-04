@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Anti-Checker & Anti-Carding Engine.
+RazorVigil Sentinel — Anti-Checker & Anti-Carding Engine.
 High-performance defense against Telegram carding bots, Browserless CDP scrapers,
 curl_cffi TLS impersonation, and micro-auth enumeration.
 """
@@ -12,7 +12,7 @@ import time
 from typing import Any, Dict, Optional, Tuple
 
 # Secret for time-bound client proof validation
-_POW_SECRET = "razorshield-client-pow-seed-2026"
+_POW_SECRET = "razorvigil-client-pow-seed-2026"
 
 # Known botnet fingerprint prefixes captured from live threat intelligence
 KNOWN_BOTNET_FINGERPRINTS = {

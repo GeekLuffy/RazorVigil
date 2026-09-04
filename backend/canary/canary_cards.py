@@ -4,7 +4,7 @@ Canary Card Honeytokens.
 50 synthetic Luhn-valid PANs that are:
 - Never issued to a real customer
 - Never used in a real transaction by design
-- Only known to RazorShield internally
+- Only known to RazorVigil internally
 
 Any checkout attempt matching one = construction-level certainty of fraud.
 Zero false-positive rate by construction.

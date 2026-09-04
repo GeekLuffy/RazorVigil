@@ -193,9 +193,9 @@ def generate_model_card(m: dict) -> str:
     d_m01 = drift.get("month_01_tradeoff", {})
     d_edge = drift.get("edge_case_genuine_hard_negative_fpr", {})
 
-    card = f"""# Model Card: RazorShield Sentinel Anti-Carding Engine
+    card = f"""# Model Card: RazorVigil Sentinel Anti-Carding Engine
 
-> **Model Identifier**: `RazorShield-Ensemble-v2.4`  
+> **Model Identifier**: `RazorVigil-Ensemble-v2.4`  
 > **Model Type**: Multi-Modal Persistence-Gated Stacked Ensemble (LightGBM + CatBoost + Isolation Forest + Graph Topology)  
 > **Target Track**: Razorpay AI Buildathon Track 02 — Next-Gen Carding & Bot-Abuse Defense  
 > **Status**: Production Verification Candidate (`{rev.get('promotion_verdict', 'RECOMMENDED_FOR_HUMAN_APPROVAL')}`)  
@@ -245,7 +245,7 @@ def generate_model_card(m: dict) -> str:
 | **Adversarial Realistic Bots** | 500 | 100.0% | Recall: **97.60%** | Recall: **97.00%** | Biometric Entropy Anomaly Interception |
 | **CVV Cycling (In-Domain)** | 500 | 100.0% | Recall: **100.00%** | Recall: **100.00%** | Multi-Card Replay Velocity Trap |
 
-* **Economic Friction Framing**: Fixed benchmark penalty of **₹150 per challenge / ₹1,200 per false decline**. RazorShield confines false positive friction to edge cases (10.60%), recovering legitimate GMV via single-use signed payment links.
+* **Economic Friction Framing**: Fixed benchmark penalty of **₹150 per challenge / ₹1,200 per false decline**. RazorVigil confines false positive friction to edge cases (10.60%), recovering legitimate GMV via single-use signed payment links.
 
 ---
 
@@ -287,7 +287,7 @@ def generate_model_card(m: dict) -> str:
 
 ## 7. Strict Defense-Only Safety Declaration
 
-> **IMPORTANT REGULATORY & SAFETY NOTICE**: RazorShield Sentinel is designed, built, and licensed **strictly and exclusively for defensive fraud prevention, security operations, and compliance auditing**.
+> **IMPORTANT REGULATORY & SAFETY NOTICE**: RazorVigil Sentinel is designed, built, and licensed **strictly and exclusively for defensive fraud prevention, security operations, and compliance auditing**.
 > * All simulation scripts (`simulator/attack_simulator.py`, `backend/governance/coevolution.py`) are hardcoded to target only the local sandbox (`http://localhost:8000/checkout`).
 > * The codebase contains zero network egress capabilities to external payment endpoints and zero weaponizable payloads.
 """
@@ -325,8 +325,8 @@ def update_readme(m: dict) -> None:
         "**Track 02: Next-Gen Carding & Bot-Abuse Mitigation Engine**"
     )
     content = content.replace(
-        "# RazorShield Sentinel: Next-Gen Carding & Account Takeover Defense Engine",
-        "# RazorShield Sentinel: Next-Gen Carding & Bot-Abuse Mitigation Engine"
+        "# RazorVigil Sentinel: Next-Gen Carding & Account Takeover Defense Engine",
+        "# RazorVigil Sentinel: Next-Gen Carding & Bot-Abuse Mitigation Engine"
     )
 
     content = inject_template(content, "BENCHMARK", generate_benchmark_table(m))

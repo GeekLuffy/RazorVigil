@@ -1,6 +1,6 @@
 # 🔬 Quad-Ensemble Models & Mathematical Reference
 
-This reference provides the exact mathematical formulations, loss functions, calibrated quantiles, and algorithmic models powering RazorShield Sentinel.
+This reference provides the exact mathematical formulations, loss functions, calibrated quantiles, and algorithmic models powering RazorVigil Sentinel.
 
 ---
 

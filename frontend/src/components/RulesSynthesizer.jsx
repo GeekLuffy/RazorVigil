@@ -129,7 +129,7 @@ export default function RulesSynthesizer() {
               report_id: `RBI-AUDIT-${Date.now()}`,
               timestamp: new Date().toISOString(),
               framework: 'Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)',
-              system: 'RazorShield Sentinel Autonomous Risk Engine v1.0',
+              system: 'RazorVigil Sentinel Autonomous Risk Engine v1.0',
               active_threat_clusters: rulesData.active_clusters_detected,
               monitored_entities: rulesData.entities_tracked,
               synthesized_rules: {
@@ -142,7 +142,7 @@ export default function RulesSynthesizer() {
             const url = URL.createObjectURL(blob)
             const a = document.createElement('a')
             a.href = url
-            a.download = `RazorShield_RBI_Compliance_Report_${Date.now()}.json`
+            a.download = `RazorVigil_RBI_Compliance_Report_${Date.now()}.json`
             a.click()
           }}
           className="text-xs font-mono font-bold bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 px-3 py-1 rounded-lg flex items-center gap-1.5 transition"

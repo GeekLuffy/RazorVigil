@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Multi-GPU Super-Cluster Training Orchestrator.
+RazorVigil Sentinel — Multi-GPU Super-Cluster Training Orchestrator.
 Trains the FT-Transformer neural model and GBDT ensemble across all 6x RTX 2080 Ti GPUs (CUDA: 0, 1, 2, 3, 4, 5)
 with mixed precision (FP16/AMP), cosine annealing learning rate scheduler, and Optuna hyperparameter optimization.
 """

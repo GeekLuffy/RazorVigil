@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Temporal Drift Monitor & Closed-Loop Remediation Engine.
+RazorVigil Sentinel — Temporal Drift Monitor & Closed-Loop Remediation Engine.
 
 Simulates month-by-month temporal attacker adaptations across 12 cohorts to detect
 blind spots in frozen deployed models, and executes closed-loop remediation with

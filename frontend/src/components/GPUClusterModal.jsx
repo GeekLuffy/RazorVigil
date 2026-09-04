@@ -369,7 +369,7 @@ export default function GPUClusterModal({ isOpen, onClose, isDark }) {
 
         {/* Footer */}
         <div className={`px-6 py-3 border-t flex items-center justify-between text-xs text-slate-400 font-mono ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-          <span>RazorShield Sentinel v2.0 · Authenticated Cluster Node</span>
+          <span>RazorVigil Sentinel v2.0 · Authenticated Cluster Node</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg border text-xs font-bold transition hover:bg-slate-800 hover:text-white"

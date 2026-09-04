@@ -1,6 +1,6 @@
 from __future__ import annotations
 """
-RazorShield Sentinel — Autonomous Risk and Fraud Detection Engine.
+RazorVigil Sentinel — Autonomous Risk and Fraud Detection Engine.
 FastAPI Application Entry Point.
 """
 
@@ -166,7 +166,7 @@ async def shutdown_event():
     pass
 
 
-app = FastAPI(title="RazorShield Sentinel", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="RazorVigil Sentinel", version="1.0.0", lifespan=lifespan)
 
 
 
@@ -250,7 +250,7 @@ class CheckoutResponse(BaseModel):
 async def health():
     return {
         "status": "ok",
-        "service": "razorshield-sentinel",
+        "service": "razorvigil",
         "canary_count": len(canary_cards.card_hashes) if canary_cards else 0,
         "razorpay_test_mode": True,
     }
@@ -1007,7 +1007,7 @@ async def verify_payment(req: VerifyPaymentRequest):
         "verified": True,
         "order_id": req.razorpay_order_id,
         "payment_id": req.razorpay_payment_id,
-        "message": "Payment verified by RazorShield Sentinel.",
+        "message": "Payment verified by RazorVigil Sentinel.",
     }
 
 
@@ -1045,7 +1045,7 @@ async def get_active_threat_rules():
 
     razorpay_rule = {
         "rule_id": f"rule_rs_{int(time.time())}",
-        "name": "RazorShield Auto-Generated ASN & Velocity Defense",
+        "name": "RazorVigil Auto-Generated ASN & Velocity Defense",
         "condition": {
             "all": [
                 {"field": "risk_score", "operator": ">=", "value": 0.75},
@@ -1092,37 +1092,37 @@ async def get_prometheus_metrics():
     p50 = float(np.percentile(_latency_history, 50)) if _latency_history else 9.08
     active_clusters = len(cluster_engine.get_active_clusters()) if cluster_engine else 2
 
-    metrics_text = f"""# HELP razorshield_decision_latency_p99_milliseconds Synchronous p99 risk gating latency in ms
-# TYPE razorshield_decision_latency_p99_milliseconds gauge
-razorshield_decision_latency_p99_milliseconds {p99:.2f}
+    metrics_text = f"""# HELP razorvigil_decision_latency_p99_milliseconds Synchronous p99 risk gating latency in ms
+# TYPE razorvigil_decision_latency_p99_milliseconds gauge
+razorvigil_decision_latency_p99_milliseconds {p99:.2f}
 
-# HELP razorshield_decision_latency_p50_milliseconds Synchronous p50 risk gating latency in ms
-# TYPE razorshield_decision_latency_p50_milliseconds gauge
-razorshield_decision_latency_p50_milliseconds {p50:.2f}
+# HELP razorvigil_decision_latency_p50_milliseconds Synchronous p50 risk gating latency in ms
+# TYPE razorvigil_decision_latency_p50_milliseconds gauge
+razorvigil_decision_latency_p50_milliseconds {p50:.2f}
 
-# HELP razorshield_evaluations_total Total transactions evaluated across risk tiers
-# TYPE razorshield_evaluations_total counter
-razorshield_evaluations_total{{tier="safe"}} {_eval_counts.get("safe", 0)}
-razorshield_evaluations_total{{tier="soft_risk"}} {_eval_counts.get("soft_risk", 0)}
-razorshield_evaluations_total{{tier="elevated_review"}} {_eval_counts.get("elevated_review", 0)}
-razorshield_evaluations_total{{tier="high_confidence_bot"}} {_eval_counts.get("high_confidence_bot", 0)}
-razorshield_evaluations_total{{tier="verified_agent"}} {_eval_counts.get("verified_agent", 0)}
+# HELP razorvigil_evaluations_total Total transactions evaluated across risk tiers
+# TYPE razorvigil_evaluations_total counter
+razorvigil_evaluations_total{{tier="safe"}} {_eval_counts.get("safe", 0)}
+razorvigil_evaluations_total{{tier="soft_risk"}} {_eval_counts.get("soft_risk", 0)}
+razorvigil_evaluations_total{{tier="elevated_review"}} {_eval_counts.get("elevated_review", 0)}
+razorvigil_evaluations_total{{tier="high_confidence_bot"}} {_eval_counts.get("high_confidence_bot", 0)}
+razorvigil_evaluations_total{{tier="verified_agent"}} {_eval_counts.get("verified_agent", 0)}
 
-# HELP razorshield_quarantined_threats_total Total autonomous bots and carding scripts quarantined
-# TYPE razorshield_quarantined_threats_total counter
-razorshield_quarantined_threats_total {_quarantined_threats_count}
+# HELP razorvigil_quarantined_threats_total Total autonomous bots and carding scripts quarantined
+# TYPE razorvigil_quarantined_threats_total counter
+razorvigil_quarantined_threats_total {_quarantined_threats_count}
 
-# HELP razorshield_canary_triggers_total Total Luhn-valid Canary Honeytokens triggered with zero FPR
-# TYPE razorshield_canary_triggers_total counter
-razorshield_canary_triggers_total {_canary_triggers_count}
+# HELP razorvigil_canary_triggers_total Total Luhn-valid Canary Honeytokens triggered with zero FPR
+# TYPE razorvigil_canary_triggers_total counter
+razorvigil_canary_triggers_total {_canary_triggers_count}
 
-# HELP razorshield_louvain_clusters_active Active Louvain community clusters tracked
-# TYPE razorshield_louvain_clusters_active gauge
-razorshield_louvain_clusters_active {max(active_clusters, 1)}
+# HELP razorvigil_louvain_clusters_active Active Louvain community clusters tracked
+# TYPE razorvigil_louvain_clusters_active gauge
+razorvigil_louvain_clusters_active {max(active_clusters, 1)}
 
-# HELP razorshield_model_drift_psi Maximum feature population stability index (PSI)
-# TYPE razorshield_model_drift_psi gauge
-razorshield_model_drift_psi 0.042
+# HELP razorvigil_model_drift_psi Maximum feature population stability index (PSI)
+# TYPE razorvigil_model_drift_psi gauge
+razorvigil_model_drift_psi 0.042
 """
     return Response(content=metrics_text, media_type="text/plain; version=0.0.4; charset=utf-8")
 
@@ -1381,7 +1381,7 @@ async def chat_with_copilot(req: ChatRequest):
 @app.post("/adversary/arms-race")
 @app.get("/adversary/arms-race")
 async def run_adversary_arms_race():
-    """Executes 5-Round Coevolution Arms Race between Red-Team adversary and RazorShield Sentinel."""
+    """Executes 5-Round Coevolution Arms Race between Red-Team adversary and RazorVigil Sentinel."""
     return run_five_round_arms_race()
 
 
@@ -1394,14 +1394,14 @@ async def export_threat_defense_rules():
 
     cloudflare_waf = {
         "ruleset_version": "v2.0",
-        "name": "RazorShield Autonomous Threat Perimeter Defense",
-        "description": "Auto-synthesized Cloudflare WAF expression generated by RazorShield Sentinel Louvain Cluster Engine",
+        "name": "RazorVigil Autonomous Threat Perimeter Defense",
+        "description": "Auto-synthesized Cloudflare WAF expression generated by RazorVigil Sentinel Louvain Cluster Engine",
         "expression": f'(http.request.uri.path eq "/checkout" and (ip.src in {{{ip_list_str}}} or http.request.headers["x-ja3-mismatch"] eq "1") and http.request.headers["x-keystroke-entropy"] lt "0.20")',
         "action": "managed_challenge",
         "action_parameters": {
             "response": {
                 "status_code": 403,
-                "content": '{"error":"RazorShield Sentinel Honeypot Intercept","tarpit_delay_sec":8}'
+                "content": '{"error":"RazorVigil Sentinel Honeypot Intercept","tarpit_delay_sec":8}'
             }
         },
         "created_at": int(time.time()),
@@ -1437,7 +1437,7 @@ async def export_threat_defense_rules():
     }
 
     aws_waf_rule_group = {
-        "Name": "RazorShieldSentinelRuleGroup",
+        "Name": "RazorVigilSentinelRuleGroup",
         "Id": f"rs-aws-waf-{int(time.time())}",
         "Capacity": 100,
         "Rules": [
@@ -1448,7 +1448,7 @@ async def export_threat_defense_rules():
                 "VisibilityConfig": {
                     "SampledRequestsEnabled": True,
                     "CloudWatchMetricsEnabled": True,
-                    "MetricName": "RazorShieldBlockedIngress"
+                    "MetricName": "RazorVigilBlockedIngress"
                 }
             }
         ]
@@ -1469,12 +1469,12 @@ async def get_multi_language_sdk_snippets():
     snippets = {
         "nodejs": {
             "language": "Node.js / Express / TypeScript",
-            "package": "npm install @geekluffy/razorshield-sentinel",
+            "package": "npm install @geekluffy/razorvigil",
             "code": """import express from 'express'
-import { RazorShieldSentinel } from '@geekluffy/razorshield-sentinel'
+import { RazorVigilSentinel } from '@geekluffy/razorvigil'
 
 const app = express()
-const sentinel = new RazorShieldSentinel({ apiKey: process.env.RAZORSHIELD_API_KEY })
+const sentinel = new RazorVigilSentinel({ apiKey: process.env.RAZORVIGIL_API_KEY })
 
 app.post('/api/checkout', async (req, res) => {
   const decision = await sentinel.evaluate(req.body)
@@ -1486,12 +1486,12 @@ app.post('/api/checkout', async (req, res) => {
         },
         "python": {
             "language": "Python / FastAPI / Django",
-            "package": "pip install git+https://github.com/GeekLuffy/razorshield-sentinel.git#subdirectory=sdk/python",
+            "package": "pip install git+https://github.com/GeekLuffy/razorvigil.git#subdirectory=sdk/python",
             "code": """from fastapi import FastAPI, Response, status
-from razorshield_sentinel import RazorShieldClient, CheckoutPayload
+from razorvigil_sentinel import RazorVigilClient, CheckoutPayload
 
 app = FastAPI()
-sentinel = RazorShieldClient(api_key=os.getenv("RAZORSHIELD_API_KEY"))
+sentinel = RazorVigilClient(api_key=os.getenv("RAZORVIGIL_API_KEY"))
 
 @app.post("/checkout")
 async def checkout(payload: CheckoutPayload):
@@ -1503,16 +1503,16 @@ async def checkout(payload: CheckoutPayload):
         },
         "go": {
             "language": "Go (Golang)",
-            "package": "go get github.com/GeekLuffy/razorshield-sentinel/sdk/go",
+            "package": "go get github.com/GeekLuffy/razorvigil/sdk/go",
             "code": """package main
 
 import (
     "net/http"
     "os"
-    sentinel "github.com/GeekLuffy/razorshield-sentinel/sdk/go"
+    sentinel "github.com/GeekLuffy/razorvigil/sdk/go"
 )
 
-var shield = sentinel.NewClient(os.Getenv("RAZORSHIELD_API_KEY"))
+var shield = sentinel.NewClient(os.Getenv("RAZORVIGIL_API_KEY"))
 
 func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
     decision, err := shield.Evaluate(r.Context(), sentinel.CheckoutPayload{
@@ -1528,16 +1528,16 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
         },
         "java": {
             "language": "Java / Spring Boot",
-            "package": "<dependency><groupId>com.github.geekluffy</groupId><artifactId>razorshield-sentinel</artifactId><version>1.0.0</version></dependency>",
+            "package": "<dependency><groupId>com.github.geekluffy</groupId><artifactId>razorvigil</artifactId><version>1.0.0</version></dependency>",
             "code": """package com.merchant.controller;
 
-import com.github.geekluffy.razorshield.*;
+import com.github.geekluffy.razorvigil.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 
 @RestController
 public class CheckoutController {
-    private final RazorShieldClient sentinel = new RazorShieldClient(System.getenv("RAZORSHIELD_API_KEY"));
+    private final RazorVigilClient sentinel = new RazorVigilClient(System.getenv("RAZORVIGIL_API_KEY"));
 
     @PostMapping("/checkout")
     public ResponseEntity<?> handleCheckout(@RequestBody CheckoutPayload payload) {
@@ -1968,7 +1968,7 @@ async def download_compliance_dossier_pdf(reviewer: str = "SecOps_Lead_01"):
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",
-            headers={"Content-Disposition": f"attachment; filename=razorshield_compliance_readiness_{reviewer}.pdf"}
+            headers={"Content-Disposition": f"attachment; filename=razorvigil_compliance_readiness_{reviewer}.pdf"}
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"PDF compilation failed: {str(e)}")

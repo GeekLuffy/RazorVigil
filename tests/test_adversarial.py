@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Adversarial & Concurrency Test Suite.
+RazorVigil Sentinel — Adversarial & Concurrency Test Suite.
 Tests race conditions, circuit breakers, model inversion bounds, honeytoken isolation,
 and shadow-mode evaluation under hostile conditions.
 """
@@ -379,7 +379,7 @@ def test_aitm_reverse_proxy_origin_interception():
         otp_code="582910",
         keystroke_intervals_ms=[180.0, 220.0, 190.0, 210.0, 200.0],
         client_reported_origin="evil-phish-checkout.com",
-        gateway_origin="checkout.razorshield.io",
+        gateway_origin="checkout.razorvigil.io",
     )
     res = engine.evaluate_otp_entry(req)
     assert res.is_valid is False

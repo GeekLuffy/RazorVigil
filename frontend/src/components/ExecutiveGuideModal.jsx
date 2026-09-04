@@ -72,7 +72,7 @@ export default function ExecutiveGuideModal({
 
             <div className="bg-slate-950/80 p-3.5 rounded-xl border border-indigo-500/30 shadow-inner">
               <div className="text-indigo-400 font-bold flex items-center gap-1.5 mb-1.5">
-                <Sparkles size={14} className="text-amber-400" /> RazorShield Sentinel
+                <Sparkles size={14} className="text-amber-400" /> RazorVigil Sentinel
               </div>
               <p className="text-[11px] text-slate-400 leading-normal">
                 Evaluates a <strong>17-dimensional vector</strong> in <strong>9.2ms</strong> using Split Conformal Prediction, Louvain Graph clustering, and kinetic keystroke telemetry.
@@ -101,7 +101,7 @@ export default function ExecutiveGuideModal({
     },
     {
       title: "2. Live Interactive Sandbox (Test It Here)",
-      subtitle: "Click a button to see RazorShield's 9.2ms decision engine in action",
+      subtitle: "Click a button to see RazorVigil's 9.2ms decision engine in action",
       badge: "Interactive Lab",
       icon: Activity,
       color: "from-indigo-500/20 via-blue-500/10 to-transparent border-indigo-500/40 text-indigo-400",
@@ -244,7 +244,7 @@ export default function ExecutiveGuideModal({
                   </div>
                 </div>
                 <p className="text-[10px] text-slate-400 pt-1">
-                  Instead of issuing a harsh decline, RazorShield seamlessly prompted a dynamic UPI QR code. The genuine user scanned and paid!
+                  Instead of issuing a harsh decline, RazorVigil seamlessly prompted a dynamic UPI QR code. The genuine user scanned and paid!
                 </p>
               </div>
             ) : (
@@ -329,7 +329,7 @@ export default function ExecutiveGuideModal({
       )
     },
     {
-      title: "4. Business ROI & Why RazorShield Wins",
+      title: "4. Business ROI & Why RazorVigil Wins",
       subtitle: "Measurable Impact on Merchant Bottom Line",
       badge: "ROI & Impact",
       icon: Scale,

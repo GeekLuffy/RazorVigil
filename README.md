@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ RazorShield Sentinel
+# 🛡️ RazorVigil Sentinel
 
 ### Autonomous Real-Time AI Risk Manager & Payment Defense Engine
 
@@ -18,9 +18,9 @@
 
 ---
 
-## 🎯 What Is RazorShield Sentinel?
+## 🎯 What Is RazorVigil Sentinel?
 
-RazorShield Sentinel is an **eight-layer, synchronous AI risk gateway** that sits directly on the live checkout authorization path. Every transaction is evaluated by a persistence-gated quad-ensemble ML engine — LightGBM + CatBoost + Isolation Forest + GraphSAGE — and a Split Conformal Prediction calibrator, producing a certified fraud decision in **under 15 ms** with a 95% statistical coverage guarantee.
+RazorVigil Sentinel is an **eight-layer, synchronous AI risk gateway** that sits directly on the live checkout authorization path. Every transaction is evaluated by a persistence-gated quad-ensemble ML engine — LightGBM + CatBoost + Isolation Forest + GraphSAGE — and a Split Conformal Prediction calibrator, producing a certified fraud decision in **under 15 ms** with a 95% statistical coverage guarantee.
 
 Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph partitioning, adversarial coevolution simulation, and automated RBI-compliant dispute evidence packaging in the background — without adding a single millisecond to the checkout latency budget.
 
@@ -189,8 +189,8 @@ $$
 
 ```bash
 # 1. Clone
-git clone https://github.com/GeekLuffy/razorshield-sentinel.git
-cd razorshield-sentinel
+git clone https://github.com/GeekLuffy/razorvigil.git
+cd razorvigil
 
 # 2. Backend
 pip install -r requirements.txt
@@ -219,7 +219,7 @@ python -m pytest tests/ -v
 | :--- | :--- |
 | **⚡ SLA Stress Benchmark** | 50-worker parallel load, real-time latency histogram, CDF with 15ms line, 1-click JSON export |
 | **💬 Threat Memory Copilot** | RAG chatbot over live telemetry, Louvain graph, and RBI directions — generates WAF rules and dispute PDFs on demand |
-| **📦 Multi-Language SDK Export** | Drop-in clients in Node.js, Python, Go, and Java under `GeekLuffy/razorshield-sentinel` |
+| **📦 Multi-Language SDK Export** | Drop-in clients in Node.js, Python, Go, and Java under `GeekLuffy/razorvigil` |
 | **⚔️ Red-Team Arms Race Lab** | 5-round adversarial coevolution simulator — Telegram scripts → proxy swarms → biometric spoofing → mule rings |
 | **🕸️ Fraud Graph Explorer** | 2D/3D force-directed Louvain canvas, financial blast-radius card, 1-click ring quarantine |
 | **⚖️ Dispute Evidence Studio** | 5-domain SHA-256 sealed PDF dossiers, RBI liability-shift ready |
@@ -267,6 +267,6 @@ Full documentation follows the [Diataxis framework](https://diataxis.fr):
 
 Built for the **Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager**
 
-[GeekLuffy](https://github.com/GeekLuffy) · [razorshield-sentinel](https://github.com/GeekLuffy/razorshield-sentinel)
+[GeekLuffy](https://github.com/GeekLuffy) · [razorvigil](https://github.com/GeekLuffy/razorvigil)
 
 </div>

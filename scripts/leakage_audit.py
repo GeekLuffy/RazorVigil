@@ -1,5 +1,5 @@
 """
-Automated Data Provenance & Leakage Audit Script for RazorShield Sentinel.
+Automated Data Provenance & Leakage Audit Script for RazorVigil Sentinel.
 Verifies zero train/test hash overlap, temporal monotonicity, and zero feature-target leakage.
 """
 

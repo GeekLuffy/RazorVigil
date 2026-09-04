@@ -20,7 +20,7 @@ with urllib.request.urlopen(req) as resp:
 print(f"[Launcher] Attached to kernel {kernel_id}")
 ws = websocket.create_connection(f"{BASE_WS}/api/kernels/{kernel_id}/channels?token={TOKEN}", timeout=None)
 
-cmd = "exec(open('/home/big/razorshield_gpu/train_100k_heavy.py').read())"
+cmd = "exec(open('/home/big/razorvigil_gpu/train_100k_heavy.py').read())"
 msg_id = str(uuid.uuid4())
 exec_msg = {
     "header": {"msg_id": msg_id, "username": "big", "session": str(uuid.uuid4()), "msg_type": "execute_request", "version": "5.3"},

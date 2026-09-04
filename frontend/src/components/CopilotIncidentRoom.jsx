@@ -30,7 +30,7 @@ export default function CopilotIncidentRoom({ isOpen, onClose, pinnedTx, onSelec
       text: `### 🤖 Threat Memory Copilot AI Initialized\n\nI am your autonomous **AI Risk Analyst Copilot** with real-time access to:\n1. **Live Transaction Telemetry** (Keystroke Shannon entropy, JA3 mismatch, Conformal uncertainty sets)\n2. **NetworkX Louvain Bipartite Graph** (Mule rings, degree centrality, $Q \\ge 0.74$)\n3. **RBI Regulatory Directives** (Authentication Mechanisms for Digital Payment Transactions, Directions 2025, effective April 1, 2026)\n\nSelect a quick prompt below or ask about any transaction ID (e.g. \`TX_...\`).`,
       citations: [
         'Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)',
-        'RazorShield Layer 0 Protocol — Deterministic Honeypot and Sub-15ms Risk Gating SLA'
+        'RazorVigil Layer 0 Protocol — Deterministic Honeypot and Sub-15ms Risk Gating SLA'
       ],
       actions: [],
       timestamp: new Date().toLocaleTimeString(),

@@ -146,7 +146,7 @@ export default function DisputeCaseWorkspace() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `RazorShield_Evidence_Dossier_${selectedCase.case_id}.json`
+    a.download = `RazorVigil_Evidence_Dossier_${selectedCase.case_id}.json`
     a.click()
   }
 

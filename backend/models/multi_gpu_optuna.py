@@ -150,7 +150,7 @@ def main():
         DB_PATH.unlink()  # Start fresh study for clean isolation
 
     storage_url = f"sqlite:///{DB_PATH.resolve()}"
-    study_name = "razorshield_multi_gpu_tune"
+    study_name = "razorvigil_multi_gpu_tune"
 
     study = optuna.create_study(
         study_name=study_name,

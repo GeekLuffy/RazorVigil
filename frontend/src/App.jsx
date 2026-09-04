@@ -351,7 +351,7 @@ export default function App() {
 
             <div className="flex sm:hidden items-center gap-1.5 text-xs font-bold font-mono text-emerald-400">
               <Shield size={16} />
-              <span className="truncate font-extrabold">RazorShield</span>
+              <span className="truncate font-extrabold">RazorVigil</span>
             </div>
           </div>
 

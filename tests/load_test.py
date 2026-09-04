@@ -110,7 +110,7 @@ async def test_sustained(n: int = 200, target_rps: float = 50.0) -> dict:
 
 async def main():
     print("=" * 65)
-    print("RAZORSHIELD SENTINEL — HONEST LATENCY & LOAD BENCHMARK")
+    print("RAZORVIGIL SENTINEL — HONEST LATENCY & LOAD BENCHMARK")
     print("=" * 65)
 
     seq_res = await test_sequential(100)

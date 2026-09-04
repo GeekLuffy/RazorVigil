@@ -62,7 +62,7 @@ export default function DashboardPage({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className={`text-base sm:text-lg font-black tracking-tight flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              <span>RazorShield Surveillance Command Center</span>
+              <span>RazorVigil Surveillance Command Center</span>
             </h1>
             <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono border ${
               isDark

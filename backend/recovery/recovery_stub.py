@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 _HOLD_TTL_S = 300
 
 # JWT secret for signing recovery tokens (in production: use env var / KMS)
-_JWT_SECRET = "razorshield-dev-secret-replace-in-prod"
+_JWT_SECRET = "razorvigil-dev-secret-replace-in-prod"
 _JWT_ALGO = "HS256"
 
 
@@ -68,14 +68,14 @@ class RecoveryStub:
 
         # Recovery URL with cryptographic token
         recovery_url = (
-            f"https://pay.razorshield.local/recover"
+            f"https://pay.razorvigil.local/recover"
             f"?token={signed_token}&order={req.order_id}"
         )
 
         # Mock UPI dynamic QR intent string (Phase 2: real Razorpay QR API)
         upi_intent = (
-            f"upi://pay?pa=razorshield@ybl"
-            f"&pn=RazorShield+Recovery"
+            f"upi://pay?pa=razorvigil@ybl"
+            f"&pn=RazorVigil+Recovery"
             f"&am={req.amount:.2f}"
             f"&tn=Recovery+{req.order_id[:8]}"
             f"&tr={token_id[:8]}"

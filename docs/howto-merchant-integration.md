@@ -1,12 +1,12 @@
-# 🛠️ How to Integrate RazorShield SDK in Under 5 Lines of Code
+# 🛠️ How to Integrate RazorVigil SDK in Under 5 Lines of Code
 
-This guide shows how to drop RazorShield Sentinel into your existing checkout flow across **Node.js, Python FastAPI, Go, and Java Spring Boot** to block carding attacks before charges hit Razorpay.
+This guide shows how to drop RazorVigil Sentinel into your existing checkout flow across **Node.js, Python FastAPI, Go, and Java Spring Boot** to block carding attacks before charges hit Razorpay.
 
 ---
 
 ## 📋 Prerequisites
-- A running RazorShield Sentinel gateway at `http://127.0.0.1:8000` (or your cloud endpoint).
-- Your `RAZORSHIELD_API_KEY` (optional for local development).
+- A running RazorVigil Sentinel gateway at `http://127.0.0.1:8000` (or your cloud endpoint).
+- Your `RAZORVIGIL_API_KEY` (optional for local development).
 
 ---
 
@@ -14,16 +14,16 @@ This guide shows how to drop RazorShield Sentinel into your existing checkout fl
 
 ### Step 1: Install the Package
 ```bash
-npm install @geekluffy/razorshield-sentinel
+npm install @geekluffy/razorvigil
 ```
 
 ### Step 2: Add Middleware to Your Checkout Route
 ```typescript
 import express from 'express'
-import { RazorShieldSentinel } from '@geekluffy/razorshield-sentinel'
+import { RazorVigilSentinel } from '@geekluffy/razorvigil'
 
 const app = express()
-const sentinel = new RazorShieldSentinel({ apiKey: process.env.RAZORSHIELD_API_KEY })
+const sentinel = new RazorVigilSentinel({ apiKey: process.env.RAZORVIGIL_API_KEY })
 
 app.post('/api/checkout', async (req, res) => {
   const decision = await sentinel.evaluate(req.body)
@@ -40,17 +40,17 @@ app.post('/api/checkout', async (req, res) => {
 
 ### Step 1: Install the Package
 ```bash
-pip install git+https://github.com/GeekLuffy/razorshield-sentinel.git#subdirectory=sdk/python
+pip install git+https://github.com/GeekLuffy/razorvigil.git#subdirectory=sdk/python
 ```
 
 ### Step 2: Add Sentinel Risk Gating
 ```python
 import os
 from fastapi import FastAPI, Response, status
-from razorshield_sentinel import RazorShieldClient, CheckoutPayload
+from razorvigil_sentinel import RazorVigilClient, CheckoutPayload
 
 app = FastAPI()
-sentinel = RazorShieldClient(api_key=os.getenv("RAZORSHIELD_API_KEY"))
+sentinel = RazorVigilClient(api_key=os.getenv("RAZORVIGIL_API_KEY"))
 
 @app.post("/checkout")
 async def checkout(payload: CheckoutPayload):
@@ -66,7 +66,7 @@ async def checkout(payload: CheckoutPayload):
 
 ### Step 1: Install the Package
 ```bash
-go get github.com/GeekLuffy/razorshield-sentinel/sdk/go
+go get github.com/GeekLuffy/razorvigil/sdk/go
 ```
 
 ### Step 2: Wrap Your HTTP Handler
@@ -76,10 +76,10 @@ package main
 import (
     "net/http"
     "os"
-    sentinel "github.com/GeekLuffy/razorshield-sentinel/sdk/go"
+    sentinel "github.com/GeekLuffy/razorvigil/sdk/go"
 )
 
-var shield = sentinel.NewClient(os.Getenv("RAZORSHIELD_API_KEY"))
+var shield = sentinel.NewClient(os.Getenv("RAZORVIGIL_API_KEY"))
 
 func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
     decision, err := shield.Evaluate(r.Context(), sentinel.CheckoutPayload{
@@ -102,7 +102,7 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 ```xml
 <dependency>
     <groupId>com.github.geekluffy</groupId>
-    <artifactId>razorshield-sentinel</artifactId>
+    <artifactId>razorvigil</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
@@ -111,13 +111,13 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 ```java
 package com.merchant.controller;
 
-import com.github.geekluffy.razorshield.*;
+import com.github.geekluffy.razorvigil.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 
 @RestController
 public class CheckoutController {
-    private final RazorShieldClient sentinel = new RazorShieldClient(System.getenv("RAZORSHIELD_API_KEY"));
+    private final RazorVigilClient sentinel = new RazorVigilClient(System.getenv("RAZORVIGIL_API_KEY"));
 
     @PostMapping("/checkout")
     public ResponseEntity<?> handleCheckout(@RequestBody CheckoutPayload payload) {
@@ -140,5 +140,5 @@ You should observe an immediate HTTP 200 OK response with risk score $0.00$.
 ---
 
 ## 🔗 Related Documentation
-- **[REST & WebSocket API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/reference-api.md)**
-- **[How to Export WAF Rules](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/howto-waf-and-rules-export.md)**
+- **[REST & WebSocket API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/reference-api.md)**
+- **[How to Export WAF Rules](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/howto-waf-and-rules-export.md)**

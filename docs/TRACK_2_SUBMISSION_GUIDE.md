@@ -1,11 +1,11 @@
-# 🏆 RazorShield Sentinel — Track 2: AI Risk Manager Master Submission Guide
+# 🏆 RazorVigil Sentinel — Track 2: AI Risk Manager Master Submission Guide
 
 ## 1. Executive Summary & Problem Formulation
 In modern payment processing, merchants face a dual-headed adversary:
 1. **Automated Card Testing & Botnet Abuse**: Carding bots using Telegram scrapers, rotating SOCKS5 residential proxies, and Playwright CDP headless browsers enumerate stolen credit cards via micro-auths ($₹1.00$ to $₹499.00$), degrading gateway reputation and incurring massive authorization fees.
 2. **3DS2 & OTP Relay Bypass Attacks**: Adversary-in-the-Middle (AiTM) reverse proxies (Evilginx/Modlishka), automated Telegram OTP scrapers, synthetic canvas/WebGL fingerprint spoofing, and forged CAVVs trick traditional rules-based systems into unauthorized direct captures.
 
-**RazorShield Sentinel** is an autonomous, multi-tiered AI defense gateway engineered to operate synchronously on the live payment path within a **strict $<50\text{ms}$ latency budget (Observed P50: 9.08ms, P99: 13.86ms)** while enforcing **Zero-Trust 3DS Verification**, **Split Conformal Prediction Guarantees**, and **Temporal Louvain GNN Graph Clustering**.
+**RazorVigil Sentinel** is an autonomous, multi-tiered AI defense gateway engineered to operate synchronously on the live payment path within a **strict $<50\text{ms}$ latency budget (Observed P50: 9.08ms, P99: 13.86ms)** while enforcing **Zero-Trust 3DS Verification**, **Split Conformal Prediction Guarantees**, and **Temporal Louvain GNN Graph Clustering**.
 
 ---
 
@@ -13,7 +13,7 @@ In modern payment processing, merchants face a dual-headed adversary:
 
 ```
                                ┌─────────────────────────────────────────────────────────┐
-                               │           RAZORSHIELD SENTINEL GATEWAY HOT PATH         │
+                               │           RAZORVIGIL SENTINEL GATEWAY HOT PATH         │
                                └────────────────────────────┬────────────────────────────┘
                                                             │
     ┌───────────────────────────────────────────────────────┴───────────────────────────────────────────────────────┐

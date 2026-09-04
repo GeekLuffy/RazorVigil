@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Autonomous Policy Engineer Orchestrator.
+RazorVigil Sentinel — Autonomous Policy Engineer Orchestrator.
 
 Executes the complete post-loss autopsy -> feature discovery -> hypothesis synthesis ->
 adversarial co-evolution -> 6-gate verification cycle, stopping at the human approval boundary.

@@ -78,7 +78,7 @@ def switch_tab(driver, tab_name):
 def run_tests():
     driver = setup_driver()
     try:
-        print(f"Loading RazorShield Sentinel UI at {BASE_URL}...")
+        print(f"Loading RazorVigil Sentinel UI at {BASE_URL}...")
         driver.get(BASE_URL)
         time.sleep(3.5)
         capture_screen(driver, "01_initial_soc_load")

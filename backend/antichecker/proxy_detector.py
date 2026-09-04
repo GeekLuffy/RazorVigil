@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — High-Performance Proxy & VPN Intelligence Engine.
+RazorVigil Sentinel — High-Performance Proxy & VPN Intelligence Engine.
 Sub-millisecond detection of:
 1. Datacenter / Cloud Provider Hosting Subnets (AWS, GCP, Azure, DigitalOcean, Hetzner, OVH, Linode, Cloudflare)
 2. Commercial VPN Egress Nodes (NordVPN, Mullvad, ProtonVPN, Surfshark, ExpressVPN)

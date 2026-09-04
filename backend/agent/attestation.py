@@ -33,9 +33,9 @@ from typing import Optional
 from jose import jwt, JWTError
 
 # Signing key for demo (in production: asymmetric key pair / KMS)
-_AGENT_SECRET  = os.getenv("AGENT_ATTESTATION_SECRET", "razorshield-agent-demo-secret")
+_AGENT_SECRET  = os.getenv("AGENT_ATTESTATION_SECRET", "razorvigil-agent-demo-secret")
 _AGENT_ALGO    = "HS256"
-_AGENT_ISSUER  = "razorshield-agent-registry"
+_AGENT_ISSUER  = "razorvigil-agent-registry"
 
 
 @dataclass

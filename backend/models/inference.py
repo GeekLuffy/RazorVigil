@@ -1,5 +1,5 @@
 """
-Model inference wrapper for RazorShield Sentinel.
+Model inference wrapper for RazorVigil Sentinel.
 
 Loads and ensembles the heterogeneous quad-architecture:
 1. LightGBM (Optuna-tuned fast tree ensemble)

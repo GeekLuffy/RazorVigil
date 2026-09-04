@@ -16,8 +16,8 @@ if torch.cuda.is_available():
     print(f"[GPU Trainer] Device Name: {torch.cuda.get_device_name(0)}")
     print(f"[GPU Trainer] VRAM: {torch.cuda.get_device_properties(0).total_memory / (1024**3):.2f} GB")
 
-DATA_PATH = "/home/big/razorshield_gpu/synthetic_transactions_50k.csv"
-OUTPUT_DIR = "/home/big/razorshield_gpu"
+DATA_PATH = "/home/big/razorvigil_gpu/synthetic_transactions_50k.csv"
+OUTPUT_DIR = "/home/big/razorvigil_gpu"
 
 FEATURE_COLS = [
     "amount", "amount_zscore", "hour_sin", "hour_cos", "asn_type_encoded",

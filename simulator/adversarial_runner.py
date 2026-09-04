@@ -1,5 +1,5 @@
 """
-Continuous Adversarial Mutation Runner for RazorShield Sentinel.
+Continuous Adversarial Mutation Runner for RazorVigil Sentinel.
 
 Simulates an evolving adversary that mutates attack vectors across generations
 (adjusting keystroke entropy, mouse jitter, ASN rotation, timing delays).
@@ -19,7 +19,7 @@ API_URL = "http://localhost:8000/checkout"
 
 def run_adversarial_simulation(n_generations: int = 10, pop_size: int = 20):
     print("\n" + "=" * 65)
-    print("RAZORSHIELD SENTINEL — ADVERSARIAL SELF-HARDENING SIMULATOR")
+    print("RAZORVIGIL SENTINEL — ADVERSARIAL SELF-HARDENING SIMULATOR")
     print(f"Generations: {n_generations} | Attack Population per Gen: {pop_size}")
     print("=" * 65 + "\n")
 

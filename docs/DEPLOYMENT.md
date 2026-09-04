@@ -1,6 +1,6 @@
 # 🚀 Production Deployment & Rollout Strategy
 
-RazorShield Sentinel is architected for zero-downtime, risk-free enterprise rollout into high-volume payment infrastructure.
+RazorVigil Sentinel is architected for zero-downtime, risk-free enterprise rollout into high-volume payment infrastructure.
 
 ---
 
@@ -19,7 +19,7 @@ RazorShield Sentinel is architected for zero-downtime, risk-free enterprise roll
 - Baseline latency distributions and feature Population Stability Index (PSI).
 
 ### Phase 2: Champion / Challenger Split (Week 3–4)
-- **10% Traffic Allocation** to RazorShield Sentinel (Challenger).
+- **10% Traffic Allocation** to RazorVigil Sentinel (Challenger).
 - **90% Traffic Allocation** to the merchant's incumbent legacy rule engine (Champion).
 - Continuously tracks false positive cost differentials, customer drop-off rates, and UPI QR recovery conversion.
 

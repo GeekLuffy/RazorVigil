@@ -28,7 +28,7 @@ const DEFAULT_FORENSIC_NOTES = [
     transaction_id: 'TX_9921_PHISH',
     timestamp: '2 mins ago',
     type: 'AiTM Proxy Intercept',
-    note: 'Intercepted Modlishka reverse proxy origin header (evil-phish-gate.com != checkout.razorshield.io). Deterministic block applied with zero gateway egress cost.'
+    note: 'Intercepted Modlishka reverse proxy origin header (evil-phish-gate.com != checkout.razorvigil.io). Deterministic block applied with zero gateway egress cost.'
   },
   {
     transaction_id: 'TX_8471_RELAY',
@@ -88,7 +88,7 @@ export default function ActiveDefenseWorkspace({ copilotNotes = [] }) {
 
   const razorpayRule = rulesData?.razorpay_risk_rule || rulesData?.razorpay_rule_json || {
     rule_id: 'rule_rs_live_defense',
-    name: 'RazorShield Autonomous Edge & Graph Risk Shield',
+    name: 'RazorVigil Autonomous Edge & Graph Risk Shield',
     condition: {
       all: [
         { field: 'risk_score', operator: '>=', value: 0.75 },
@@ -281,7 +281,7 @@ export default function ActiveDefenseWorkspace({ copilotNotes = [] }) {
             </div>
             <p className="text-xs text-slate-300 leading-relaxed font-sans max-w-2xl">
               When Telegram scrapers (e.g. BIN 411773 ₹1 tests) or Playwright CDP headless browsers hit the checkout gateway,
-              RazorShield Sentinel intercepts the request at Layer 0, injects an artificial 3,000ms tarpit delay, and serves a deceptive
+              RazorVigil Sentinel intercepts the request at Layer 0, injects an artificial 3,000ms tarpit delay, and serves a deceptive
               <code className="bg-slate-800 text-rose-300 px-1 py-0.5 rounded mx-1 text-[11px] font-mono">ERR_CARD_INVALID_STATUS</code> response.
               This poisons the attacker's card-checker database without incurring gateway transaction costs.
             </p>

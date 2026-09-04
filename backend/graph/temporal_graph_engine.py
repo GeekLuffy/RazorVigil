@@ -1,5 +1,5 @@
 ﻿"""
-Temporal Dynamic Entity Graph Engine for RazorShield Sentinel.
+Temporal Dynamic Entity Graph Engine for RazorVigil Sentinel.
 
 Constructs 5-minute rolling time-sliced graph snapshots (G_t0, G_t1, ...)
 from synthetic and real transaction streams, capturing dynamic carding ring

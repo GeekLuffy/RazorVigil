@@ -1,7 +1,7 @@
 # 📊 Data Provenance & Leakage Audit
 
 ## 1. Data Source & Generation Methodology
-RazorShield Sentinel was evaluated using a rigorous benchmark partition modeling Indian e-commerce checkout distributions (UPI, CoFT RuPay/Visa/Mastercard, NetBanking, and Wallets) under active bot and carding pressure.
+RazorVigil Sentinel was evaluated using a rigorous benchmark partition modeling Indian e-commerce checkout distributions (UPI, CoFT RuPay/Visa/Mastercard, NetBanking, and Wallets) under active bot and carding pressure.
 
 - **Baseline Fraud Rate**: **3.20%** (matching RBI & Indian payments industry benchmarks for high-risk digital commerce).
 - **Temporal Span**: 90 days of synthetic checkout activity partitioned into **chronological, non-overlapping train/validation/test splits** (70% Train, 15% Validation, 15% Held-Out Test, $N=10,000$).
@@ -22,7 +22,7 @@ To prove that our dataset is non-trivial and that high PR-AUC ($0.9412$) is a re
 | **Standalone LightGBM** | 16 Tabular & Velocity Signals | **0.9180** | 92.40% | 88.50% | Strong on recurring attack patterns, weak on zero-day bots |
 | **Standalone CatBoost** | 16 Tabular & Categorical Signals | **0.9095** | 91.80% | 87.20% | Robust on categorical BIN ranges |
 | **Standalone Isolation Forest** | Unsupervised Behavioral Anomaly | **0.7420** | 64.10% | 82.00% | High recall, elevated FPR |
-| **RazorShield Stacked Ensemble** | **Full 5-Domain Stacked Blend** | **0.9412** | **95.42%** | **91.20%** | **Optimal boundary with 0.00% Canary FPR & <15ms SLA** |
+| **RazorVigil Stacked Ensemble** | **Full 5-Domain Stacked Blend** | **0.9412** | **95.42%** | **91.20%** | **Optimal boundary with 0.00% Canary FPR & <15ms SLA** |
 
 ---
 

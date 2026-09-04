@@ -1,4 +1,4 @@
-# 🛡️ RazorShield Sentinel — Comprehensive Deep-Analysis Master Report
+# 🛡️ RazorVigil Sentinel — Comprehensive Deep-Analysis Master Report
 ### Autonomous Real-Time AI Risk Manager & Payment Defense Engine
 **Razorpay AI Buildathon 2026 · Track 02: AI Risk Manager**
 *Document Generated for Deep Project Audit, Regulatory Review & Executive Evaluation*
@@ -39,8 +39,8 @@ Modern e-commerce checkout is besieged by distributed automation:
 - **AiTM Reverse Proxies & OTP Relays (Evilginx/Modlishka)**: Intercepting session cookies and 2FA credentials in real-time.
 - **False Declines on Edge-Case Genuine Shoppers**: The persistence-gated configuration validated a **10.6% Edge-Case Genuine FPR** (VPN/traveler segment) — a real, hard-won trade-off, not zero.
 
-### The RazorShield Sentinel Solution:
-**RazorShield Sentinel** is an enterprise-grade autonomous AI Risk Manager that operates **synchronously on the live checkout path** ($p50 = 9.08\text{ms}, p99 = 13.86\text{ms}$ sequential). It deploys a **4-way stacked ML ensemble** (LightGBM + CatBoost + Isolation Forest + GraphSAGE) with **persistence-gating** and **Split Conformal Calibration** to deliver **99.57–99.60% full-funnel fraud catch rate** with independently audited Bootstrap 95% CIs.
+### The RazorVigil Sentinel Solution:
+**RazorVigil Sentinel** is an enterprise-grade autonomous AI Risk Manager that operates **synchronously on the live checkout path** ($p50 = 9.08\text{ms}, p99 = 13.86\text{ms}$ sequential). It deploys a **4-way stacked ML ensemble** (LightGBM + CatBoost + Isolation Forest + GraphSAGE) with **persistence-gating** and **Split Conformal Calibration** to deliver **99.57–99.60% full-funnel fraud catch rate** with independently audited Bootstrap 95% CIs.
 
 ---
 
@@ -233,7 +233,7 @@ $$\hat{V}_{\text{DR}}(\pi) = \frac{1}{N} \sum_{i=1}^N \left[ \hat{Q}(x_i, \pi(x_
 - Citations from RBI and EMVCo legal documentation surfaced inline.
 
 ### 3. 📦 1-Click Merchant Export & Multi-Language SDK Snippets
-- Drop-in SDK snippets for Node.js (`@geekluffy/razorshield-sentinel`), Python (`razorshield_sentinel`), Go (`github.com/GeekLuffy/razorshield-sentinel/sdk/go`), and Java (`com.github.geekluffy:razorshield-sentinel`).
+- Drop-in SDK snippets for Node.js (`@geekluffy/razorvigil`), Python (`razorvigil_sentinel`), Go (`github.com/GeekLuffy/razorvigil/sdk/go`), and Java (`com.github.geekluffy:razorvigil`).
 - 1-Click export to Cloudflare WAF Expression, Razorpay Risk Rules JSON, and AWS WAF Rule Groups.
 
 ### 4. 🤖 Autonomous Red-Team Adversary Simulator (5-Round Arms Race)
@@ -323,21 +323,21 @@ Total: 59 passed, 2 skipped, 48 warnings in ~22.56s
 
 ## 10. Multi-Language Drop-in SDK Specifications
 
-All packages hosted under `github.com/GeekLuffy/razorshield-sentinel`. Starter source implementations exist in `sdk/`.
+All packages hosted under `github.com/GeekLuffy/razorvigil`. Starter source implementations exist in `sdk/`.
 
 | Language | Install | Integration |
 | :--- | :--- | :--- |
-| **Go** | `go get github.com/GeekLuffy/razorshield-sentinel/sdk/go` | `shield.Evaluate(ctx, payload)` |
-| **Node.js** | `npm install @geekluffy/razorshield-sentinel` | `sentinel.evaluate(req.body)` |
-| **Python** | `pip install git+https://github.com/GeekLuffy/razorshield-sentinel.git#subdirectory=sdk/python` | `await sentinel.evaluate_async(payload)` |
-| **Java** | `com.github.geekluffy:razorshield-sentinel:1.0.0` | `sentinel.evaluate(payload)` |
+| **Go** | `go get github.com/GeekLuffy/razorvigil/sdk/go` | `shield.Evaluate(ctx, payload)` |
+| **Node.js** | `npm install @geekluffy/razorvigil` | `sentinel.evaluate(req.body)` |
+| **Python** | `pip install git+https://github.com/GeekLuffy/razorvigil.git#subdirectory=sdk/python` | `await sentinel.evaluate_async(payload)` |
+| **Java** | `com.github.geekluffy:razorvigil:1.0.0` | `sentinel.evaluate(payload)` |
 
 ---
 
 ## 11. Repository Topology & File Inventory
 
 ```
-razorshield/
+razorvigil/
 ├── backend/
 │   ├── main.py                       # Unified FastAPI server (30+ REST & WebSocket endpoints)
 │   ├── razorpay_client.py            # Mock Razorpay API Gateway client

@@ -88,7 +88,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
     setLastKeyTime(now)
   }
 
-  const verifyLiveOtp = async (customIntervals = null, origin = 'checkout.razorshield.io') => {
+  const verifyLiveOtp = async (customIntervals = null, origin = 'checkout.razorvigil.io') => {
     setOtpTesting(true)
     try {
       const intervalsToUse = customIntervals || (otpIntervals.length >= 3 ? otpIntervals : [180.2, 215.4, 195.1, 230.8, 205.3])
@@ -104,7 +104,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
           time_to_first_keystroke_ms: 350.0,
           total_entry_duration_ms: intervalsToUse.reduce((a, b) => a + b, 0) + 350.0,
           client_reported_origin: origin,
-          gateway_origin: 'checkout.razorshield.io',
+          gateway_origin: 'checkout.razorvigil.io',
         })
       }).then(r => r.json())
       setOtpVerificationResult(res)
@@ -411,7 +411,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               Threat Replay Lab &amp; Detection Pipeline Runner
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
-              Replay known fraud patterns — Telegram carding micro-auths, rotating proxy swarms, canary honeytoken probes — exclusively against RazorShield Sentinel's own sandboxed gateway to measure real-time defense performance.
+              Replay known fraud patterns — Telegram carding micro-auths, rotating proxy swarms, canary honeytoken probes — exclusively against RazorVigil Sentinel's own sandboxed gateway to measure real-time defense performance.
             </p>
           </div>
 

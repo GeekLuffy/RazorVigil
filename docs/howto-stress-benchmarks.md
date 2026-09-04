@@ -1,6 +1,6 @@
 # ⚡ How to Run Live Parallel Stress Benchmarks
 
-This guide shows how to run high-concurrency stress benchmarks against RazorShield Sentinel to mathematically prove sub-15ms synchronous SLA compliance ($p99 < 15.0\text{ms}$).
+This guide shows how to run high-concurrency stress benchmarks against RazorVigil Sentinel to mathematically prove sub-15ms synchronous SLA compliance ($p99 < 15.0\text{ms}$).
 
 ---
 
@@ -72,5 +72,5 @@ curl -X POST http://localhost:8000/benchmark/run \
 ---
 
 ## 🔗 Related Documentation
-- **[Model & Math Architecture Reference](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/reference-models-and-math.md)**
-- **[Architectural Design Explanations](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/explanation-architecture-and-tradeoffs.md)**
+- **[Model & Math Architecture Reference](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/reference-models-and-math.md)**
+- **[Architectural Design Explanations](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/explanation-architecture-and-tradeoffs.md)**

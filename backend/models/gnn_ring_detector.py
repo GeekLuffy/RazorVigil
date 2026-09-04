@@ -1,6 +1,6 @@
 ﻿"""
 Heterogeneous Graph Neural Network (Hetero-GraphSAGE) for Carding Ring Detection.
-GPU-Accelerated PyTorch / PyTorch Geometric Architecture for RazorShield Sentinel.
+GPU-Accelerated PyTorch / PyTorch Geometric Architecture for RazorVigil Sentinel.
 
 Graph Schema:
   - Node types: 'transaction', 'card', 'address', 'email'
@@ -192,7 +192,7 @@ def train_gnn(epochs: int = 15, lr: float = 0.005, gpu_id: int = 0):
         
     device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
     print(f"\n=======================================================")
-    print(f"RAZORSHIELD GNN RING DETECTOR TRAINING (GPU: {device})")
+    print(f"RAZORVIGIL GNN RING DETECTOR TRAINING (GPU: {device})")
     print(f"=======================================================")
     
     graph_path = Path("data/external/ieee_entity_graph.pkl")

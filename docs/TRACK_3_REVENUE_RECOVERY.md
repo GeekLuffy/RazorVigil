@@ -1,11 +1,11 @@
-# 💸 RazorShield Sentinel — Track 3: Revenue Recovery & Chargeback Automation
+# 💸 RazorVigil Sentinel — Track 3: Revenue Recovery & Chargeback Automation
 
 ## 1. Executive Summary
 Traditional fraud systems operate with a blunt binary hammer: **Approve or Hard Block**.
 - A false decline on an innocent customer destroys **15% to 40% of merchant margin** and inflicts permanent Customer Lifetime Value (LTV) churn.
 - A missed fraud attack inflicts full **GMV loss + ₹1,200 payment network chargeback fines**.
 
-**RazorShield Sentinel Track 3 Engine** introduces:
+**RazorVigil Sentinel Track 3 Engine** introduces:
 1. **Bayesian Minimum Expected Loss (MEL) Routing**: Mathematical trade-off matrix between Gross Margin, Customer LTV, and Chargeback Fine.
 2. **Out-of-Band UPI QR Recovery Bridge**: Soft-risk transactions ($0.15 \le \text{Risk} \le 0.75$) are instantly converted into cryptographically signed UPI QR recovery links, rescuing legitimate revenue while deflecting card fraud.
 3. **5-Domain Verifiable Dispute Evidence Package**: Eliminates manual chargeback representation by autonomously compiling forensic proofs for Razorpay dispute representments.
@@ -14,7 +14,7 @@ Traditional fraud systems operate with a blunt binary hammer: **Approve or Hard 
 
 ## 2. Bayesian Minimum Expected Loss (MEL) Optimization
 
-For every evaluated authorization, RazorShield computes expected financial rupee loss across all three actions:
+For every evaluated authorization, RazorVigil computes expected financial rupee loss across all three actions:
 
 $$\mathbb{E}[\text{Loss} \mid \text{Pass}] = P(\text{Fraud}) \times (\text{Amount} + \text{Chargeback Fine})$$
 
@@ -28,7 +28,7 @@ $$\text{Optimal Action} = \arg\min_{a \in \{\text{Pass}, \text{Recovery}, \text{
 
 ## 3. 5-Domain Verifiable Chargeback Evidence Synthesizer
 
-When a chargeback case is filed, RazorShield synthesizes a deterministic, non-hallucinatory ISO 8583 evidence dossier:
+When a chargeback case is filed, RazorVigil synthesizes a deterministic, non-hallucinatory ISO 8583 evidence dossier:
 
 | Domain | Cryptographic Evidence Signals |
 |---|---|

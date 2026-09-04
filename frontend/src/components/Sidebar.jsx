@@ -82,7 +82,7 @@ function SidebarContent({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-sm tracking-tight text-white font-mono">RazorShield</span>
+              <span className="font-extrabold text-sm tracking-tight text-white font-mono">RazorVigil</span>
               <span className="px-1.5 py-0.2 text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/30">v2.0</span>
             </div>
             <p className="text-[11px] text-slate-400 font-sans">Autonomous Risk Engine</p>

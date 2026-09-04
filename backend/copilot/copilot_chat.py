@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel ? Autonomous Threat Memory & Copilot Incident Room Engine.
+RazorVigil Sentinel ? Autonomous Threat Memory & Copilot Incident Room Engine.
 Provides interactive conversational interrogation over live transaction telemetry,
 NetworkX Louvain cluster topology, and RBI Sovereign Regulatory Compliance.
 Features:
@@ -152,7 +152,7 @@ class CopilotIncidentEngine:
             "RBI Master Direction 2025/2026 on Digital Payment Security Controls (§7.2 — Dynamic Risk-Based Authentication)",
             "RBI Circular on Additional Factor of Authentication (AFA) for Card Not Present (CNP) Transactions",
             "EMVCo 3-D Secure Protocol and Core Functions Specification v2.2.0 (Kinetic Keystroke Biometrics Exemption)",
-            "RazorShield Layer 0 Protocol — Deterministic Honeypot and Sub-15ms Risk Gating SLA",
+            "RazorVigil Layer 0 Protocol — Deterministic Honeypot and Sub-15ms Risk Gating SLA",
             "Reserve Bank of India Guidelines on Harmonisation of Turn Around Time (TAT) and Customer Compensation (§4.1 Liability Shift)"
         ]
 
@@ -298,7 +298,7 @@ class CopilotIncidentEngine:
             gpu_breakdown = gpus_info if gpus_info else "  - 6x NVIDIA GeForce RTX 2080 Ti (66GB Total VRAM, 104 cores, 503GB RAM)\n"
 
             context_summary = f"""
-RazorShield Sentinel Live Operational Telemetry Context:
+RazorVigil Sentinel Live Operational Telemetry Context:
 - Host & Super-Cluster: bd216server3 (104 CPU Cores, 503GB RAM, 6x RTX 2080 Ti GPUs)
 - Cluster Live GPU Breakdown:
 {gpu_breakdown}
@@ -321,7 +321,7 @@ Current Pinned Transaction:
 - Conformal Set: {sig.get('conformal_prediction_set', ['safe'])}
 """
 
-            system_prompt = f"""You are the Forensic AI Copilot for RazorShield Sentinel, an autonomous enterprise fraud intelligence system protecting Indian payment corridors (Razorpay, UPI 2.0, HDFC, ICICI, SBI).
+            system_prompt = f"""You are the Forensic AI Copilot for RazorVigil Sentinel, an autonomous enterprise fraud intelligence system protecting Indian payment corridors (Razorpay, UPI 2.0, HDFC, ICICI, SBI).
 You provide mathematically rigorous, legally sound (RBI Master Directions 2025/2026, EMVCo 3DS 2.2), and forensic explanations of fraud vectors, syndicate graph rings, super-cluster hardware telemetry, and real-time defense actions.
 Keep responses formatted cleanly in markdown with headings, bullets, and actionable code/WAF blocks.
 Context:
@@ -505,7 +505,7 @@ Context:
                 "2. **Kinetic Keystroke Exemption (?7.2)**:\n"
                 "   - Transactions with high typing entropy ($H > 2.50$) and zero JA3 mismatch qualify for **Frictionless Low-Risk Exemption**, allowing sub-15ms checkout approval.\n"
                 "3. **Zero False Decline Mandate**:\n"
-                "   - Merely blocking suspicious transactions breaches merchant SLA. RazorShield Sentinel bridges ambiguous transactions into an **Out-of-Band Dynamic UPI QR Hold** (5-minute TTL), ensuring genuine shoppers never face false declines.\n\n"
+                "   - Merely blocking suspicious transactions breaches merchant SLA. RazorVigil Sentinel bridges ambiguous transactions into an **Out-of-Band Dynamic UPI QR Hold** (5-minute TTL), ensuring genuine shoppers never face false declines.\n\n"
                 "**Action Available**: You can export an RBI-compliant forensic dispute dossier PDF with SHA-256 evidence anchoring directly from the Disputes tab."
             )
             actions.append(CopilotAction(
@@ -569,7 +569,7 @@ Context:
 
         # DEFAULT GENERAL RESPONSE
         reply = (
-            f"### ?? RazorShield Forensic Copilot Ready\n\n"
+            f"### ?? RazorVigil Forensic Copilot Ready\n\n"
             f"I am your autonomous risk analyst with live telemetry connected to:\n"
             f"1. **Remote GPU Super-Cluster**: `bd216server3` (6x RTX 2080 Ti, CUDA:4 Model Pipeline)\n"
             f"2. **Live Transaction Ledger**: {len(transaction_store)} evaluated transactions with real 4-way ML scoring\n"

@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Conformal Prediction & Temporal GNN Test Suite.
+RazorVigil Sentinel — Conformal Prediction & Temporal GNN Test Suite.
 Verifies finite-sample mathematical coverage guarantees, interval validity,
 FT-Transformer forward pass, and temporal graph edge decay weighting.
 """

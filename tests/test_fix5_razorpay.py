@@ -15,7 +15,7 @@ import time
 import httpx
 
 API_BASE = "http://localhost:8000"
-WEBHOOK_SECRET = "razorshield_webhook_secret_2026"
+WEBHOOK_SECRET = "razorvigil_webhook_secret_2026"
 
 
 def main():

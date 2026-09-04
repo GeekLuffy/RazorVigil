@@ -1,6 +1,6 @@
 # 📋 REST & WebSocket API Reference
 
-Complete technical specification for all RazorShield Sentinel HTTP and WebSocket endpoints.
+Complete technical specification for all RazorVigil Sentinel HTTP and WebSocket endpoints.
 
 **Base URL**: `http://127.0.0.1:8000`  
 **Frontend Proxy**: All endpoints are also accessible via Vite at `http://localhost:5173/`
@@ -114,7 +114,7 @@ Executes parallel stress test evaluations against the live backend risk pipeline
 ## 4. Red-Team Coevolution & Arms Race
 
 ### `POST /adversary/arms-race` & `GET /adversary/arms-race`
-Runs 5-round adversarial arms race between Red-Team adversary and RazorShield defense grid.
+Runs 5-round adversarial arms race between Red-Team adversary and RazorVigil defense grid.
 
 ---
 

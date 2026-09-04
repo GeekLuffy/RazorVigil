@@ -1,8 +1,8 @@
 """
-RazorShield Sentinel - Demo Agent for Razorpay Agent Studio Integration.
+RazorVigil Sentinel - Demo Agent for Razorpay Agent Studio Integration.
 
 Demonstrates how Razorpay's Agent Studio (or any Claude Agent SDK agent) can
-delegate specialist carding/bot-abuse investigation to RazorShield Sentinel
+delegate specialist carding/bot-abuse investigation to RazorVigil Sentinel
 via MCP tool calls.
 
 This minimal demo shows the delegation pattern:
@@ -29,7 +29,7 @@ import sys
 
 import httpx
 
-RAZORSHIELD_API_URL = os.getenv("RAZORSHIELD_API_URL", "http://localhost:8000")
+RAZORVIGIL_API_URL = os.getenv("RAZORVIGIL_API_URL", "http://localhost:8000")
 
 # ---------------------------------------------------------------------------
 # Simulated MCP tool calls via direct HTTP (no MCP transport needed for demo)
@@ -37,7 +37,7 @@ RAZORSHIELD_API_URL = os.getenv("RAZORSHIELD_API_URL", "http://localhost:8000")
 # ---------------------------------------------------------------------------
 
 async def call_check_canary_status(transaction_id: str) -> dict:
-    async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as c:
+    async with httpx.AsyncClient(base_url=RAZORVIGIL_API_URL, timeout=10.0) as c:
         try:
             r = await c.get("/canary/status", params={"transaction_id": transaction_id})
             return r.json() if r.status_code == 200 else {"is_canary": False, "note": "not found"}
@@ -46,7 +46,7 @@ async def call_check_canary_status(transaction_id: str) -> dict:
 
 
 async def call_investigate_transaction(transaction_id: str) -> dict:
-    async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as c:
+    async with httpx.AsyncClient(base_url=RAZORVIGIL_API_URL, timeout=10.0) as c:
         try:
             r = await c.get(f"/investigate/{transaction_id}")
             return r.json() if r.status_code == 200 else {"tier": "unknown", "error": "not found"}
@@ -55,7 +55,7 @@ async def call_investigate_transaction(transaction_id: str) -> dict:
 
 
 async def call_get_cluster_risk_score(device_fingerprint: str = None, ip_hash: str = None, card_hash: str = None) -> dict:
-    async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as c:
+    async with httpx.AsyncClient(base_url=RAZORVIGIL_API_URL, timeout=10.0) as c:
         try:
             r = await c.post("/cluster/risk-score", json={
                 "device_fingerprint": device_fingerprint,
@@ -68,7 +68,7 @@ async def call_get_cluster_risk_score(device_fingerprint: str = None, ip_hash: s
 
 
 async def call_compile_dispute_evidence(transaction_id: str) -> dict:
-    async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=15.0) as c:
+    async with httpx.AsyncClient(base_url=RAZORVIGIL_API_URL, timeout=15.0) as c:
         try:
             # Step 0: Fetch real transaction amount and telemetry from the registry
             # so the evidence dossier reflects the actual transaction, not a placeholder.
@@ -102,12 +102,12 @@ async def call_compile_dispute_evidence(transaction_id: str) -> dict:
 
 async def run_demo_agent(transaction_id: str):
     print("=" * 70)
-    print("RAZORSHIELD SENTINEL — AGENT STUDIO MCP DEMO")
-    print("Simulates Razorpay native agent delegating to RazorShield via MCP")
+    print("RAZORVIGIL SENTINEL — AGENT STUDIO MCP DEMO")
+    print("Simulates Razorpay native agent delegating to RazorVigil via MCP")
     print("(HTTP simulation — backend endpoints are the same ones MCP tools call)")
     print("=" * 70)
     print(f"\n[Agent] Received suspicious transaction for investigation: {transaction_id}")
-    print("[Agent] Delegating to RazorShield Sentinel specialist sub-agent...\n")
+    print("[Agent] Delegating to RazorVigil Sentinel specialist sub-agent...\n")
 
     # Tool call 1: investigate_transaction — full 8-layer forensic pipeline
     print(f"[MCP Tool Call 1/4] investigate_transaction('{transaction_id}')")
@@ -185,7 +185,7 @@ async def run_demo_agent(transaction_id: str):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="RazorShield Agent Studio MCP Demo")
+    parser = argparse.ArgumentParser(description="RazorVigil Agent Studio MCP Demo")
     parser.add_argument("--transaction-id", default="TXN_DEMO_MCP_001",
                         help="Transaction ID to investigate")
     args = parser.parse_args()

@@ -1,5 +1,5 @@
 """
-Unit test for RazorShield Sentinel durable webhook idempotency store.
+Unit test for RazorVigil Sentinel durable webhook idempotency store.
 Verifies that duplicate webhook event IDs are rejected by the SQLite UNIQUE constraint
 even if the fast-path in-memory cache is bypassed or restarted.
 """

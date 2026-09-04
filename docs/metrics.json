@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.0.0",
     "last_updated": "2026-08-31T03:00:00Z",
-    "description": "Single canonical source of truth for all RazorShield Sentinel metrics and benchmarks.",
+    "description": "Single canonical source of truth for all RazorVigil Sentinel metrics and benchmarks.",
     "dataset": {
       "total_transactions": 50000,
       "split_ratio": {

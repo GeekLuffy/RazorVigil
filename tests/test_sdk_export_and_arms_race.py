@@ -22,15 +22,15 @@ def test_sdk_snippets_export():
         assert "curl" in snippets
 
         # Verify Node.js snippet
-        assert "@geekluffy/razorshield-sentinel" in snippets["nodejs"]["package"]
+        assert "@geekluffy/razorvigil" in snippets["nodejs"]["package"]
         assert "sentinel.evaluate" in snippets["nodejs"]["code"]
 
         # Verify Python snippet
-        assert "GeekLuffy/razorshield-sentinel" in snippets["python"]["package"]
+        assert "GeekLuffy/razorvigil" in snippets["python"]["package"]
         assert "sentinel.evaluate_async" in snippets["python"]["code"]
 
         # Verify Go snippet
-        assert "GeekLuffy/razorshield-sentinel/sdk/go" in snippets["go"]["package"]
+        assert "GeekLuffy/razorvigil/sdk/go" in snippets["go"]["package"]
 
 
 

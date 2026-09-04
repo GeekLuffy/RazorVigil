@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — High-Concurrency Stress & Boundary Test Suite.
+RazorVigil Sentinel — High-Concurrency Stress & Boundary Test Suite.
 Verifies gateway stability under extreme concurrent load, edge-case feature bounds,
 Bayesian loss singularities, and dynamic sliding-window velocity boundaries.
 """
@@ -87,8 +87,8 @@ def test_otp_kinetic_keystroke_boundary_delays():
         order_id="ORD_INSTANT",
         otp_code="849201",
         keystroke_intervals_ms=[0.0, 0.0, 0.0, 0.0, 0.0],
-        client_reported_origin="checkout.razorshield.io",
-        gateway_origin="checkout.razorshield.io"
+        client_reported_origin="checkout.razorvigil.io",
+        gateway_origin="checkout.razorvigil.io"
     )
     res_instant = engine.evaluate_otp_entry(instant_req)
     assert res_instant.is_valid is False
@@ -101,8 +101,8 @@ def test_otp_kinetic_keystroke_boundary_delays():
         order_id="ORD_SLOW_HUMAN",
         otp_code="849201",
         keystroke_intervals_ms=[420.5, 780.2, 1150.0, 390.1, 620.4],
-        client_reported_origin="checkout.razorshield.io",
-        gateway_origin="checkout.razorshield.io"
+        client_reported_origin="checkout.razorvigil.io",
+        gateway_origin="checkout.razorvigil.io"
     )
     res_human = engine.evaluate_otp_entry(human_req)
     assert res_human.is_valid is True

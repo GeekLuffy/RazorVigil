@@ -1,6 +1,6 @@
 # ⚖️ How to Generate RBI 2025/2026 Dispute Representation Packages
 
-When a cardholder files a fraudulent chargeback (e.g. Reason Code `4837` / `10.4`), merchants must provide verifiable cryptographic and behavioral evidence to win representment. This guide shows how to generate and export **RBI Sovereign-Compliant Evidence Dossiers** with SHA-256 anchoring in RazorShield Sentinel.
+When a cardholder files a fraudulent chargeback (e.g. Reason Code `4837` / `10.4`), merchants must provide verifiable cryptographic and behavioral evidence to win representment. This guide shows how to generate and export **RBI Sovereign-Compliant Evidence Dossiers** with SHA-256 anchoring in RazorVigil Sentinel.
 
 ---
 
@@ -52,5 +52,5 @@ Under the **Reserve Bank of India (Authentication Mechanisms for Digital Payment
 ---
 
 ## 🔗 Related Documentation
-- **[REST API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/reference-api.md)**
-- **[Architectural Design Explanations](file:///c:/Users/Owais/Documents/RazorPay/razorshield/docs/explanation-architecture-and-tradeoffs.md)**
+- **[REST API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/reference-api.md)**
+- **[Architectural Design Explanations](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/explanation-architecture-and-tradeoffs.md)**

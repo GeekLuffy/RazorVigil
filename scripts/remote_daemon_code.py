@@ -18,7 +18,7 @@ import uvicorn
 os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-app = FastAPI(title="RazorShield Sentinel GPU Inference Daemon", version="2.0.0")
+app = FastAPI(title="RazorVigil Sentinel GPU Inference Daemon", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODELS_DIR = "/home/big/razorshield_gpu"
+MODELS_DIR = "/home/big/razorvigil_gpu"
 CB_PATH = os.path.join(MODELS_DIR, "catboost_model.pkl")
 FT_PATH = os.path.join(MODELS_DIR, "ft_transformer_model.pt")
 

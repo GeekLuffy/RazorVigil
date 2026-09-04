@@ -1,4 +1,4 @@
-# RazorShield Sentinel — Technical Architecture & System Specification
+# RazorVigil Sentinel — Technical Architecture & System Specification
 **Project Version:** 2.6.0-Production (Audited Release)  
 **Document Type:** Technical Architecture Dossier & System Specification  
 **Audience:** Payment Security Engineers, ML Systems Auditors, and Technical Reviewers  
@@ -36,7 +36,7 @@ Modern payment infrastructure faces sophisticated, automated fraud patterns that
 5. **The False Decline Tax**: Conventional fixed-threshold risk scoring disproportionately rejects legitimate high-value customers. Industry false decline rates typically range between 2.5% and 5.0%, costing merchants up to 15x more in lost customer lifetime value than actual fraud losses.
 
 ### 1.2 Core Architectural Principles & Technical Approach
-RazorShield Sentinel is engineered as a synchronous, in-line payment defense engine operating within strict gateway latency budgets:
+RazorVigil Sentinel is engineered as a synchronous, in-line payment defense engine operating within strict gateway latency budgets:
 - **Synchronous Hot-Path Gating (<50ms SLA Budget)**: Local in-memory decisioning delivers $p50 = 9.48\text{ ms}$ and $p99 = 14.20\text{ ms}$ sequential execution (and $p99 = 29.35\text{ ms}$ under sustained 40 RPS load), running well within standard payment gateway timeout limits.
 - **Distribution-Free Risk Certification**: Instead of arbitrary probability thresholds, Sentinel employs **Split Conformal Prediction** to provide rigorous, finite-sample coverage guarantees ($1 - \alpha = 95\%$, empirical coverage 95.40% `[94.90%, 95.80%]`).
 - **Separation of Synchronous Gating and Asynchronous Intelligence**: Hot-path evaluation runs locally with zero external network hops. Heavy model retraining, 100k synthetic dataset generation, and vector embeddings are offloaded asynchronously to dedicated GPU infrastructure (`bd216server3`).
@@ -106,7 +106,7 @@ RazorShield Sentinel is engineered as a synchronous, in-line payment defense eng
 ```
 
 ### 2.2 Synchronous Hot Path vs. Asynchronous Intelligence Plane
-A foundational design requirement of RazorShield Sentinel is that **no external network call may block the live checkout authorization path**:
+A foundational design requirement of RazorVigil Sentinel is that **no external network call may block the live checkout authorization path**:
 
 1. **Synchronous In-Line Hot Path**:
    - All 8 defense layers execute locally on the application host using in-memory feature pipelines, pre-loaded model weights, and Redis cache lookups.
@@ -169,7 +169,7 @@ The selection rule strictly maximized zero-day CVV recall subject to $\text{FPR}
 ## 4. Mathematical Grounding: Split Conformal Risk Prediction
 
 ### 4.1 Distribution-Free Error Control
-Fixed probability thresholds (e.g. $P > 0.70$) fail under test-time distribution shifts. RazorShield Sentinel implements inductive **Split Conformal Prediction** (`backend/models/conformal_calibrator.py`), providing guaranteed finite-sample coverage:
+Fixed probability thresholds (e.g. $P > 0.70$) fail under test-time distribution shifts. RazorVigil Sentinel implements inductive **Split Conformal Prediction** (`backend/models/conformal_calibrator.py`), providing guaranteed finite-sample coverage:
 
 $$P(Y \in C(X)) \ge 1 - \alpha \qquad (\alpha = 0.05 \implies 95\%\text{ certified coverage})$$
 
@@ -245,7 +245,7 @@ $$Q = \frac{1}{2m} \sum_{i,j} \left[ A_{ij} - \frac{k_i k_j}{2m} \right] \delta(
 ### 6.2 Workload Isolation & Hardware Mapping
 To guarantee zero resource contention with concurrent cluster workloads:
 - **GPUs 0–3**: General background tasks and external research jobs.
-- **GPU 4 (Physical Device ID 4)**: Dedicated to RazorShield Sentinel heavy model training, hyperparameter sweeps, and synthetic dataset generation.
+- **GPU 4 (Physical Device ID 4)**: Dedicated to RazorVigil Sentinel heavy model training, hyperparameter sweeps, and synthetic dataset generation.
 - **GPU 5 (Physical Device ID 5)**: Dedicated standby node for offline LLM synthesis and vector embedding indexing.
 
 ### 6.3 Architectural Clarification: GPU Throughput vs. Live Network Latency
@@ -470,7 +470,7 @@ Simulates a 5-round coevolution arms race targeting decision boundaries:
 ## 14. Repository Topology & Component Manifest
 
 ```
-razorshield/
+razorvigil/
 ├── .env.example                          # Environment configuration template (sanitized)
 ├── .gitignore                            # Git exclusion rules (excluding caches, db, credentials)
 ├── Dockerfile                            # Production multi-stage Docker build

@@ -110,7 +110,7 @@ def objective(trial, X_train, y_train):
 
 def run_full_training(n_trials: int = 15):
     print("=" * 65)
-    print("RAZORSHIELD SENTINEL — OPTUNA TUNING & STRATIFIED TRAINING (50K)")
+    print("RAZORVIGIL SENTINEL — OPTUNA TUNING & STRATIFIED TRAINING (50K)")
     print("=" * 65)
 
     df = load_data()

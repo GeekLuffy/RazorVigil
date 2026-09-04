@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Drop-in Anti-Checker ASGI Middleware.
+RazorVigil Sentinel — Drop-in Anti-Checker ASGI Middleware.
 
 Provides plug-and-play defense against automated card checkers for any
 FastAPI, Starlette, or ASGI-compatible payment service.

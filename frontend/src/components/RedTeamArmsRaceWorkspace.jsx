@@ -105,7 +105,7 @@ export default function RedTeamArmsRaceWorkspace() {
               </span>
             </h2>
             <p className="text-xs text-slate-400">
-              Demonstrating 5 rounds of autonomous adversarial escalation vs RazorShield's multi-layered defense grid.
+              Demonstrating 5 rounds of autonomous adversarial escalation vs RazorVigil's multi-layered defense grid.
             </p>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function RedTeamArmsRaceWorkspace() {
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                 <Bar dataKey="initial" name="Adversary Initial Evasion %" fill="#f43f5e" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="hardened" name="RazorShield Hardened Evasion %" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="hardened" name="RazorVigil Hardened Evasion %" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -220,8 +220,8 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
           paste_event: isBotSim,
           time_to_first_keystroke_ms: isBotSim ? 5.0 : 380.0,
           total_entry_duration_ms: isBotSim ? 10.0 : intervalsToUse.reduce((a, b) => a + b, 0) + 380.0,
-          client_reported_origin: 'checkout.razorshield.io',
-          gateway_origin: 'checkout.razorshield.io',
+          client_reported_origin: 'checkout.razorvigil.io',
+          gateway_origin: 'checkout.razorvigil.io',
         })
       }).then(r => r.json())
 
@@ -246,8 +246,8 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
           cavv: 'AAABBIIFmQAAAAAAAQUWJgAAAAA=',
           eci: '05',
           device_channel: '02',
-          client_challenge_origin: 'checkout.razorshield.io',
-          acs_challenge_origin: 'checkout.razorshield.io',
+          client_challenge_origin: 'checkout.razorvigil.io',
+          acs_challenge_origin: 'checkout.razorvigil.io',
           session_resumed: true,
           tls_handshake_latency_ms: 22.4,
           synthetic_canvas_noise: false,
@@ -510,7 +510,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
               handler: async function (resp) {
                 await verifyPaymentOnBackend(resp.razorpay_order_id || data.razorpay_order_id, resp.razorpay_payment_id, resp.razorpay_signature)
               },
-              prefill: { name: cardName, email: 'customer@razorshield.io', contact: '9876543210' },
+              prefill: { name: cardName, email: 'customer@razorvigil.io', contact: '9876543210' },
               theme: { color: '#4f46e5' },
             })
             rzp.open()
@@ -619,7 +619,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
           key: keyId,
           amount: selectedProduct.price * 100,
           currency: 'INR',
-          name: 'RazorShield Sovereign Store',
+          name: 'RazorVigil Sovereign Store',
           description: selectedProduct.name,
           order_id: data.razorpay_order_id,
           handler: async function (resp) {
@@ -627,7 +627,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
           },
           prefill: {
             name: cardName,
-            email: 'customer@razorshield.io',
+            email: 'customer@razorvigil.io',
             contact: '9876543210',
           },
           theme: { color: '#4f46e5' },
@@ -905,7 +905,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
                     </div>
                   </div>
                   <span className="text-xs font-mono font-bold text-slate-300 tracking-wider">
-                    {activePreset === 'canary' ? 'CANARY HONEYTOKEN' : 'RAZORSHIELD SECURE'}
+                    {activePreset === 'canary' ? 'CANARY HONEYTOKEN' : 'RAZORVIGIL SECURE'}
                   </span>
                 </div>
                 <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-white/10 border border-white/10 uppercase tracking-wider">
@@ -1001,7 +1001,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
                 <div>
                   <h3 className="text-lg font-bold text-white font-sans">Payment Verified &amp; Captured</h3>
                   <p className="text-xs text-emerald-400 font-mono mt-0.5">
-                    Cleared by RazorShield Sentinel AI Hot Path (&lt;15ms SLA)
+                    Cleared by RazorVigil Sentinel AI Hot Path (&lt;15ms SLA)
                   </p>
                 </div>
 
@@ -1106,7 +1106,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
                     </label>
                   </div>
 
-                  {/* Dual Action Buttons: RazorShield Direct & Razorpay Native Checkout */}
+                  {/* Dual Action Buttons: RazorVigil Direct & Razorpay Native Checkout */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
                     <button
                       type="submit"

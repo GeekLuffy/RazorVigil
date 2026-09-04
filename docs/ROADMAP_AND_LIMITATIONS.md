@@ -1,6 +1,6 @@
 # Production Roadmap & Architectural Scope Boundaries
 
-> Technical scope boundaries, production hardening roadmap, and multi-tenant scaling considerations for RazorShield Sentinel.
+> Technical scope boundaries, production hardening roadmap, and multi-tenant scaling considerations for RazorVigil Sentinel.
 
 ---
 
@@ -29,7 +29,7 @@ merchants share anonymised fraud signals (hashed PANs, device fingerprints, velo
 using differential privacy or SMPC so that a carding ring blocked at Merchant A is immediately
 flagged at Merchant B — without either merchant seeing the other's raw transaction data.
 
-**What is actually implemented**: The RazorShield backend is a single-tenant service. There is
+**What is actually implemented**: The RazorVigil backend is a single-tenant service. There is
 no inter-merchant communication layer, no federated learning protocol, no differential privacy
 budget management, and no consortium governance model. The architecture section describes this
 as a future direction with reference to Flower FL / OpenFL patterns.
@@ -90,7 +90,7 @@ tool calls. This is confirmed by `backend/mcp_verify.py` (committed to repo).
 workspace. Razorpay Agent Studio launched March 12 2026 (FTX'26) — the MCP registration
 flow requires a live Agent Studio tenant, which we do not have access to for a test submission.
 The positioning is correct (MCP protocol, same Claude Agent SDK stack) but the end-to-end
-`Razorpay Agent → RazorShield sub-agent` delegation has not been run on live Agent Studio
+`Razorpay Agent → RazorVigil sub-agent` delegation has not been run on live Agent Studio
 infrastructure, only simulated via `demo_agent.py`.
 
 ---

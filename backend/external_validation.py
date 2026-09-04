@@ -1,5 +1,5 @@
 """
-External Validation Pipeline — RazorShield Sentinel
+External Validation Pipeline — RazorVigil Sentinel
 =====================================================
 Cold-transfer evaluation of the existing trained ensemble against two
 independently-labeled real-world fraud datasets:
@@ -324,7 +324,7 @@ def build_ieee_entity_graph(df: pd.DataFrame) -> dict:
 # --------------------------------------------------------------------------
 def main():
     print("=" * 60)
-    print("RAZORSHIELD SENTINEL — EXTERNAL OOD VALIDATION")
+    print("RAZORVIGIL SENTINEL — EXTERNAL OOD VALIDATION")
     print("=" * 60)
 
     if not LGBM_PATH.exists() or not IF_PATH.exists():
@@ -388,7 +388,7 @@ def main():
         for r in results:
             print(f"{r['dataset']:<45} {r['pr_auc']:>8.4f} {r['recall_at_50']:>10.2%} {r['prevalence']:>10.2%}")
         print("\nSynthetic baseline (for reference):")
-        print(f"  {'RazorShield synthetic (in-distribution)':<43} {'0.9983':>8} {'99.10%':>11} {'22.25%':>11}")
+        print(f"  {'RazorVigil synthetic (in-distribution)':<43} {'0.9983':>8} {'99.10%':>11} {'22.25%':>11}")
         print("\nThe gap between synthetic and external OOD numbers is expected.")
         print("Behavioral biometric features are absent in all external datasets.")
     else:

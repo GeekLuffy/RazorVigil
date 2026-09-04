@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Durable Webhook Idempotency Store
+RazorVigil Sentinel — Durable Webhook Idempotency Store
 Provides a persistent database-level idempotency backstop with a UNIQUE(event_id)
 constraint that guarantees zero duplicate processing even across Redis restarts or cache flushes.
 

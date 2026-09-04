@@ -317,7 +317,7 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
               </span>
             </div>
             <div className={`text-[11px] font-sans ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              All simulated vectors fire only against RazorShield's own sandboxed local gateway. Zero code here can target any third-party system.
+              All simulated vectors fire only against RazorVigil's own sandboxed local gateway. Zero code here can target any third-party system.
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Adversarial Co-Evolution Arms Race Engine.
+RazorVigil Sentinel — Adversarial Co-Evolution Arms Race Engine.
 
 DEFENSE-ONLY COMPLIANCE DECLARATION:
 This module operates exclusively in-memory on synthetic numpy/pandas data structures.
@@ -214,7 +214,7 @@ def run_coevolution(
 def run_five_round_arms_race() -> dict:
     """
     Executes a structured 5-round adversarial arms race demonstrating the sequential
-    escalation between an evolving AI-powered Red Team adversary and RazorShield Sentinel's
+    escalation between an evolving AI-powered Red Team adversary and RazorVigil Sentinel's
     multi-layered defense grid.
     """
     rounds = [

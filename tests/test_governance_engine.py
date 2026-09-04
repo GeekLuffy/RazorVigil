@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel — Governance & Autonomous Policy Engine Test Suite.
+RazorVigil Sentinel — Governance & Autonomous Policy Engine Test Suite.
 
 Verifies the full post-loss autopsy, automated feature discovery, multi-round
 adversarial co-evolution, 6-gate verification suite, off-policy evaluation,

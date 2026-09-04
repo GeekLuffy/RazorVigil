@@ -5,7 +5,7 @@ from pathlib import Path
 
 TOKEN = "2d1743a3308542c7beb1b61f769c124a9b08e7a04f09f851"
 BASE_URL = "http://192.168.20.15:8888"
-REMOTE_ROOT = "razorshield_workspace"
+REMOTE_ROOT = "razorvigil_workspace"
 
 headers = {"Authorization": f"token {TOKEN}"}
 

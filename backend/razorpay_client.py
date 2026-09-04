@@ -20,7 +20,7 @@ except ImportError:
 
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "rzp_test_demo12345678")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "razorpay_test_secret_demo")
-RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET", "razorshield_webhook_secret_2026")
+RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET", "razorvigil_webhook_secret_2026")
 
 
 class RazorpayClient:
@@ -64,7 +64,7 @@ class RazorpayClient:
             "currency": "INR",
             "receipt": receipt_id,
             "notes": {
-                "risk_engine": "RazorShield Sentinel",
+                "risk_engine": "RazorVigil Sentinel",
                 "decision": "safe"
             }
         }
@@ -88,7 +88,7 @@ class RazorpayClient:
             "created_at": int(time.time()),
         }
 
-    async def create_payment_link(self, amount_rupees: float, description: str = "RazorShield Recovery Link") -> Dict[str, Any]:
+    async def create_payment_link(self, amount_rupees: float, description: str = "RazorVigil Recovery Link") -> Dict[str, Any]:
         """
         Creates a Payment Link for soft-risk recovery workflows.
         """
@@ -101,7 +101,7 @@ class RazorpayClient:
             "reminder_enable": False,
             "notes": {
                 "tier": "soft_risk_recovered",
-                "risk_engine": "RazorShield Sentinel"
+                "risk_engine": "RazorVigil Sentinel"
             }
         }
 

@@ -1,5 +1,5 @@
 """
-RazorShield Sentinel - MCP Server for Razorpay Agent Studio Integration.
+RazorVigil Sentinel - MCP Server for Razorpay Agent Studio Integration.
 
 Exposes 4 MCP tools callable by any Claude Agent SDK agent:
   1. check_canary_status(transaction_id)
@@ -10,8 +10,8 @@ Exposes 4 MCP tools callable by any Claude Agent SDK agent:
 How to run standalone:
     python backend/mcp_server.py
 
-Note: Wraps the live RazorShield backend HTTP API (localhost:8000).
-Set RAZORSHIELD_API_URL env var to point to a deployed backend.
+Note: Wraps the live RazorVigil backend HTTP API (localhost:8000).
+Set RAZORVIGIL_API_URL env var to point to a deployed backend.
 
 SDK: mcp 2.x (MCPServer from mcp.server.mcpserver, @server.tool decorator).
 """
@@ -26,7 +26,7 @@ from typing import Any, Optional
 import httpx
 from mcp.server.mcpserver import MCPServer
 
-RAZORSHIELD_API_URL = os.getenv("RAZORSHIELD_API_URL", "http://localhost:8000")
+RAZORVIGIL_API_URL = os.getenv("RAZORVIGIL_API_URL", "http://localhost:8000")
 
 # ---------------------------------------------------------------------------
 # HTTP helpers — fresh AsyncClient per call (safe for stdio + async context)
@@ -34,7 +34,7 @@ RAZORSHIELD_API_URL = os.getenv("RAZORSHIELD_API_URL", "http://localhost:8000")
 
 async def _get(path: str, params: dict | None = None) -> dict[str, Any]:
     try:
-        async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as client:
+        async with httpx.AsyncClient(base_url=RAZORVIGIL_API_URL, timeout=10.0) as client:
             r = await client.get(path, params=params or {})
             r.raise_for_status()
             return r.json()
@@ -44,7 +44,7 @@ async def _get(path: str, params: dict | None = None) -> dict[str, Any]:
 
 async def _post(path: str, body: dict) -> dict[str, Any]:
     try:
-        async with httpx.AsyncClient(base_url=RAZORSHIELD_API_URL, timeout=10.0) as client:
+        async with httpx.AsyncClient(base_url=RAZORVIGIL_API_URL, timeout=10.0) as client:
             r = await client.post(path, json=body)
             r.raise_for_status()
             return r.json()
@@ -159,9 +159,9 @@ async def tool_compile_dispute_evidence(transaction_id: str) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 server = MCPServer(
-    name="razorshield-sentinel",
+    name="razorvigil",
     version="1.2.0",
-    title="RazorShield Sentinel",
+    title="RazorVigil Sentinel",
     description=(
         "Specialist MCP sub-agent for carding ring detection, Louvain graph clustering, "
         "canary honeytoken forensics, and chargeback evidence dossier compilation. "
@@ -173,8 +173,8 @@ server = MCPServer(
 @server.tool(
     name="check_canary_status",
     description=(
-        "Check whether a transaction triggered a RazorShield canary honeytoken hit. "
-        "Canary cards are synthetic Luhn-valid PANs seeded exclusively within RazorShield's "
+        "Check whether a transaction triggered a RazorVigil canary honeytoken hit. "
+        "Canary cards are synthetic Luhn-valid PANs seeded exclusively within RazorVigil's "
         "own decoy inventory endpoints. Any hit = 1.0-confidence attacker was scanning our system. "
         "Returns is_canary, confidence, canary_index."
     ),
@@ -203,7 +203,7 @@ async def get_cluster_risk_score(
 @server.tool(
     name="investigate_transaction",
     description=(
-        "Run the full 8-layer RazorShield forensic pipeline on any transaction. "
+        "Run the full 8-layer RazorVigil forensic pipeline on any transaction. "
         "Returns tier (safe/soft_risk/elevated_review/high_confidence_bot), "
         "risk_score (0-1), explanation, and all forensic signal values. "
         "Use for specialist carding/bot-abuse deep-forensic analysis."

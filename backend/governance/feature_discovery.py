@@ -1,5 +1,5 @@
 ﻿"""
-RazorShield Sentinel — Autonomous Feature Discovery Engine.
+RazorVigil Sentinel — Autonomous Feature Discovery Engine.
 
 Computes candidate behavioral and structural features using strictly pre-decision 
 information, followed by non-parametric RandomForestClassifier importance screening.

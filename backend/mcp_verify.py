@@ -27,7 +27,7 @@ async def verify():
     params = StdioServerParameters(
         command=sys.executable,
         args=[server_script],
-        env={"RAZORSHIELD_API_URL": "http://localhost:8000"},
+        env={"RAZORVIGIL_API_URL": "http://localhost:8000"},
     )
 
     print("=" * 60)

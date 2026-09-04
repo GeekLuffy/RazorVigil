@@ -73,7 +73,7 @@ export default function ArchitectureOverview() {
                 </span>
               </div>
               <h2 className="text-xl font-bold text-white tracking-tight font-sans mt-1">
-                RazorShield Sentinel — System Architecture &amp; Mathematical Specification
+                RazorVigil Sentinel — System Architecture &amp; Mathematical Specification
               </h2>
               <p className="text-xs text-slate-400 font-sans">
                 Autonomous 5-Layer Defense Stack, Conformal Prediction Proofs &amp; RBI Compliance
@@ -340,7 +340,7 @@ export default function ArchitectureOverview() {
             <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
               <h4 className="text-emerald-400 font-bold">Digital Payment Authentication Directions 2025</h4>
               <p className="text-slate-300 text-[11px] leading-relaxed">
-                Mandates dynamic Risk-Based Authentication (RBA). RazorShield performs sub-15ms risk tiering, enforcing step-up 3DS2 challenges when risk exceeds thresholds.
+                Mandates dynamic Risk-Based Authentication (RBA). RazorVigil performs sub-15ms risk tiering, enforcing step-up 3DS2 challenges when risk exceeds thresholds.
               </p>
               <span className="inline-block px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">
                 Effective April 1, 2026

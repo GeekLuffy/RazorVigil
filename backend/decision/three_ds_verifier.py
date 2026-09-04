@@ -1,5 +1,5 @@
 """
-3DS2 Cryptographic & Anti-Bypass Verification Engine — RazorShield Sentinel.
+3DS2 Cryptographic & Anti-Bypass Verification Engine — RazorVigil Sentinel.
 Neutralizes automated 3DS solver scripts, synthetic devicePrint spoofing (random canvas/webgl),
 fake CAVV/ECI injections, and Python requests TLS Client Hello impersonation.
 """
@@ -51,7 +51,7 @@ class ThreeDSAntiBypassEngine:
     """
 
     # Dummy issuer verification key (in production, loaded from Visa/Mastercard DS HSM)
-    _ISSUER_DS_SECRET = b"razorshield-visa-mastercard-ds-secret-2026"
+    _ISSUER_DS_SECRET = b"razorvigil-visa-mastercard-ds-secret-2026"
 
     # Known synthetic script signatures (e.g. random canvas numbers, fake plugin lists)
     _SYNTHETIC_PLUGINS = {"Chrome PDF Plugin", "Chrome PDF Viewer"}
