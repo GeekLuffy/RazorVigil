@@ -29,6 +29,8 @@ Simultaneously, an asynchronous intelligence plane runs Louvain bipartite graph 
 ## 📊 Key Verified Benchmarks
 
 > Source: [`docs/metrics.json`](docs/metrics.json) v1.0.0 · Held-out test N = 10,000 · Bootstrap 95% CI (1,000 resamples)
+>
+> ⚠️ **Dataset Context**: Metrics are evaluated on a synthetic dataset (30% fraud prevalence, entity-disjoint partition). Synthetic data is structurally easier to separate than production data — high PR-AUC is expected by design. Real-world benchmarks on entity-disjoint production datasets (IEEE-CIS, 6,381-team Kaggle) top out at AUC-ROC ~0.94 and PR-AUC ~0.89. The **76.8% zero-day CVV recall** gain is our most robust metric — evaluated under leave-one-attack-type-out, the hardest generalization test.
 
 | Metric | Tabular GBDT Blend | Static 4-Way Blend | **Persistence-Gated P2** ✅ |
 | :--- | :---: | :---: | :---: |
@@ -145,13 +147,13 @@ $$
 
 ---
 
-### 2. Kinetic Keystroke Shannon Entropy *(USENIX Security Literature)*
+### 2. Kinetic Keystroke Shannon Entropy *(Keystroke Dynamics Literature)*
 
 $$
 H(\Delta t) = -\sum_{k=1}^{K} p_k \log_2(p_k)
 $$
 
-Human baseline: $H \in [2.20, 3.50]\text{ bits}$. Robotic replay: $H < 0.60\text{ bits}$ ($> 5.9\sigma$ anomaly).
+Human typing exhibits cognitive variation with measurably higher entropy than scripted replay (Joyce & Gupta 1990 lineage; HAL survey 2025). Specific thresholds ($H \in [2.20, 3.50]\text{ bits}$ for humans; $H < 0.60\text{ bits}$ for bots) are **internal calibration values** derived from RazorVigil's synthetic dataset — not published peer-reviewed figures.
 
 ---
 
@@ -246,10 +248,11 @@ Full documentation follows the [Diataxis framework](https://diataxis.fr):
 
 ## ⚖️ Regulatory Compliance
 
-- **Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)** — dynamic Risk-Based Authentication mandate.
-- **Card-on-File Tokenization (CoFT)** — zero cleartext PAN/CVV. All features operate on SHA-256 surrogate tokens (`card_hash`).
+- **RBI (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025** (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026, effective April 1, 2026) — mandates dynamic Risk-Based Authentication evaluating behavioral analytics, device fingerprinting, transaction history, and geolocation. RBA engines are a regulatory obligation, not a nice-to-have.
+- **Card-on-File Tokenization (CoFT)** — zero cleartext PAN/CVV since October 1, 2022. All features operate on SHA-256 surrogate tokens (`card_hash`).
 - **EMVCo 3DS 2.2** — cryptographic CAVV/AAV verification enables full issuer liability shift on proven authentic transactions.
 - **ISO 8583 Audit Trails** — 5-domain evidentiary packages with SHA-256 seals for every flagged authorization.
+- **Visa Acquirer Monitoring Program (VAMP)** (effective April 1, 2025, Excessive threshold tightened to 1.5% from April 1, 2026) — $8/transaction fine with no warning tier. Critically, VAMP's denominator structure means over-blocking is now mathematically self-defeating: declining legitimate transactions shrinks the TC05 denominator while the fraud numerator stays constant, pushing the ratio up. RazorVigil's three-tier soft-hold architecture is the correct response to this incentive structure.
 
 ---
 
@@ -258,8 +261,11 @@ Full documentation follows the [Diataxis framework](https://diataxis.fr):
 1. Huang et al. — *Uncertainty Quantification over Graphs with Conformalized GNNs (CF-GNN)*, NeurIPS 2023.
 2. Lin & Goyal et al. — *Focal Loss for Dense Object Detection*, IEEE TNNLS 2022.
 3. Dou et al. — *Enhancing GNNs for Fraud Detection via Dual-Stage Neighbor Selection (Care-GNN)*, ACM SIGKDD 2020.
-4. Security Research Group — *Analyzing AiTM 3DS and OTP Relays*, USENIX Security 2024.
-5. Reserve Bank of India — *Authentication Mechanisms for Digital Payment Transactions Directions, 2025*.
+4. Ali et al. (Newcastle University) — *Does the Online Card Payment Landscape Unwittingly Facilitate Card-Not-Present Fraud?*, **IEEE Security & Privacy, 2017** — primary academic source for distributed CVV guessing attack.
+5. Dal Pozzolo et al. — *Learned Lessons in Credit Card Fraud Detection from a Practitioner Perspective*, Expert Systems with Applications 41(10), 2014 — concept drift & delayed supervision.
+6. Reserve Bank of India — *Authentication Mechanisms for Digital Payment Transactions Directions, 2025* (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026), September 25, 2025. Effective April 1, 2026.
+7. LexisNexis Risk Solutions / Forrester Consulting — *True Cost of Fraud Study, Asia-Pacific*, 2024 — ₹4.00 total cost per ₹1 fraud for Indian enterprises.
+8. "Data Leakage and Deceptive Performance: A Critical Examination of Credit Card Fraud Detection Methodologies" — arXiv:2506.02703, June 2025.
 
 ---
 

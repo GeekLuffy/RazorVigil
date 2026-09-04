@@ -46,8 +46,8 @@ $$\mathcal{L}_{\text{Focal}}(p_t) = -\alpha_t (1 - p_t)^\gamma \log(p_t), \quad 
 Over inter-keystroke intervals $\Delta t_i = t_i - t_{i-1}$ quantized into bins $k=1 \dots K$:
 $$H(\Delta t) = -\sum_{k=1}^K p_k \log_2(p_k)$$
 
-* **Human Baseline**: $H \in [2.20, 3.50]\text{ bits}$
-* **Robotic CDP / Script Replay**: $H < 0.60\text{ bits}$ ($5.9\sigma$ anomaly, triggering instant quarantine)
+* **Human Baseline**: $H \in [2.20, 3.50]\text{ bits}$ *(internal calibration threshold — qualitative distinction established in keystroke dynamics literature; Joyce & Gupta 1990 lineage)*
+* **Robotic CDP / Script Replay**: $H < 0.60\text{ bits}$ *(internal calibration threshold — not a published peer-reviewed figure)*
 
 ---
 

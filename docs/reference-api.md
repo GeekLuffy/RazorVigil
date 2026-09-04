@@ -47,7 +47,7 @@ Evaluates an incoming payment transaction through the full 8-layer quad-ensemble
 ## 2. Threat Memory Copilot AI (Track 02)
 
 ### `POST /copilot/chat`
-Interactive RAG conversational endpoint over live transaction store, Louvain graph topology, and RBI Master Directions.
+Interactive RAG conversational endpoint over live transaction store, Louvain graph topology, and RBI Authentication Mechanisms for Digital Payment Transactions Directions, 2025.
 
 #### Request Body:
 ```json

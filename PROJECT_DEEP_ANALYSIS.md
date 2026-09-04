@@ -134,8 +134,8 @@ Certified prediction sets $C(X)$:
 
 ### B. Kinetic Keystroke Shannon Entropy
 $$H(\Delta t) = -\sum_{k=1}^K p_k \log_2(p_k)$$
-- Human baseline: $H \in [2.20, 3.50]\text{ bits}$.
-- Robotic CDP/Puppeteer: $H < 0.60\text{ bits}$ ($>5.9\sigma$ anomaly).
+- Human baseline: $H \in [2.20, 3.50]\text{ bits}$ *(internal calibration threshold; qualitative distinction established in keystroke dynamics literature — Joyce & Gupta 1990 lineage)*.
+- Robotic CDP/Puppeteer: $H < 0.60\text{ bits}$ *(internal calibration threshold — not a published peer-reviewed figure)*.
 
 ### C. Temporal Louvain Graph Modularity
 Bipartite edge weights decay with a 30-minute half-life ($\tau = 1800\text{s}$):
@@ -227,7 +227,7 @@ $$\hat{V}_{\text{DR}}(\pi) = \frac{1}{N} \sum_{i=1}^N \left[ \hat{Q}(x_i, \pi(x_
 - 1-Click JSON export of SRE compliance records.
 
 ### 2. 💬 Interactive Threat Memory Copilot Incident Room (Track 02 AI Risk Manager)
-- Interactive slide-out drawer connected to live transaction memory, Louvain graph topology, and RBI Master Directions.
+- Interactive slide-out drawer connected to live transaction memory, Louvain graph topology, and RBI Authentication Mechanisms for Digital Payment Transactions Directions, 2025.
 - 8D Vector Cosine Similarity Search: $S = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|}$ matching against historical carding archetypes.
 - Actionable 1-click triggers: `[Quarantine Entire Ring]`, `[Copy Cloudflare WAF]`, `[Download Dispute PDF]`.
 - Citations from RBI and EMVCo legal documentation surfaced inline.

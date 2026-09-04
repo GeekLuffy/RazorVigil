@@ -33,7 +33,7 @@ Modern payment infrastructure faces sophisticated, automated fraud patterns that
 2. **Rotating Residential Proxy Swarms**: Attackers route traffic across millions of residential IP addresses, completely circumventing simple IP-based velocity limits.
 3. **Synthetic Kinetic Biometrics**: Headless automation frameworks (Puppeteer, Playwright) spoof basic user behavior, generating synthetic mouse movements and timing delays.
 4. **Adversarial AiTM Reverse Proxies & OTP Relays**: Reverse-proxy frameworks (Evilginx, Modlishka) intercept session tokens and one-time passwords during 3DS flows in real time.
-5. **The False Decline Tax**: Conventional fixed-threshold risk scoring disproportionately rejects legitimate high-value customers. Industry false decline rates typically range between 2.5% and 5.0%, costing merchants up to 15x more in lost customer lifetime value than actual fraud losses.
+5. **The False Decline Tax**: Conventional fixed-threshold risk scoring disproportionately rejects legitimate high-value customers. The LexisNexis True Cost of Fraud Study (Asia-Pacific, 2024) found Indian organizations incur **₹4.00 in total cost for every ₹1.00 lost to actual fraud** — making false decline losses the dominant economic threat, not the fraud itself.
 
 ### 1.2 Core Architectural Principles & Technical Approach
 RazorVigil is engineered as a synchronous, in-line payment defense engine operating within strict gateway latency budgets:
@@ -297,11 +297,12 @@ The Copilot produces actionable, 1-click incident responses:
 
 ---
 
-## 8. Regulatory Compliance: RBI Master Directions & EMVCo 3DS 2.2
+## 8. Regulatory Compliance: RBI Directions & EMVCo 3DS 2.2
 
-1. **Reserve Bank of India (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (effective April 1, 2026)**:
-   - §7.2 mandates dynamic Risk-Based Authentication (RBA) evaluating user context, velocity, and device health.
-   - Sentinel dynamically routes transactions into Green (frictionless pass), Amber (step-up challenge / UPI hold), and Red (tarpit block).
+1. **RBI (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025** (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026, effective April 1, 2026):
+   - Mandates dynamic Risk-Based Authentication (RBA) evaluating behavioural analytics, device fingerprinting, transaction pattern, and geolocation for all non-card-present transactions.
+   - Cross-border CNP provisions effective October 1, 2026.
+   - RazorVigil dynamically routes transactions into Green (frictionless pass), Amber (step-up challenge / UPI hold), and Red (tarpit block), directly implementing the RBA mandate.
    - No unsubstantiated regulatory exemptions are claimed; all routing conforms strictly to published guidelines.
 
 2. **Card-on-File Tokenization (CoFT)**:
@@ -322,7 +323,7 @@ The Copilot produces actionable, 1-click incident responses:
 Collected client-side during form completion without collecting personally identifiable information:
 - **Keystroke Inter-Arrival Shannon Entropy $H(\Delta t)$**:
   $$H(\Delta t) = -\sum_{k=1}^K p_k \log_2(p_k)$$
-  Human typists exhibit cognitive variation with $H \in [2.20, 3.50]\text{ bits}$. Automated script injection exhibits near-zero entropy ($H < 0.60\text{ bits}$), triggering instant quarantine.
+  Human typing exhibits measurably higher entropy than scripted replay (Joyce & Gupta 1990 lineage; HAL survey 2025). Thresholds ($H \in [2.20, 3.50]\text{ bits}$ for humans; $H < 0.60\text{ bits}$ for bots) are **internal calibration values** derived from RazorVigil's synthetic dataset, not published peer-reviewed benchmarks.
 - **Mouse Jitter & Path Curvature**: Measures Bézier linearity. Pure straight-line coordinate vectors indicate headless browser automation.
 - **Input Paste Detection**: Identifies automated clipboard paste events across PAN and CVV fields.
 

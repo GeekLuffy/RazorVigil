@@ -15,7 +15,15 @@
       "confidence_level": 0.95,
       "split_methodology": "Entity-disjoint stratified 3-way partition. Card SHA-256 hashes, IP subnet CIDRs, and device fingerprints are first clustered by entity group ID; groups are then randomly assigned to Train/Val/Test with no entity appearing across split boundaries. A transaction-hash disjointness audit (scripts/leakage_audit.py) confirms zero cross-split card_hash collisions, strictly monotonic timestamps (dt>=0), and max feature-target correlation < 0.85.",
       "entity_disjoint": true,
-      "entity_disjoint_note": "Same physical card, IP, or device fingerprint never appears in both train and test partitions. Splits are computed on entity group level, not transaction level, preventing entity-level leakage even when the same entity generates multiple transactions with distinct transaction hashes."
+      "entity_disjoint_note": "Same physical card, IP, or device fingerprint never appears in both train and test partitions. Splits are computed on entity group level, not transaction level, preventing entity-level leakage even when the same entity generates multiple transactions with distinct transaction hashes.",
+      "dataset_type": "synthetic",
+      "fraud_prevalence_test": 0.30,
+      "dataset_caveat": "All metrics are evaluated on a synthetic dataset with 30% fraud prevalence. Synthetic data is structurally easier to separate than production data — high PR-AUC (0.99+) is expected by design, not a claim of production-equivalent performance. Real-world benchmarks on entity-disjoint production datasets (IEEE-CIS, 6381-team Kaggle) top out at AUC-ROC ~0.94 and PR-AUC ~0.89. The zero-day CVV recall gain (76.8% vs 8.2%) is evaluated under leave-one-attack-type-out — the hardest generalization test available without real labeled production data.",
+      "real_world_context": {
+        "ieee_cis_best_auc_roc": 0.9459,
+        "ieee_cis_ensemble_pr_auc": 0.891,
+        "source": "arXiv:2506.02703 June 2025; Kaggle IEEE-CIS 2019 competition (6381 teams)"
+      }
     }
   },
   "global_test_metrics": {
