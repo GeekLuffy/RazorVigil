@@ -1188,7 +1188,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
 
       {/* 3DS 2.0 Bank ACS Step-Up & Kinetic OTP Challenge Modal */}
       {threeDsModal && (
-        <div className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-indigo-500/40 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-up">
             
             {/* ACS Secure Address Header */}
@@ -1323,7 +1323,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
 
       {/* Out-of-Band UPI QR Recovery Modal */}
       {recoveryModal && (
-        <div className="fixed inset-0 z-60 bg-black/85 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-black/85 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-amber-500/40 rounded-2xl w-full max-w-md p-6 shadow-2xl text-center space-y-4">
             <div className="w-12 h-12 bg-amber-500/20 border border-amber-500/30 rounded-2xl mx-auto flex items-center justify-center text-amber-400">
               <QrCode size={24} />
