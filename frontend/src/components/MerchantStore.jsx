@@ -514,6 +514,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
               },
               prefill: { name: cardName, email: 'customer@razorvigil.io', contact: '9876543210' },
               theme: { color: '#4f46e5' },
+              remember_customer: false,
             })
             rzp.open()
           } else {
@@ -633,6 +634,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
             contact: '9876543210',
           },
           theme: { color: '#4f46e5' },
+          remember_customer: false,
         })
         rzp.open()
       } else {
