@@ -19,7 +19,7 @@ export default function AttackSimulatorPage({ onOpenStore }) {
           }`}
         >
           <Flame size={14} className="text-rose-400" />
-          <span>Threat Lab &amp; Attack Injector</span>
+          <span>Threat Replay Lab &amp; Test Harness</span>
         </button>
 
         <button

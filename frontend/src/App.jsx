@@ -51,7 +51,7 @@ const ALL_TABS = [
   { id: 'syndicates',        label: 'Syndicate Graph' },
   { id: 'risk-intelligence', label: 'Risk Intelligence' },
   { id: 'model-evaluation',  label: 'Model Studio' },
-  { id: 'simulator',         label: 'Attack Simulator' },
+  { id: 'simulator',         label: 'Threat Replay Lab' },
   { id: 'architecture',      label: 'RBI Architecture' },
   { id: 'audit-log',         label: 'Dispute Cases' },
 ]

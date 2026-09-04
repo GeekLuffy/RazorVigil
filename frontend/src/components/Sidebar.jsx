@@ -19,7 +19,7 @@ export const NAV_SECTIONS = [
     items: [
       { id: 'risk-intelligence', label: 'Risk Intelligence', icon: Activity },
       { id: 'model-evaluation', label: 'Model Studio', icon: BarChart3 },
-      { id: 'simulator', label: 'Attack Simulator', icon: Flame },
+      { id: 'simulator', label: 'Threat Replay Lab', icon: Flame },
     ]
   },
   {
@@ -40,7 +40,7 @@ const HINDI_MAP = {
   'Syndicate Graph': 'सिंडिकेट ग्राफ',
   'Risk Intelligence': 'जोखिम इंटेलिजेंस',
   'Model Studio': 'मॉडल स्टूडियो',
-  'Attack Simulator': 'हमला सिम्युलेटर',
+  'Threat Replay Lab': 'थ्रेट रीप्ले लैब',
   'Dispute Cases': 'विवाद मामले',
   'RBI Architecture': 'आरबीआई आर्किटेक्चर',
   'Merchant Storefront': 'मर्चेंट स्टोरफ्रंट',

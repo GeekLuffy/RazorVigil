@@ -91,7 +91,7 @@ export default function DashboardPage({
             className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-sans transition-all flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer"
           >
             <Flame size={13} />
-            <span>Attack Simulator</span>
+            <span>Threat Replay Lab</span>
           </button>
 
           <button
