@@ -82,6 +82,20 @@ _quarantined_threats_count: int = 312
 _canary_triggers_count: int = 28
 _total_blocked_inr: float = 1930500.0
 
+
+def _record_metrics(tier: str, amount: float, latency_ms: float = 8.5):
+    global _quarantined_threats_count, _total_blocked_inr
+    _eval_counts[tier] = _eval_counts.get(tier, 0) + 1
+    _latency_history.append(latency_ms)
+    if len(_latency_history) > 1000:
+        _latency_history.pop(0)
+    amt = float(amount or 0.0)
+    if tier == "high_confidence_bot":
+        _quarantined_threats_count += 1
+        _total_blocked_inr += (amt if amt > 10.0 else 1499.0) + 670.0
+    elif tier == "soft_risk":
+        _total_blocked_inr += amt
+
 ws_clients: list[WebSocket] = []
 
 # Real-time Pre-Seeded Transaction Store with Pure ML & Empirical Dataset Telemetry
@@ -111,18 +125,10 @@ async def _live_stream_generator_loop():
                 
                 # Update eval counts and running financial metrics
                 tier = tx.get("tier", "safe")
-                _eval_counts[tier] = _eval_counts.get(tier, 0) + 1
-                
                 amt = float(tx.get("amount", 0.0))
-                if tier == "high_confidence_bot":
-                    _quarantined_threats_count += 1
-                    # Blocked fraud + saved chargeback arbitration fee (INR 670)
-                    _total_blocked_inr += (amt if amt > 10.0 else 1499.0) + 670.0
-                    if tx.get("is_canary"):
-                        _canary_triggers_count += 1
-                elif tier == "soft_risk":
-                    # Conformal UPI QR step-up saved a legitimate transaction from false decline!
-                    _total_blocked_inr += amt
+                _record_metrics(tier, amt, float(tx.get("latency_ms", 8.5)))
+                if tx.get("is_canary"):
+                    _canary_triggers_count += 1
                 
                 await _broadcast({
                     "type": "transaction",
@@ -355,6 +361,7 @@ async def checkout(
                 bin6=req.bin6,
                 razorpay_order_id=None,
             )
+            _record_metrics("high_confidence_bot", req.amount, latency_ms)
             if ws_clients:
                 asyncio.create_task(_broadcast(response.model_dump()))
             return response
@@ -448,6 +455,8 @@ async def checkout(
             amount=req.amount,
             razorpay_order_id=None,
         )
+        _record_metrics("high_confidence_bot", req.amount, latency_ms)
+        _canary_triggers_count += 1
         if ws_clients:
             asyncio.create_task(_broadcast(response.model_dump()))
         return response
@@ -469,6 +478,7 @@ async def checkout(
             amount=req.amount,
             razorpay_order_id=None,
         )
+        _record_metrics("high_confidence_bot", req.amount, latency_ms)
         if ws_clients:
             asyncio.create_task(_broadcast(response.model_dump()))
         return response
@@ -579,17 +589,7 @@ async def checkout(
     }
 
     # Record live real-time SRE metrics
-    global _quarantined_threats_count, _canary_triggers_count, _total_blocked_inr
-    _eval_counts[tier] = _eval_counts.get(tier, 0) + 1
-    _latency_history.append(latency_ms)
-    if len(_latency_history) > 1000:
-        _latency_history.pop(0)
-    amt = float(req.amount or 0.0)
-    if tier == "high_confidence_bot":
-        _quarantined_threats_count += 1
-        _total_blocked_inr += (amt if amt > 10.0 else 1499.0) + 670.0
-    elif tier == "soft_risk":
-        _total_blocked_inr += amt
+    _record_metrics(tier, req.amount, latency_ms)
 
 
     if ws_clients:

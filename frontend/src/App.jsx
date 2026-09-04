@@ -267,8 +267,25 @@ export default function App() {
       const res = await fetch(`${API_BASE}/metrics/summary`).catch(() => null)
       if (res && res.ok) {
         const data = await res.json()
-        if (data.stats) setStats(prev => ({ ...prev, ...data.stats }))
-        if (data.tier_counts) setTierCounts(prev => ({ ...prev, ...data.tier_counts }))
+        if (data.stats) {
+          setStats(prev => ({
+            ...prev,
+            ...data.stats,
+            total_evaluated: Math.max(prev.total_evaluated || 0, data.stats.total_evaluated || 0),
+            total_blocked_inr: Math.max(prev.total_blocked_inr || 0, data.stats.total_blocked_inr || 0),
+            quarantined_threats: Math.max(prev.quarantined_threats || 0, data.stats.quarantined_threats || 0),
+            canary_triggers: Math.max(prev.canary_triggers || 0, data.stats.canary_triggers || 0),
+          }))
+        }
+        if (data.tier_counts) {
+          setTierCounts(prev => {
+            const nextCounts = { ...prev }
+            for (const [k, v] of Object.entries(data.tier_counts)) {
+              nextCounts[k] = Math.max(prev[k] || 0, v || 0)
+            }
+            return nextCounts
+          })
+        }
       }
 
       const txRes = await fetch(`${API_BASE}/api/transactions/recent`).catch(() => null)
