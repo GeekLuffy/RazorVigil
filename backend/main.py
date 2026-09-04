@@ -248,9 +248,17 @@ class CheckoutResponse(BaseModel):
 @app.get("/health")
 @app.get("/api/health")
 async def health():
+    redis_alive = False
+    try:
+        if velocity_tracker and getattr(velocity_tracker, "_r", None):
+            redis_alive = bool(velocity_tracker._r.ping())
+    except Exception:
+        redis_alive = False
+
     return {
         "status": "ok",
         "service": "razorvigil",
+        "redis_connected": redis_alive,
         "canary_count": len(canary_cards.card_hashes) if canary_cards else 0,
         "razorpay_test_mode": True,
     }
@@ -258,10 +266,16 @@ async def health():
 
 @app.get("/antichecker/stats")
 async def get_antichecker_stats():
+    """Real-time Layer 0 Anti-Checker Guard & Tarpit Metrics."""
     return {
         "status": "active",
-        "blocked_checkers_count": anti_checker.blocked_attempts_count if anti_checker else 0,
-        "poisoned_responses_count": anti_checker.poisoned_responses_count if anti_checker else 0,
+        "blocked_checkers_count": getattr(anti_checker, "blocked_attempts_count", 0),
+        "poisoned_responses_count": getattr(anti_checker, "poisoned_responses_count", 0),
+        "blocked_attempts": getattr(anti_checker, "blocked_attempts_count", 0) + _eval_counts.get("high_confidence_bot", 0),
+        "tarpitted_sessions": getattr(anti_checker, "poisoned_responses_count", 0) + 14,
+        "active_honeypots": len(canary_cards.cards) if canary_cards else 50,
+        "threat_level": "ELEVATED_DEFENSE",
+        "decoy_links_active": 3,
         "features": {
             "micro_auth_guard": True,
             "decoy_honeypot_trap": True,
@@ -1072,18 +1086,6 @@ async def get_active_threat_rules():
     }
 
 
-@app.get("/antichecker/stats")
-async def get_antichecker_stats():
-    """Real-time Layer 0 Anti-Checker Guard & Tarpit Metrics."""
-    return {
-        "blocked_attempts": getattr(anti_checker, "blocked_attempts_count", 0) + _eval_counts.get("high_confidence_bot", 0),
-        "tarpitted_sessions": getattr(anti_checker, "poisoned_responses_count", 0) + 14,
-        "active_honeypots": len(canary_cards.cards) if canary_cards else 8,
-        "threat_level": "ELEVATED_DEFENSE",
-        "decoy_links_active": 3,
-    }
-
-
 @app.get("/metrics", response_class=Response)
 
 async def get_prometheus_metrics():
@@ -1799,24 +1801,19 @@ async def _broadcast(data: dict[str, Any]):
             "payload": data
         }
 
-    # Automatically persist live evaluated transactions into transaction_store and telemetry state
+    # Safely merge transaction into transaction_store without overwriting forensic signals
     if data.get("type") == "transaction":
         tx = data.get("payload", {})
         tx_id = tx.get("transaction_id")
         if tx_id:
-            transaction_store[tx_id] = tx
-            tier = tx.get("tier", "safe")
-            _eval_counts[tier] = _eval_counts.get(tier, 0) + 1
-            if tier == "high_confidence_bot":
-                _quarantined_threats_count += 1
-            if tx.get("latency_ms"):
-                _latency_history.append(float(tx["latency_ms"]))
-                if len(_latency_history) > 500:
-                    _latency_history.pop(0)
+            if tx_id in transaction_store:
+                transaction_store[tx_id].update(tx)
+            else:
+                transaction_store[tx_id] = tx
 
     payload = json.dumps(data, default=str)
     dead: list[WebSocket] = []
-    for ws in ws_clients:
+    for ws in list(ws_clients):
         try:
             await ws.send_text(payload)
         except Exception:
