@@ -43,6 +43,12 @@ Simultaneously, an **asynchronous intelligence plane** runs Louvain bipartite gr
 
 ---
 
+> [!IMPORTANT]
+> **Track 02 Compliance: Strictly Defense-Only Architecture**  
+> RazorVigil is engineered **strictly as a merchant payment defense system**. It contains **zero offensive capabilities**, zero exploit tools, and zero automated attack scripts against external targets. All test harnesses (such as the Detection Test Harness and Red-Team Arms Race Lab) operate **exclusively within an internal local sandbox** to replay synthetic mock traffic against RazorVigil's own defensive gates for benchmark verification.
+
+---
+
 ## 📊 Key Verified Benchmarks
 
 > Source: [`docs/metrics.json`](docs/metrics.json) v1.0.0 · Held-out test N = 10,000 · Bootstrap 95% CI (1,000 resamples)

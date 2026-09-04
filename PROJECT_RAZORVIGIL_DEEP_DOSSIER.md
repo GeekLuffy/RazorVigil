@@ -45,6 +45,7 @@ RazorVigil is engineered as a synchronous, in-line payment defense engine operat
 - **Separation of Synchronous Gating and Asynchronous Intelligence**: Hot-path evaluation runs locally with zero external network hops. Heavy model retraining, 100k synthetic dataset generation, and vector embeddings are offloaded asynchronously to dedicated GPU infrastructure (`bd216server3`).
 - **Dynamic Disagreement Gating on Zero-Day Attacks**: Supervised gradient-boosted trees alone fail on novel attack geometries (dropping to 6.6%–9.0% recall). RazorVigil couples supervised models with an unsupervised Isolation Forest and dynamic persistence gating, raising zero-day CVV cycling recall to **76.80%** `[73.40%, 80.40%]`.
 - **Soft-Risk Out-of-Band Recovery**: Edge-case genuine shoppers (e.g. travelers, VPN users) encountering risk triggers are routed to dynamic UPI QR step-up verification rather than being hard-declined, preserving checkout conversion.
+- **Strictly Defense-Only Architecture (Track 02 Compliance)**: RazorVigil contains zero offensive exploitation code, zero network penetration modules, and zero capabilities to target external payment gateways or third-party systems. All internal simulators, red-team labs, and honeypot triggers operate exclusively within a local, self-contained sandbox to replay synthetic threat patterns against RazorVigil's own defensive gates.
 
 ### 1.3 Hackathon Track 02 Alignment Matrix (AI Risk Manager)
 

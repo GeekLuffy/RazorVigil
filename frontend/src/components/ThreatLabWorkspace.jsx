@@ -462,7 +462,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
         {/* Left Column: Manual Attack Vector Launchpad */}
         <div className="lg:col-span-7 space-y-3">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between font-sans">
-            <span>Direct Attack Vector Triggers (Layer 0–4)</span>
+            <span>Detection Test Harness: Threat Vector Replays (Layer 0–4)</span>
             <span className="text-[10px] font-mono text-indigo-400">REALTIME DISPATCH</span>
           </div>
 
@@ -472,7 +472,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">🤖</span>
-                  <strong className="text-xs font-bold text-white font-sans">Telegram ₹1 Carding Bot Exploit</strong>
+                  <strong className="text-xs font-bold text-white font-sans">Telegram ₹1 Carding Bot Pattern</strong>
                   <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-bold">
                     Layer 0 Pre-Auth Tarpit
                   </span>
@@ -487,7 +487,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
                 className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold font-sans transition shadow-sm border border-indigo-400/30 disabled:opacity-50"
               >
                 {loadingAction === 'tg_checker' ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
-                Trigger Exploit
+                Replay Threat Pattern
               </button>
             </div>
           </div>
