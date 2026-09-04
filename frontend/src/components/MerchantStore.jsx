@@ -56,9 +56,9 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
 
   // Form State
   const [cardName, setCardName] = useState('Rahul Sharma')
-  const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242')
+  const [cardNumber, setCardNumber] = useState('4012 0000 0000 0002')
   const [expiry, setExpiry] = useState('12/28')
-  const [cvv, setCvv] = useState('888')
+  const [cvv, setCvv] = useState('123')
   const [vpnMode, setVpnMode] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isRzpNativeLoading, setIsRzpNativeLoading] = useState(false)
@@ -317,7 +317,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
 
     if (type === 'human') {
       setCardName('Rahul Sharma')
-      setCardNumber('4111 1111 1111 1111')
+      setCardNumber('4012 0000 0000 0002')
       setExpiry('12/28')
       setCvv('123')
       setVpnMode(false)
@@ -1062,7 +1062,7 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
                     <label className="block text-[11px] text-slate-400 font-medium mb-1">Card Number (Type to measure live entropy)</label>
                     <input
                       type="text"
-                      placeholder="4242 4242 4242 4242"
+                      placeholder="4012 0000 0000 0002"
                       value={cardNumber}
                       onChange={e => setCardNumber(e.target.value)}
                       onKeyDown={handleKeyDown}
@@ -1161,6 +1161,10 @@ export default function MerchantStore({ onClose, onPaymentComplete, onTransactio
                         </button>
                       )
                     })()}
+                  </div>
+                  <div className="pt-2 text-[10px] text-slate-400 font-mono flex items-center justify-between border-t border-slate-800/60 mt-2">
+                    <span className="text-slate-500">Test Credentials:</span>
+                    <span className="text-slate-300">Card: <code className="text-indigo-300">4012...0002</code> | UPI: <code className="text-emerald-300">success@razorpay</code></span>
                   </div>
                 </form>
 
