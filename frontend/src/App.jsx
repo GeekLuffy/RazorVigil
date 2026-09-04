@@ -203,12 +203,14 @@ export default function App() {
     }))
     setStats(prev => {
       const isThreat = tier === 'high_confidence_bot' || (tx.risk_score && tx.risk_score > 0.6)
+      const isSoftRisk = tier === 'soft_risk'
       const amt = Number(tx.amount || 0)
-      const incBlocked = isThreat ? (amt > 0 ? amt : 16999) : 0
+      const incBlocked = isThreat ? (amt > 10 ? amt + 670 : 1499 + 670) : (isSoftRisk ? amt : 0)
       return {
         ...prev,
         total_evaluated: (prev.total_evaluated || 24891) + 1,
         total_blocked_inr: (prev.total_blocked_inr || 1930500) + incBlocked,
+        quarantined_threats: (prev.quarantined_threats || 312) + (isThreat ? 1 : 0),
         p99_latency_ms: tx.latency_ms ? Number(Number(tx.latency_ms).toFixed(1)) : prev.p99_latency_ms
       }
     })

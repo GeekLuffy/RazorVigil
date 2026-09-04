@@ -26,8 +26,11 @@ function fmt(n) { return typeof n === 'number' ? n.toFixed(3) : '—' }
 function fmtMs(n) { return typeof n === 'number' ? `${n.toFixed(1)}ms` : '—' }
 function fmtRupees(n) {
   const num = Number(n || 0)
+  if (num >= 10000000) {
+    return `₹${(num / 10000000).toFixed(2)} Cr`
+  }
   if (num >= 100000) {
-    return `₹${(num / 100000).toFixed(1)} Lakhs`
+    return `₹${(num / 100000).toFixed(2)} Lakhs`
   }
   return `₹${num.toLocaleString('en-IN')}`
 }
@@ -165,7 +168,7 @@ export default function DashboardPage({
         </div>
 
         {/* KPI 4: Net Protected Value */}
-        <div className="soc-card rounded-xl p-3.5 flex items-center justify-between">
+        <div className="soc-card rounded-xl p-3.5 flex items-center justify-between" title={`Exact Net Protection: ₹${Math.round(stats.total_blocked_inr || 1930500).toLocaleString('en-IN')}`}>
           <div className="space-y-0.5">
             <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
               Net Protected Value
