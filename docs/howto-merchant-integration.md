@@ -23,10 +23,10 @@ import express from 'express'
 import { RazorVigil } from '@geekluffy/razorvigil'
 
 const app = express()
-const sentinel = new RazorVigil({ apiKey: process.env.RAZORVIGIL_API_KEY })
+const vigil = new RazorVigil({ apiKey: process.env.RAZORVIGIL_API_KEY })
 
 app.post('/api/checkout', async (req, res) => {
-  const decision = await sentinel.evaluate(req.body)
+  const decision = await vigil.evaluate(req.body)
   if (decision.tier === 'high_confidence_bot') {
     return res.status(403).json(decision.honeypot)
   }

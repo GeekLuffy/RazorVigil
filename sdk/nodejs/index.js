@@ -35,3 +35,7 @@ export class RazorShieldSentinel {
     }
   }
 }
+
+export class RazorVigil extends RazorShieldSentinel {}
+export default RazorVigil
+

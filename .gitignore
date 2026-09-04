@@ -19,6 +19,9 @@ threat_intelligence/
 evidence/
 notes/
 backend/dataset/*.csv
+backend/dataset/*.gz
+docs/screenshots/
+docs/verification_results.json
 
 *.db
 *.sqlite

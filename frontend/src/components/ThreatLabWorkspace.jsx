@@ -254,7 +254,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
         })
         const json = await res.json()
         setLastActionStatus('Telegram ₹1 Checker Exploit Blocked via Botnet Fingerprint & Deceptive Tarpit Trap')
-        addLog('Telegram Exploit', '₹1 Scraper Botnet Micro-Auth', `Caught by Anti-Checker Sentinel (Latency: ${json.latency_ms}ms)`, 'TARPIT POISONED')
+        addLog('Telegram Exploit', '₹1 Scraper Botnet Micro-Auth', `Caught by Anti-Checker Pre-Auth Gate (Latency: ${json.latency_ms}ms)`, 'TARPIT POISONED')
       } else if (type === 'burst') {
         for (let i = 0; i < 12; i++) {
           await fetch(`${API_BASE}/checkout`, {
@@ -474,7 +474,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
                   <span className="text-sm">🤖</span>
                   <strong className="text-xs font-bold text-white font-sans">Telegram ₹1 Carding Bot Exploit</strong>
                   <span className="text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded font-bold">
-                    Layer 0 Sentinel
+                    Layer 0 Pre-Auth Tarpit
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 font-sans max-w-xl">

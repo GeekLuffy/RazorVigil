@@ -79,8 +79,8 @@ export default function GPUClusterModal({ isOpen, onClose, isDark }) {
     { index: 1, name: 'NVIDIA GeForce RTX 2080 Ti', temp_c: 42, fan_pct: 25, util_pct: 0, mem_used_mb: 2481, mem_total_mb: 11264, power_w: 14.0, role: 'Background Worker' },
     { index: 2, name: 'NVIDIA GeForce RTX 2080 Ti', temp_c: 36, fan_pct: 22, util_pct: 0, mem_used_mb: 9201, mem_total_mb: 11264, power_w: 2.0, role: 'Astra RAG Node' },
     { index: 3, name: 'NVIDIA GeForce RTX 2080 Ti', temp_c: 87, fan_pct: 100, util_pct: 98, mem_used_mb: 10231, mem_total_mb: 11264, power_w: 149.0, role: 'Heavy Compute' },
-    { index: 4, name: 'NVIDIA GeForce RTX 2080 Ti', temp_c: 50, fan_pct: 27, util_pct: 4, mem_used_mb: 167, mem_total_mb: 11264, power_w: 28.0, role: 'Sentinel Real-Time Inference' },
-    { index: 5, name: 'NVIDIA GeForce RTX 2080 Ti', temp_c: 39, fan_pct: 22, util_pct: 0, mem_used_mb: 9, mem_total_mb: 11264, power_w: 1.0, role: 'Sentinel Standby Node' }
+    { index: 4, name: 'NVIDIA GeForce RTX 2080 Ti', temp_c: 50, fan_pct: 27, util_pct: 4, mem_used_mb: 167, mem_total_mb: 11264, power_w: 28.0, role: 'RazorVigil Real-Time Inference' },
+    { index: 5, name: 'NVIDIA GeForce RTX 2080 Ti', temp_c: 39, fan_pct: 22, util_pct: 0, mem_used_mb: 9, mem_total_mb: 11264, power_w: 1.0, role: 'RazorVigil Standby Node' }
   ]
 
   const sys = clusterData?.system || {
@@ -259,14 +259,14 @@ export default function GPUClusterModal({ isOpen, onClose, isDark }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {gpus.map((gpu) => {
                 const memPct = Math.round((gpu.mem_used_mb / gpu.mem_total_mb) * 100)
-                const isSentinel = gpu.index === 4 || gpu.index === 5
+                const isVigil = gpu.index === 4 || gpu.index === 5
                 const isHeavy = gpu.util_pct > 80 || gpu.temp_c > 80
 
                 return (
                   <div
                     key={gpu.index}
                     className={`p-4 rounded-xl border transition-all ${
-                      isSentinel
+                      isVigil
                         ? isDark
                           ? 'bg-emerald-950/20 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.08)]'
                           : 'bg-emerald-50/50 border-emerald-200'
@@ -283,7 +283,7 @@ export default function GPUClusterModal({ isOpen, onClose, isDark }) {
                       </div>
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
-                          isSentinel
+                          isVigil
                             ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
                             : isHeavy
                             ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
@@ -307,7 +307,7 @@ export default function GPUClusterModal({ isOpen, onClose, isDark }) {
                       <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                         <div
                           className={`h-full transition-all duration-500 ${
-                            isSentinel ? 'bg-emerald-400' : memPct > 80 ? 'bg-rose-500' : 'bg-cyan-400'
+                            isVigil ? 'bg-emerald-400' : memPct > 80 ? 'bg-rose-500' : 'bg-cyan-400'
                           }`}
                           style={{ width: `${memPct}%` }}
                         />
