@@ -1474,10 +1474,10 @@ async def get_multi_language_sdk_snippets():
 import { RazorVigil } from '@geekluffy/razorvigil'
 
 const app = express()
-const sentinel = new RazorVigil({ apiKey: process.env.RAZORVIGIL_API_KEY })
+const vigil = new RazorVigil({ apiKey: process.env.RAZORVIGIL_API_KEY })
 
 app.post('/api/checkout', async (req, res) => {
-  const decision = await sentinel.evaluate(req.body)
+  const decision = await vigil.evaluate(req.body)
   if (decision.tier === 'high_confidence_bot') {
     return res.status(403).json(decision.honeypot)
   }
@@ -1491,11 +1491,11 @@ app.post('/api/checkout', async (req, res) => {
 from razorvigil import RazorVigilClient, CheckoutPayload
 
 app = FastAPI()
-sentinel = RazorVigilClient(api_key=os.getenv("RAZORVIGIL_API_KEY"))
+vigil = RazorVigilClient(api_key=os.getenv("RAZORVIGIL_API_KEY"))
 
 @app.post("/checkout")
 async def checkout(payload: CheckoutPayload):
-    decision = await sentinel.evaluate_async(payload)
+    decision = await vigil.evaluate_async(payload)
     if decision.tier == "high_confidence_bot":
         return Response(content=decision.honeypot_json, status_code=status.HTTP_403_FORBIDDEN)
     # Proceed to standard Razorpay checkout
@@ -1509,13 +1509,13 @@ async def checkout(payload: CheckoutPayload):
 import (
     "net/http"
     "os"
-    sentinel "github.com/GeekLuffy/razorvigil/sdk/go"
+    razorvigil "github.com/GeekLuffy/razorvigil/sdk/go"
 )
 
-var shield = sentinel.NewClient(os.Getenv("RAZORVIGIL_API_KEY"))
+var client = razorvigil.NewClient(os.Getenv("RAZORVIGIL_API_KEY"))
 
 func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
-    decision, err := shield.Evaluate(r.Context(), sentinel.CheckoutPayload{
+    decision, err := client.Evaluate(r.Context(), razorvigil.CheckoutPayload{
         Amount: 2499.0, Currency: "INR", CardHash: "c_9981", DeviceFingerprint: "dev_41", KeystrokeEntropy: 2.85,
     })
     if err == nil && decision.Tier == "high_confidence_bot" {
@@ -1537,11 +1537,11 @@ import org.springframework.http.*;
 
 @RestController
 public class CheckoutController {
-    private final RazorVigilClient sentinel = new RazorVigilClient(System.getenv("RAZORVIGIL_API_KEY"));
+    private final RazorVigilClient vigil = new RazorVigilClient(System.getenv("RAZORVIGIL_API_KEY"));
 
     @PostMapping("/checkout")
     public ResponseEntity<?> handleCheckout(@RequestBody CheckoutPayload payload) {
-        Decision decision = sentinel.evaluate(payload);
+        Decision decision = vigil.evaluate(payload);
         if (decision.isQuarantined()) return ResponseEntity.status(403).body(decision.getHoneypot());
         return ResponseEntity.ok(paymentService.process(payload));
     }

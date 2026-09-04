@@ -329,7 +329,7 @@ export default function ExecutiveGuideModal({
       )
     },
     {
-      title: "4. Business ROI & Why RazorVigil Wins",
+      title: "4. Business ROI & Technical Advantage",
       subtitle: "Measurable Impact on Merchant Bottom Line",
       badge: "ROI & Impact",
       icon: Scale,
@@ -346,8 +346,8 @@ export default function ExecutiveGuideModal({
               <span className="text-[10px] text-slate-400 block mt-1">Synchronous SLA</span>
             </div>
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span className="text-2xl font-bold font-mono text-purple-400">99.9%</span>
-              <span className="text-[10px] text-slate-400 block mt-1">PR-AUC Accuracy</span>
+              <span className="text-2xl font-bold font-mono text-purple-400">0.9963</span>
+              <span className="text-[10px] text-slate-400 block mt-1">PR-AUC (Synthetic)</span>
             </div>
           </div>
 

@@ -149,7 +149,7 @@ class ChatResponse(BaseModel):
 class CopilotIncidentEngine:
     def __init__(self):
         self.rbi_citations = [
-            "RBI Master Direction 2025/2026 on Digital Payment Security Controls (§7.2 — Dynamic Risk-Based Authentication)",
+            "RBI (Authentication Mechanisms for Digital Payment Transactions) Directions, 2025 (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026)",
             "RBI Circular on Additional Factor of Authentication (AFA) for Card Not Present (CNP) Transactions",
             "EMVCo 3-D Secure Protocol and Core Functions Specification v2.2.0 (Kinetic Keystroke Biometrics Exemption)",
             "RazorVigil Layer 0 Protocol — Deterministic Honeypot and Sub-15ms Risk Gating SLA",
@@ -322,7 +322,7 @@ Current Pinned Transaction:
 """
 
             system_prompt = f"""You are the Forensic AI Copilot for RazorVigil, an autonomous enterprise fraud intelligence system protecting Indian payment corridors (Razorpay, UPI 2.0, HDFC, ICICI, SBI).
-You provide mathematically rigorous, legally sound (RBI Master Directions 2025/2026, EMVCo 3DS 2.2), and forensic explanations of fraud vectors, syndicate graph rings, super-cluster hardware telemetry, and real-time defense actions.
+You provide mathematically rigorous, legally sound (RBI Authentication Directions 2025, EMVCo 3DS 2.2), and forensic explanations of fraud vectors, syndicate graph rings, super-cluster hardware telemetry, and real-time defense actions.
 Keep responses formatted cleanly in markdown with headings, bullets, and actionable code/WAF blocks.
 Context:
 {context_summary}
@@ -498,14 +498,14 @@ Context:
         if any(w in msg_lower for w in ["rbi", "compliance", "dispute", "chargeback", "regulation", "liability", "representment"]):
             citations.extend(self.rbi_citations[:3])
             reply = (
-                "### ?? RBI Sovereign Compliance & Dispute Legal Stance\n\n"
-                "Under the **Reserve Bank of India (RBI) Master Directions 2025/2026** on Digital Payment Security:\n\n"
-                "1. **Cryptographic Liability Shift (?4.1)**:\n"
+                "### ⚖️ RBI Sovereign Compliance & Dispute Legal Stance\n\n"
+                "Under the **Reserve Bank of India (RBI) Authentication Mechanisms Directions, 2025** (CO.DPSS.POLC.No.S 668/02-14-015/2025-2026):\n\n"
+                "1. **Dynamic Risk-Based Authentication Mandate**:\n"
+                "   - Mandates that issuers and aggregators evaluate behavioural analytics, device fingerprinting, transaction patterns, and geolocation for all CNP transactions, enforcing dynamic authentication factors.\n"
+                "2. **Cryptographic Liability Shift**:\n"
                 "   - When an EMVCo 3DS 2.2 authentication challenge succeeds with a verifiable CAVV/AAV cryptographic token, full chargeback liability shifts from the Merchant/Aggregator to the Issuing Bank.\n"
-                "2. **Kinetic Keystroke Exemption (?7.2)**:\n"
-                "   - Transactions with high typing entropy ($H > 2.50$) and zero JA3 mismatch qualify for **Frictionless Low-Risk Exemption**, allowing sub-15ms checkout approval.\n"
                 "3. **Zero False Decline Mandate**:\n"
-                "   - Merely blocking suspicious transactions breaches merchant SLA. RazorVigil bridges ambiguous transactions into an **Out-of-Band Dynamic UPI QR Hold** (5-minute TTL), ensuring genuine shoppers never face false declines.\n\n"
+                "   - Merely blocking suspicious transactions breaches merchant SLA and destroys customer LTV (LexisNexis ₹4.00 total cost per ₹1.00 fraud ratio). RazorVigil bridges ambiguous transactions into an **Out-of-Band Dynamic UPI QR Hold** (5-minute TTL), ensuring genuine shoppers never face false declines.\n\n"
                 "**Action Available**: You can export an RBI-compliant forensic dispute dossier PDF with SHA-256 evidence anchoring directly from the Disputes tab."
             )
             actions.append(CopilotAction(
@@ -532,11 +532,11 @@ Context:
             modularity = topo.get("modularity", 0.74)
 
             reply = (
-                f"### ??? Louvain Graph Intelligence & Mule Ring Analysis\n\n"
+                f"### 🕸️ Louvain Graph Intelligence & Mule Ring Analysis\n\n"
                 f"- **Total Entities Tracked**: `{total_nodes}` heterogeneous nodes (Cards, Devices, IPs, AI Agents)\n"
                 f"- **Louvain Modularity ($Q$)**: **`{modularity}`** (Values $>0.60$ mathematically prove strong non-random community clustering)\n"
                 f"- **Active Communities Detected**: `{len(clusters_meta)}` community rings\n\n"
-                f"#### ?? Threat Clusters Summary:\n"
+                f"#### 🔍 Threat Clusters Summary:\n"
             )
 
             for c in clusters_meta:
@@ -545,8 +545,8 @@ Context:
                 count = c.get("node_count", 0)
                 threat = c.get("threat_level", "SAFE")
                 is_q = c.get("is_quarantined", False)
-                status_str = "?? QUARANTINED" if is_q else ("?? ACTIVE THREAT" if threat == "CRITICAL" else "? SAFE")
-                reply += f"- **Cluster #{cid} ({cname})**: `{count} nodes` ? Threat: **`{threat}`** ? Status: `{status_str}`\n"
+                status_str = "🛑 QUARANTINED" if is_q else ("⚠️ ACTIVE THREAT" if threat == "CRITICAL" else "✅ SAFE")
+                reply += f"- **Cluster #{cid} ({cname})**: `{count} nodes` • Threat: **`{threat}`** • Status: `{status_str}`\n"
 
             reply += "\n**Autonomous Quarantine Action**: Quarantining any cluster instantly routes all connected devices and IP subnets to $O(1)$ Redis honeypot tarpits."
 
@@ -569,13 +569,13 @@ Context:
 
         # DEFAULT GENERAL RESPONSE
         reply = (
-            f"### ?? RazorVigil Forensic Copilot Ready\n\n"
+            f"### 🛡️ RazorVigil Forensic Copilot Ready\n\n"
             f"I am your autonomous risk analyst with live telemetry connected to:\n"
             f"1. **Remote GPU Super-Cluster**: `bd216server3` (6x RTX 2080 Ti, CUDA:4 Model Pipeline)\n"
             f"2. **Live Transaction Ledger**: {len(transaction_store)} evaluated transactions with real 4-way ML scoring\n"
             f"3. **NetworkX Louvain Bipartite Graph**: {len(topo.get('nodes', []))} nodes, Modularity $Q={topo.get('modularity', 0.74)}$\n"
             f"4. **Threat Memory Vector RAG Corpus**: {len(THREAT_MEMORY_CASES)} historical carding & botnet archetypes\n"
-            f"5. **RBI Sovereign Regulatory Corpus**: 2025/2026 Master Directions & Chargeback Liability Law\n\n"
+            f"5. **RBI Sovereign Regulatory Corpus**: Directions 2025 & Card-on-File Tokenization Mandates\n\n"
             f"Ask me about any transaction, GPU super-cluster status, WAF rule synthesis, or RBI compliance!"
         )
 

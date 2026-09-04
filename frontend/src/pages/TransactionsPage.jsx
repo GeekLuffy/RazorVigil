@@ -131,7 +131,7 @@ export default function TransactionsPage({
             </span>
           </h1>
           <p className="text-xs text-slate-400 mt-0.5 font-sans">
-            Real-time immutable audit trail evaluated by Sentinel Quad-Ensemble ML, Split Conformal Calibration ($p &lt; 0.05$), and Bayesian Expected Loss matrix
+            Real-time immutable audit trail evaluated by RazorVigil Quad-Ensemble ML, Split Conformal Calibration ($p &lt; 0.05$), and Bayesian Expected Loss matrix
           </p>
         </div>
 

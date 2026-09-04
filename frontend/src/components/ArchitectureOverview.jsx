@@ -44,10 +44,16 @@ const IEEE_REFERENCES = [
     takeaway: "Mitigates camouflaged carding fraud by filtering high-relation edge connections across heterogeneous transaction graphs."
   },
   {
-    citation: "USENIX Security 2024",
-    title: "Analyzing and Mitigating Modern Adversary-in-the-Middle (AiTM) 3DS and OTP Relays",
-    authors: "Security Research Group",
-    takeaway: "Formalizes kinetic keystroke entropy (Shannon H) and TLS/origin header binding to intercept automated OTP grabber botnets."
+    citation: "IEEE S&P 2017",
+    title: "Does the Online Card Payment Landscape Unwittingly Facilitate Card-Not-Present Fraud?",
+    authors: "Ali, Arief, Emms, van Moorsel (Newcastle University)",
+    takeaway: "Proves Distributed Guessing Attacks subvert merchant checks in <6s; primary foundation for zero-day CVV cycling defense."
+  },
+  {
+    citation: "ESWA 2014",
+    title: "Learned Lessons in Credit Card Fraud Detection from a Practitioner Perspective",
+    authors: "Dal Pozzolo, Caelen, Le Borgne, Waterschoot, Bontempi",
+    takeaway: "Establishes delayed-label feedback loops, extreme class imbalance, and sliding-window concept drift adaptation."
   }
 ]
 
@@ -315,7 +321,7 @@ export default function ArchitectureOverview() {
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-slate-300 leading-relaxed">
                 <div className="text-amber-300 font-bold mb-1">Monetary Risk Trade-Off:</div>
                 <div className="space-y-1 text-[10px]">
-                  <div>• E[Loss | Pass] = P(Fraud) · (Amount + ₹1,200 Fine)</div>
+                  <div>• E[Loss | Pass] = P(Fraud) · (Amount + Network Chargeback Fine)</div>
                   <div>• E[Loss | Recovery] = P(Genuine) · (0.15 · Margin · Amount)</div>
                   <div>• E[Loss | HardBlock] = P(Genuine) · (Margin · Amount + LTV)</div>
                 </div>
@@ -338,12 +344,12 @@ export default function ArchitectureOverview() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
-              <h4 className="text-emerald-400 font-bold">Digital Payment Authentication Directions 2025</h4>
+              <h4 className="text-emerald-400 font-bold">Authentication Mechanisms Directions, 2025</h4>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 Mandates dynamic Risk-Based Authentication (RBA). RazorVigil performs sub-15ms risk tiering, enforcing step-up 3DS2 challenges when risk exceeds thresholds.
               </p>
               <span className="inline-block px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">
-                Effective April 1, 2026
+                CO.DPSS.POLC.No.S 668 · Eff. April 1, 2026
               </span>
             </div>
 

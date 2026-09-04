@@ -296,7 +296,7 @@ export default function ActiveDefenseWorkspace({ copilotNotes = [] }) {
                 <Terminal size={14} className="text-indigo-400" />
                 Copilot Forensic Notes
               </div>
-              <span className="text-[10px] font-mono text-slate-500">Autonomous Sentinel LLM</span>
+              <span className="text-[10px] font-mono text-slate-500">Autonomous RazorVigil LLM</span>
             </div>
 
             <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">

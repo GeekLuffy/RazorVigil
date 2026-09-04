@@ -23,11 +23,11 @@ def test_sdk_snippets_export():
 
         # Verify Node.js snippet
         assert "@geekluffy/razorvigil" in snippets["nodejs"]["package"]
-        assert "sentinel.evaluate" in snippets["nodejs"]["code"]
+        assert "vigil.evaluate" in snippets["nodejs"]["code"]
 
         # Verify Python snippet
         assert "GeekLuffy/razorvigil" in snippets["python"]["package"]
-        assert "sentinel.evaluate_async" in snippets["python"]["code"]
+        assert "vigil.evaluate_async" in snippets["python"]["code"]
 
         # Verify Go snippet
         assert "GeekLuffy/razorvigil/sdk/go" in snippets["go"]["package"]
