@@ -72,5 +72,5 @@ curl -X POST http://localhost:8000/benchmark/run \
 ---
 
 ## 🔗 Related Documentation
-- **[Model & Math Architecture Reference](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/reference-models-and-math.md)**
-- **[Architectural Design Explanations](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/explanation-architecture-and-tradeoffs.md)**
+- **[Model & Math Architecture Reference](reference-models-and-math.md)**
+- **[Architectural Design Explanations](explanation-architecture-and-tradeoffs.md)**

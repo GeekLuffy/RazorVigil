@@ -128,7 +128,7 @@ export default function ActiveDefenseWorkspace({ copilotNotes = [] }) {
               Autonomous Threat Defense &amp; Policy Synthesizer
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight font-sans">
-              Dynamic Edge WAF, Razorpay Risk Rules &amp; Anti-Checker Sentinel
+              Dynamic Edge WAF, Razorpay Risk Rules &amp; Anti-Checker Defense
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
               Real-time rules dynamically synthesized by graph modularity and ML risk clusters.

@@ -38,21 +38,21 @@ Modern payment infrastructure faces sophisticated, automated fraud patterns that
 ### 1.2 Core Architectural Principles & Technical Approach
 RazorVigil is engineered as a synchronous, in-line payment defense engine operating within strict gateway latency budgets:
 - **Synchronous Hot-Path Gating (<50ms SLA Budget)**: Local in-memory decisioning delivers $p50 = 9.48\text{ ms}$ and $p99 = 14.20\text{ ms}$ sequential execution (and $p99 = 29.35\text{ ms}$ under sustained 40 RPS load), running well within standard payment gateway timeout limits.
-- **Distribution-Free Risk Certification**: Instead of arbitrary probability thresholds, Sentinel employs **Split Conformal Prediction** to provide rigorous, finite-sample coverage guarantees ($1 - \alpha = 95\%$, empirical coverage 95.40% `[94.90%, 95.80%]`).
+- **Distribution-Free Risk Certification**: Instead of arbitrary probability thresholds, RazorVigil employs **Split Conformal Prediction** to provide rigorous, finite-sample coverage guarantees ($1 - \alpha = 95\%$, empirical coverage 95.40% `[94.90%, 95.80%]`).
 - **Separation of Synchronous Gating and Asynchronous Intelligence**: Hot-path evaluation runs locally with zero external network hops. Heavy model retraining, 100k synthetic dataset generation, and vector embeddings are offloaded asynchronously to dedicated GPU infrastructure (`bd216server3`).
-- **Dynamic Disagreement Gating on Zero-Day Attacks**: Supervised gradient-boosted trees alone fail on novel attack geometries (dropping to 6.6%–9.0% recall). Sentinel couples supervised models with an unsupervised Isolation Forest and dynamic persistence gating, raising zero-day CVV cycling recall to **76.80%** `[73.40%, 80.40%]`.
+- **Dynamic Disagreement Gating on Zero-Day Attacks**: Supervised gradient-boosted trees alone fail on novel attack geometries (dropping to 6.6%–9.0% recall). RazorVigil couples supervised models with an unsupervised Isolation Forest and dynamic persistence gating, raising zero-day CVV cycling recall to **76.80%** `[73.40%, 80.40%]`.
 - **Soft-Risk Out-of-Band Recovery**: Edge-case genuine shoppers (e.g. travelers, VPN users) encountering risk triggers are routed to dynamic UPI QR step-up verification rather than being hard-declined, preserving checkout conversion.
 
 ### 1.3 Hackathon Track 02 Alignment Matrix (AI Risk Manager)
 
-| Track 02 Pillar | Sentinel Engineering Implementation | Audited Measurement (Source: `docs/metrics.json`) |
+| Track 02 Pillar | RazorVigil Engineering Implementation | Audited Measurement (Source: `docs/metrics.json`) |
 | :--- | :--- | :--- |
 | **Stop Merchant Revenue Loss** | Three-tier mitigation: (1) Deterministic botnet tarpit traps, (2) Out-of-Band UPI QR recovery for edge cases, (3) 5-domain verifiable dispute evidence dossiers. | Policy value lift: **+₹266.58 / 1,000 txns** over static baseline via Doubly Robust off-policy evaluation. |
 | **Held-Out Test Set Evaluation** | 3-way partition (60% Train / 20% Val / 20% Held-Out Test, $N_{\text{test}} = 10,000$) with 1,000 bootstrap resamples. | Persistence-Gated P2: **PR-AUC 0.9963** `[0.9944, 0.9979]`, **ROC-AUC 0.9986** `[0.9980, 0.9992]`. |
 | **Honest Error Accounting** | Explicitly reported per-segment false positive rates and Pareto trade-off documentation. | **Normal Genuine FPR: 0.09%** `[0.00%, 0.27%]`. **Edge-Case Genuine FPR: 10.60%** (validated Pareto trade-off for 76.80% zero-day recall). |
 | **Abuse-Ring Detection** | Bipartite entity graph (Cards, IPs, Devices $\times$ Transactions) with Newman-Girvan Louvain modularity and temporal edge decay ($\tau = 1800\text{s}$). | Graph Modularity **$Q = 0.8994$**, isolating coordinated syndicate subgraphs. |
 | **Fraud-Spike Detection** | Redis atomic sliding-window velocity across 10s, 1m, 10m, and 1h horizons. | Micro-burst containment: captures card enumeration and distributed sweeps within $<3.0\text{ ms}$. |
-| **Chargeback Evidence Automation** | 5-domain evidence synthesis: device fingerprint, biometric entropy, 3DS2 CAVV, historical whitelist, and geolocation. | Tamper-evident PDF generation with SHA-256 digital seals and RBI Master Directions regulatory citations. |
+| **Chargeback Evidence Automation** | 5-domain evidence synthesis: device fingerprint, biometric entropy, 3DS2 CAVV, historical whitelist, and geolocation. | Tamper-evident PDF generation with SHA-256 digital seals and RBI regulatory citations. |
 | **Defensive-Only Boundary** | All simulator components feed defensive honeypot updates, synthetic canary rotation, and threshold tuning. | Purely defensive evaluation; no offensive exploitation utilities. |
 
 ---
@@ -66,7 +66,7 @@ RazorVigil is engineered as a synchronous, in-line payment defense engine operat
                                             │
                                             ▼
 ┌───────────────────────────────────────────────────────────────────────────────────────┐
-│                    LAYER 0: Anti-Checker Tarpit Sentinel (<1.2ms)                     │
+│                    LAYER 0: Anti-Checker Tarpit Guard (<1.2ms)                        │
 │               Luhn verification, micro-auth (<₹2.00) traps, poison delay              │
 ├───────────────────────────────────────────────────────────────────────────────────────┤
 │                  LAYER 1: 50 Armed Canary Honeytokens (<2.5ms)                        │
@@ -147,7 +147,7 @@ In supervised tabular modeling, high in-distribution metrics can create a false 
 - CatBoost alone achieves only **6.60%** zero-day recall.
 - A standard static 4-way blend (0.45 LGB / 0.35 CB / 0.10 IF / 0.10 GNN) drops to **8.20%** recall because the 80% supervised weight dilutes the anomaly signal from the Isolation Forest.
 
-To solve this, Sentinel introduces **Persistence-Gated Dynamic Disagreement Routing**:
+To solve this, RazorVigil introduces **Persistence-Gated Dynamic Disagreement Routing**:
 
 $$\text{Gate Trigger} = \mathbb{I}\left( S_{\text{IF}}(X) \ge \tau_{\text{IF}} \;\land\; P_{\text{sup}}(X) \le \tau_{\text{sup}} \;\land\; \text{Automation}(X) = \text{True} \right)$$
 
@@ -215,7 +215,7 @@ Set: {"genuine"}              Set: {"genuine", "fraud"}         Set: {"fraud"}
 ## 5. Topological Graph Engine: NetworkX Louvain Bipartite Clustering
 
 ### 5.1 Bipartite Entity Construction
-Carding syndicates share payment infrastructure across rotating proxy nodes and virtual machines. Sentinel maintains an in-memory bipartite dynamic graph $G = (V_E, V_T, E)$:
+Carding syndicates share payment infrastructure across rotating proxy nodes and virtual machines. RazorVigil maintains an in-memory bipartite dynamic graph $G = (V_E, V_T, E)$:
 - **Entity Nodes $V_E$**: SHA-256 Card Token Hashes (`card_hash`), IP Subnet Hashes (`ip_hash`), and Hardware Device Fingerprints (`device_fingerprint`).
 - **Transaction Nodes $V_T$**: Unique authorization events with timestamps and amounts.
 - **Dynamic Edges $E$**: Formed when an entity participates in a checkout transaction.
@@ -229,7 +229,7 @@ The graph engine partitions communities via Louvain optimization of Newman-Girva
 
 $$Q = \frac{1}{2m} \sum_{i,j} \left[ A_{ij} - \frac{k_i k_j}{2m} \right] \delta(c_i, c_j)$$
 
-**Measured Modularity**: In the active network topology, Sentinel maintains **$Q = 0.8994$**, cleanly isolating distributed carding swarms into discrete topological clusters. When a single node inside a cluster triggers a canary or velocity violation, the entire connected ring's risk score escalates immediately.
+**Measured Modularity**: In the active network topology, RazorVigil maintains **$Q = 0.8994$**, cleanly isolating distributed carding swarms into discrete topological clusters. When a single node inside a cluster triggers a canary or velocity violation, the entire connected ring's risk score escalates immediately.
 
 ---
 
@@ -437,13 +437,13 @@ Simulates a 5-round coevolution arms race targeting decision boundaries:
 | **Adversarial Realistic Bots** | 500 | Recall | **97.00%** `[95.60%, 98.40%]` | Tier 3: 8s Tarpit Poison Delay |
 | **CVV Cycling (In-Domain)** | 500 | Recall | **100.0%** `[100.0%, 100.0%]` | Tier 3: 8s Tarpit Poison Delay |
 
-> **Accounting for the 10.60% Edge-Case FPR**: The 10.60% FPR on edge-case genuine traffic is the explicit, validated cost of raising zero-day CVV recall from 8.20% to 76.80%. Rather than declining these users, Sentinel routes them to Tier 2 Out-of-Band UPI QR verification, rescuing legitimate transactions while neutralizing automation.
+> **Accounting for the 10.60% Edge-Case FPR**: The 10.60% FPR on edge-case genuine traffic is the explicit, validated cost of raising zero-day CVV recall from 8.20% to 76.80%. Rather than declining these users, RazorVigil routes them to Tier 2 Out-of-Band UPI QR verification, rescuing legitimate transactions while neutralizing automation.
 
 ### 13.4 Synchronous Latency Budget Breakdown
 
 | Pipeline Layer | Allocated Budget | Observed Latency (P50) | Observed Latency (P99) | Execution Scope |
 | :--- | :---: | :---: | :---: | :--- |
-| **Layer 0: Anti-Checker & Tarpit Sentinel** | < 1.2 ms | 0.35 ms | 0.82 ms | Local In-Memory |
+| **Layer 0: Anti-Checker & Tarpit Guard** | < 1.2 ms | 0.35 ms | 0.82 ms | Local In-Memory |
 | **Layer 1: 50 Armed Dynamic Canary Honeytokens** | < 2.5 ms | 0.45 ms | 1.10 ms | Local In-Memory |
 | **Layer 2: Sliding-Window Velocity (Redis Atomic)** | < 3.0 ms | 1.15 ms | 2.10 ms | Local In-Memory Cache |
 | **Layer 3: WebRTC & ASN Proxy Classifier** | < 3.5 ms | 0.85 ms | 1.45 ms | Local Subnet Lookup |
@@ -456,7 +456,7 @@ Simulates a 5-round coevolution arms race targeting decision boundaries:
 
 ### 13.5 Governance & Economic Validation
 - **Doubly Robust Off-Policy Evaluation ($N=10,000$)**:
-  - Sentinel Policy Value: **₹194.29** vs. Static Baseline: **-₹72.29**
+  - RazorVigil Policy Value: **₹194.29** vs. Static Baseline: **-₹72.29**
   - Net Economic Lift: **₹266.58 / 1,000 transactions**
   - Direct Method Agreement: **0.972**
 - **Temporal Drift Stress Test (Months 01–08 Train vs. Months 09–12 Frozen Holdout)**:

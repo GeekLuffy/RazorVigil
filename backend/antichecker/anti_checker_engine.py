@@ -95,7 +95,7 @@ class AntiCheckerGuard:
         if amount <= 10.0 and (is_datacenter or zero_biometrics):
             self.blocked_attempts_count += 1
             return True, "MICRO_AUTH_ENUMERATION", {
-                "defense": "Micro-Charge Velocity Sentinel",
+                "defense": "Micro-Charge Velocity Guard",
                 "detail": f"Testing minimum amount (Rs.{amount:.2f}) from automated/datacenter session",
                 "confidence": 0.98,
             }

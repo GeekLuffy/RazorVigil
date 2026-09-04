@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > **Explicit Scope & Non-Transfer Disclaimer**:  
-> **Native benchmark — trained and evaluated within IEEE-CIS, NOT a measure of cross-domain transfer from our synthetic carding model. See [EXTERNAL_VALIDATION.md](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/EXTERNAL_VALIDATION.md) for the separate OOD-transfer results, which remain unchanged.**
+> **Native benchmark — trained and evaluated within IEEE-CIS, NOT a measure of cross-domain transfer from our synthetic carding model. See [EXTERNAL_VALIDATION.md](EXTERNAL_VALIDATION.md) for the separate OOD-transfer results, which remain unchanged.**
 
 ---
 

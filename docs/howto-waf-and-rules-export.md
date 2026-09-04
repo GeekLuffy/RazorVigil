@@ -59,5 +59,5 @@ From the export endpoint, download the active risk rule definition:
 ---
 
 ## 🔗 Related Documentation
-- **[How to Integrate SDKs](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/howto-merchant-integration.md)**
-- **[REST API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/reference-api.md)**
+- **[How to Integrate SDKs](howto-merchant-integration.md)**
+- **[REST API Reference](reference-api.md)**

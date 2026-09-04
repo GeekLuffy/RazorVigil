@@ -182,7 +182,7 @@ export default function GPUClusterModal({ isOpen, onClose, isDark }) {
 
             <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
               <div className="flex items-center justify-between text-xs text-slate-400 mb-1 font-mono">
-                <span>SENTINEL ALLOCATION</span>
+                <span>RAZORVIGIL ALLOCATION</span>
                 <ShieldCheck size={14} className="text-emerald-400" />
               </div>
               <div className="text-xl font-bold font-mono text-emerald-400">CUDA:4 & CUDA:5</div>

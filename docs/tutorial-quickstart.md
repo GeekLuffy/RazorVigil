@@ -106,6 +106,6 @@ You now have a fully operational local instance of RazorVigil with:
 
 ## 📚 Next Steps & Deep Dives
 
-* **[Integrate into Your Merchant App (<5 Lines of Code)](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/howto-merchant-integration.md)**
-* **[Run Parallel SLA Stress Benchmarks](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/howto-stress-benchmarks.md)**
-* **[Explore the Full REST API Reference](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/docs/reference-api.md)**
+* **[Integrate into Your Merchant App (<5 Lines of Code)](howto-merchant-integration.md)**
+* **[Run Parallel SLA Stress Benchmarks](howto-stress-benchmarks.md)**
+* **[Explore the Full REST API Reference](reference-api.md)**

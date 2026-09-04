@@ -263,7 +263,7 @@ async def get_antichecker_stats():
         "blocked_checkers_count": anti_checker.blocked_attempts_count if anti_checker else 0,
         "poisoned_responses_count": anti_checker.poisoned_responses_count if anti_checker else 0,
         "features": {
-            "micro_auth_sentinel": True,
+            "micro_auth_guard": True,
             "decoy_honeypot_trap": True,
             "tarpit_card_poisoning": True,
             "botnet_fingerprint_blacklist": True,
@@ -304,7 +304,7 @@ async def checkout(
     if x_agent_attestation:
         attestation, _ = agent_validator.validate(x_agent_attestation, client_ip=req.ip_hash)
 
-    # 0.2 Anti-Checker Guard (Layer 0 Sentinel against Telegram scrapers & micro-auths) - skipped for verified agents
+    # 0.2 Anti-Checker Guard (Layer 0 Guard against Telegram scrapers & micro-auths) - skipped for verified agents
     if not attestation and anti_checker:
         is_bot, bot_reason, bot_meta = anti_checker.evaluate_request(
             amount=req.amount,
@@ -323,7 +323,7 @@ async def checkout(
                 risk_score=0.99,
                 action="honeypot",
                 latency_ms=round(latency_ms, 2),
-                explanation=f"Anti-Checker Sentinel: {bot_meta.get('defense', 'Automated')} — {bot_meta.get('detail', bot_reason)}. Deceptive honeypot issued.",
+                explanation=f"Anti-Checker Guard: {bot_meta.get('defense', 'Automated')} — {bot_meta.get('detail', bot_reason)}. Deceptive honeypot issued.",
                 amount=req.amount,
                 bin6=req.bin6,
                 razorpay_order_id=None,
@@ -1074,7 +1074,7 @@ async def get_active_threat_rules():
 
 @app.get("/antichecker/stats")
 async def get_antichecker_stats():
-    """Real-time Layer 0 Anti-Checker Sentinel & Tarpit Metrics."""
+    """Real-time Layer 0 Anti-Checker Guard & Tarpit Metrics."""
     return {
         "blocked_attempts": getattr(anti_checker, "blocked_attempts_count", 0) + _eval_counts.get("high_confidence_bot", 0),
         "tarpitted_sessions": getattr(anti_checker, "poisoned_responses_count", 0) + 14,

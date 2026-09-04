@@ -127,7 +127,7 @@ const INITIAL_NODES = [
     ringPos: { normX: 0.44, normY: 0.74 },
     bipartitePos: { normX: 0.85, normY: 0.58 },
     details: {
-      asn: 'Pre-seeded Sentinel-2 Decoy',
+      asn: 'Pre-seeded Canary-2 Decoy',
       status: 'Zero-Tolerance Canary Trap',
       risk: 1.00,
       role: 'Honeytoken Poisoning Decoy'

@@ -50,7 +50,7 @@ export default function RulesSynthesizer() {
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
-              Autonomous Threat Advisory &amp; Anti-Checker Sentinel
+              Autonomous Threat Advisory &amp; Anti-Checker Defense
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono">
                 {rulesData.active_clusters_detected} Clusters Tracked
               </span>

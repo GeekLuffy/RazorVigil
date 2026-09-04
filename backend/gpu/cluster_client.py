@@ -45,8 +45,8 @@ FALLBACK_TELEMETRY = {
         {"index": 1, "name": "NVIDIA GeForce RTX 2080 Ti", "temp_c": 42, "fan_pct": 25, "util_pct": 0, "mem_used_mb": 2481, "mem_total_mb": 11264, "power_w": 14.0, "role": "Background Worker"},
         {"index": 2, "name": "NVIDIA GeForce RTX 2080 Ti", "temp_c": 36, "fan_pct": 22, "util_pct": 0, "mem_used_mb": 9201, "mem_total_mb": 11264, "power_w": 2.0, "role": "Astra RAG Node"},
         {"index": 3, "name": "NVIDIA GeForce RTX 2080 Ti", "temp_c": 87, "fan_pct": 100, "util_pct": 98, "mem_used_mb": 10231, "mem_total_mb": 11264, "power_w": 149.0, "role": "Heavy Compute"},
-        {"index": 4, "name": "NVIDIA GeForce RTX 2080 Ti", "temp_c": 50, "fan_pct": 27, "util_pct": 4, "mem_used_mb": 167, "mem_total_mb": 11264, "power_w": 28.0, "role": "Sentinel Real-Time Inference"},
-        {"index": 5, "name": "NVIDIA GeForce RTX 2080 Ti", "temp_c": 39, "fan_pct": 22, "util_pct": 0, "mem_used_mb": 9, "mem_total_mb": 11264, "power_w": 1.0, "role": "Sentinel Standby Node"}
+        {"index": 4, "name": "NVIDIA GeForce RTX 2080 Ti", "temp_c": 50, "fan_pct": 27, "util_pct": 4, "mem_used_mb": 167, "mem_total_mb": 11264, "power_w": 28.0, "role": "RazorVigil Real-Time Inference"},
+        {"index": 5, "name": "NVIDIA GeForce RTX 2080 Ti", "temp_c": 39, "fan_pct": 22, "util_pct": 0, "mem_used_mb": 9, "mem_total_mb": 11264, "power_w": 1.0, "role": "RazorVigil Standby Node"}
     ]
 }
 
@@ -84,8 +84,8 @@ roles = {
     1: "Background Worker",
     2: "Astra RAG Node",
     3: "Heavy Compute",
-    4: "Sentinel Real-Time Inference",
-    5: "Sentinel Standby Node"
+    4: "RazorVigil Real-Time Inference",
+    5: "RazorVigil Standby Node"
 }
 for line in res.stdout.strip().split("\n"):
     parts = [p.strip() for p in line.split(",")]

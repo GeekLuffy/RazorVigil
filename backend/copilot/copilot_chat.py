@@ -302,7 +302,7 @@ RazorVigil Live Operational Telemetry Context:
 - Host & Super-Cluster: bd216server3 (104 CPU Cores, 503GB RAM, 6x RTX 2080 Ti GPUs)
 - Cluster Live GPU Breakdown:
 {gpu_breakdown}
-- Dedicated Sentinel Inference Engine: CUDA:4 (Real CatBoost GPU PR-AUC 0.99974, FT-Transformer Neural Attention)
+- Dedicated RazorVigil Inference Engine: CUDA:4 (Real CatBoost GPU PR-AUC 0.99974, FT-Transformer Neural Attention)
 - Split Conformal Prediction: q_hat = 0.02489, 95% Certified Confidence Coverage.
 - Bipartite Syndicate Graph: {len(topo.get('nodes', []))} nodes, Louvain Modularity Q = {topo.get('modularity', 0.74)}.
 - Matched Threat Memory Vector: Case {threat_match.get('case_id')} ({threat_match.get('title')}) with {threat_match.get('similarity_pct', 0.0)}% Cosine Similarity.
@@ -365,18 +365,18 @@ Context:
                 "- **Compute Cores**: **104 Xeon vCPU Cores**\n"
                 "- **System RAM**: **503 GB RAM** (464 GB Free)\n"
                 "- **Accelerators**: **6x NVIDIA GeForce RTX 2080 Ti** (67.5 GB Total VRAM)\n"
-                "- **Dedicated Sentinel Allocation**: **CUDA:4** (Dedicated to Real-Time Inference & CatBoost GPU Evaluation)\n"
+                "- **Dedicated RazorVigil Allocation**: **CUDA:4** (Dedicated to Real-Time Inference & CatBoost GPU Evaluation)\n"
                 "- **Secondary Allocation**: **CUDA:5** (Reserved for FT-Transformer Neural Attention Batches)\n\n"
-                "#### ? Per-GPU Live Allocation:\n"
+                "#### 📊 Per-GPU Live Allocation:\n"
             )
             if gpu_list:
                 for idx, g in enumerate(gpu_list):
-                    dedicated_badge = " ? **?? DEDICATED SENTINEL INFERENCE**" if idx == 4 else (" ? **?? MODEL RETRAINING / LLM**" if idx == 5 else "")
-                    reply += f"- **GPU {idx} ({g.get('name', 'RTX 2080 Ti')})**: {g.get('memory_used_mb', 0):,} / {g.get('memory_total_mb', 11264):,} MB VRAM ? Load: {g.get('utilization_gpu_pct', 0)}% ? Temp: {g.get('temperature_gpu', 45)}?C{dedicated_badge}\n"
+                    dedicated_badge = " • **⚡ DEDICATED RAZORVIGIL INFERENCE**" if idx == 4 else (" • **🧠 MODEL RETRAINING / LLM**" if idx == 5 else "")
+                    reply += f"- **GPU {idx} ({g.get('name', 'RTX 2080 Ti')})**: {g.get('memory_used_mb', 0):,} / {g.get('memory_total_mb', 11264):,} MB VRAM • Load: {g.get('utilization_gpu_pct', 0)}% • Temp: {g.get('temperature_gpu', 45)}°C{dedicated_badge}\n"
             else:
                 for idx in range(6):
-                    dedicated_badge = " ? **?? DEDICATED SENTINEL INFERENCE**" if idx == 4 else ""
-                    reply += f"- **GPU {idx} (NVIDIA GeForce RTX 2080 Ti)**: 11,264 MB VRAM ? Online{dedicated_badge}\n"
+                    dedicated_badge = " • **⚡ DEDICATED RAZORVIGIL INFERENCE**" if idx == 4 else ""
+                    reply += f"- **GPU {idx} (NVIDIA GeForce RTX 2080 Ti)**: 11,264 MB VRAM • Online{dedicated_badge}\n"
 
             reply += "\nAll real-time transaction scoring pipelines are pre-compiled and served directly from GPU 4 VRAM with sub-15ms latency."
             actions.append(CopilotAction(

@@ -41,7 +41,7 @@ In 2024–2026, real-world carding networks (e.g. Telegram carding swarms, Genes
 
 ## 🛡️ Part 2: How RazorVigil Neutralizes These Attacks
 
-RazorVigil deploys a **Multi-Stage Kinetic & Cryptographic Defense Engine** ([`backend/decision/otp_defense.py`](file:///c:/Users/Owais/Documents/RazorPay/razorvigil/backend/decision/otp_defense.py)) operating with a sub-2ms evaluation SLA.
+RazorVigil deploys a **Multi-Stage Kinetic & Cryptographic Defense Engine** ([`backend/decision/otp_defense.py`](../backend/decision/otp_defense.py)) operating with a sub-2ms evaluation SLA.
 
 ```
 Incoming 3DS Step-Up Request

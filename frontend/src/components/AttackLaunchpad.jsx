@@ -49,7 +49,7 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           tier: txPayload.tier,
           riskScore: txPayload.risk_score,
           latencyMs: txPayload.latency_ms,
-          layer: 'Layer 0: Sentinel Anti-Checker & Micro-Auth Tarpit',
+          layer: 'Layer 0: RazorVigil Anti-Checker & Micro-Auth Tarpit',
           detail: txPayload.explanation,
           payload: 'HTTP 403 · Honeypot Issued (₹1 Voided)',
           txId: txPayload.transaction_id
@@ -139,7 +139,7 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
           tier: 'high_confidence_bot',
           riskScore: 1.00,
           latencyMs: canaryPayload.latency_ms,
-          layer: 'Layer 0: Sentinel-2 Luhn Canary Decoy Card',
+          layer: 'Layer 0: RazorVigil-2 Luhn Canary Decoy Card',
           detail: canaryPayload.explanation,
           payload: 'HTTP 403 · Instant Autonomous Device Blacklist',
           txId: canaryPayload.transaction_id
@@ -518,7 +518,7 @@ export default function AttackLaunchpad({ onTriggerStoreDemo, onSelectTransactio
               <div className={`font-bold ${isDark ? 'text-amber-400' : 'text-amber-800'}`}>50 Pre-Seeded BINs</div>
             </div>
             <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-900/60 border-slate-800/60' : 'bg-white border-slate-200 shadow-sm'}`}>
-              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>GRAPH SENTINEL</div>
+              <div className={`text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>GRAPH VIGIL</div>
               <div className={`font-bold ${isDark ? 'text-indigo-300' : 'text-indigo-700'}`}>Louvain Q=0.8994</div>
             </div>
             <div className={`p-1.5 rounded-lg border ${isDark ? 'bg-slate-900/60 border-slate-800/60' : 'bg-white border-slate-200 shadow-sm'}`}>

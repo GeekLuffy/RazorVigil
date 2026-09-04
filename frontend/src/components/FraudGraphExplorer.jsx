@@ -585,7 +585,7 @@ export default function FraudGraphExplorer() {
 
     setTimeout(() => {
       setSimPhase(4)
-      setActionNotice('Phase 4/4: Layer 0 Sentinel intervenes: Tarpit delay + 1-Click Quarantine active!')
+      setActionNotice('Phase 4/4: Layer 0 RazorVigil intervenes: Tarpit delay + 1-Click Quarantine active!')
       setIsReplaying(false)
     }, 6000)
   }
