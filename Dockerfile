@@ -34,12 +34,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source code, data, models, and docs
+# Copy backend source code, docs, tests, and scripts
 COPY backend/ ./backend/
-COPY data/ ./data/
 COPY docs/ ./docs/
 COPY tests/ ./tests/
 COPY scripts/ ./scripts/
+RUN mkdir -p data
 
 # Copy compiled React UI from stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
