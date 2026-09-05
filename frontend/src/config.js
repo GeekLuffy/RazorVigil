@@ -1,18 +1,24 @@
 // Dynamic API & WebSocket configuration supporting local dev, Vercel, and Cloudflare Tunnel sharing
 
+const NORTHFLANK_BACKEND = 'https://p01--razorvigil-backend--jt5p6ms2vgxh.code.run'
+const NORTHFLANK_WS = 'wss://p01--razorvigil-backend--jt5p6ms2vgxh.code.run/ws'
+
 const envApi = import.meta.env?.VITE_API_BASE
 const envWs = import.meta.env?.VITE_WS_URL
 
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+)
+
 export const API_BASE = envApi
   ? envApi.replace(/\/$/, '')
-  : (typeof window !== 'undefined' && window.location.origin)
-    ? ''
-    : 'http://localhost:8000'
+  : isLocalhost
+    ? 'http://localhost:8000'
+    : NORTHFLANK_BACKEND
 
 export const WS_URL = envWs
   ? envWs
-  : (typeof window !== 'undefined' && window.location.protocol === 'https:')
-    ? `wss://${window.location.host}/ws`
-    : (typeof window !== 'undefined' && window.location.host)
-      ? `ws://${window.location.host}/ws`
-      : 'ws://localhost:8000/ws'
+  : isLocalhost
+    ? 'ws://localhost:8000/ws'
+    : NORTHFLANK_WS

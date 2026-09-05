@@ -119,6 +119,10 @@ class CanaryCards:
     def card_hashes(self) -> set[str]:
         return set(self._lookup.keys())
 
+    @property
+    def cards(self) -> dict[str, str]:
+        return self._cards
+
     def get_demo_hash(self, index: int = 1) -> str:
         """Return a canary card_hash for use in demos/tests (1-indexed)."""
         return list(self._lookup.keys())[index - 1]
