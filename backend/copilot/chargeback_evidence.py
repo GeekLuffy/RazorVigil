@@ -1,6 +1,6 @@
 """
 RazorVigil — AI Chargeback Defense & Evidence Dossier Synthesizer.
-Track 02 (AI Risk Manager) & Track 03 (Revenue Recovery Bridge).
+Track 02 (AI Risk Manager) — Autonomous Defense.
 
 Automated, zero-hallucination dispute evidence compilation grounded in:
   1. Gateway & Payment Integrity (Razorpay Order/Payment ID, HMAC signature, Webhook idempotency)

@@ -340,7 +340,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
         })
         const data = await res.json()
         setLastActionStatus(`High-Value VPN Shopper: Rescued ₹18,999 from false decline via single-use signed UPI QR recovery link.`)
-        addLog('Revenue Recovery', 'High-Value Shopper on VPN', `Issued Track 03 signed recovery link (${data.tier})`, 'RECOVERY LINK ISSUED')
+        addLog('Revenue Recovery', 'High-Value Shopper on VPN', `Issued soft-risk signed recovery link (${data.tier})`, 'RECOVERY LINK ISSUED')
       } else if (type === 'agent') {
         const tokenResp = await fetch(`${API_BASE}/agent/demo-token?spend_limit=50000`).then(r => r.json())
         const res = await fetch(`${API_BASE}/checkout`, {
@@ -578,7 +578,7 @@ export default function ThreatLabWorkspace({ onTriggerStoreDemo }) {
                   <span className="text-sm">🛡️</span>
                   <strong className="text-xs font-bold text-white font-sans">High-Value VPN Shopper (₹18,999)</strong>
                   <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">
-                    Track 03 Recovery
+                    Soft-Risk Recovery
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 font-sans max-w-xl">

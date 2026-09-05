@@ -6,7 +6,7 @@ Three modes (all hit the live /checkout API):
 
   --mode burst     100 rapid card attempts in a tight window (high-confidence bot demo)
   --mode slow      Distributed slow-rate carding across rotating IPs (velocity demo)
-  --mode genuine   A single genuine-but-anomalous VPN customer who gets recovered (Track 3 demo)
+  --mode genuine   A single genuine-but-anomalous VPN customer who gets recovered (Soft-Risk Recovery demo)
 
 Usage:
   python -m simulator.attack_simulator --mode burst
@@ -285,7 +285,7 @@ async def run_genuine() -> None:
     """
     Send a single genuine-but-anomalous transaction (VPN customer).
     Should get soft_risk → recovery_url returned.
-    This is the 'Track 3 rescue moment' in the demo.
+    This is the 'Soft-Risk rescue moment' in the demo.
     """
     print(f"\n{_GREEN}{_BOLD}=== GENUINE CUSTOMER (VPN) - RECOVERY DEMO ==={_RESET}")
     print(f"{_GREEN}  Real customer | VPN (datacenter ASN) | human behavioral signals | Rs.7,499 purchase{_RESET}\n")
