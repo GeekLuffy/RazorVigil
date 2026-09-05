@@ -1,6 +1,7 @@
 fastapi==0.115.5
 uvicorn[standard]==0.32.1
 redis[hiredis]==5.2.0
+fakeredis>=2.20.0
 razorpay>=2.0.1
 lightgbm==4.5.0
 catboost>=1.2.7

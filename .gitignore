@@ -3,6 +3,7 @@
 __pycache__/
 *.pyc
 *.pkl
+!backend/models/*.pkl
 node_modules/
 dist/
 data/*.csv

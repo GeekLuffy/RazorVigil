@@ -4,6 +4,7 @@ Redis sliding-window velocity counters with Rotating Proxy & Device-Fanout detec
 
 from __future__ import annotations
 
+import os
 import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -32,25 +33,31 @@ class VelocityFeatures:
 
 
 class VelocityTracker:
-    def __init__(self, host: str = "localhost", port: int = 6379):
-        self._host = host
-        self._port = port
+    def __init__(self, host: str | None = None, port: int | None = None):
+        self._url = os.getenv("REDIS_URL", "").strip()
+        self._host = host or os.getenv("REDIS_HOST", "localhost")
+        self._port = port or int(os.getenv("REDIS_PORT", "6379"))
         self.redis: aioredis.Redis
 
     async def connect(self):
         try:
-            self.redis = aioredis.Redis(
-                host=self._host,
-                port=self._port,
-                decode_responses=True,
-            )
+            if self._url:
+                self.redis = aioredis.from_url(self._url, decode_responses=True)
+            else:
+                self.redis = aioredis.Redis(
+                    host=self._host,
+                    port=self._port,
+                    decode_responses=True,
+                )
             await self.redis.ping()
-            print(f"[VelocityTracker] Connected to Redis at {self._host}:{self._port}")
+            endpoint = self._url if self._url else f"{self._host}:{self._port}"
+            print(f"[VelocityTracker] Connected to Redis at {endpoint}")
         except Exception as e:
             print(f"[VelocityTracker] Redis unavailable ({e}). Using in-memory fakeredis.")
             import fakeredis.aioredis as fakeredis_async
             self.redis = fakeredis_async.FakeRedis(decode_responses=True)
             await self.redis.ping()
+            print("[VelocityTracker] In-memory fakeredis initialized successfully.")
 
     async def close(self):
         await self.redis.aclose()
