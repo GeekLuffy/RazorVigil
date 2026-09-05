@@ -22,6 +22,7 @@ notes/
 backend/dataset/*.csv
 backend/dataset/*.gz
 docs/screenshots/
+docs/fresh_screenshots/
 docs/verification_results.json
 SUBMISSION_KIT.md
 
