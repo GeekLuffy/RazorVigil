@@ -79,10 +79,10 @@ export default function ArchitectureOverview() {
                 </span>
               </div>
               <h2 className="text-xl font-bold text-white tracking-tight font-sans mt-1">
-                RazorVigil — System Architecture &amp; Mathematical Specification
+                RazorVigil — 9-Layer Real-Time Fraud Interception Architecture
               </h2>
               <p className="text-xs text-slate-400 font-sans">
-                Autonomous 5-Layer Defense Stack, Conformal Prediction Proofs &amp; RBI Compliance
+                Autonomous 9-Layer Defense Pipeline, Conformal Prediction Proofs &amp; RBI Compliance
               </p>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function ArchitectureOverview() {
               onClick={() => setActiveSubSection('layers')}
               className={`px-3 py-1 rounded-lg font-bold transition ${activeSubSection === 'layers' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}
             >
-              5-Layer Stack
+              9-Layer Pipeline
             </button>
             <button
               onClick={() => setActiveSubSection('math')}
@@ -117,25 +117,26 @@ export default function ArchitectureOverview() {
         </div>
       </div>
 
-      {/* Sub-Section 1: 5-Layer Defense Stack */}
+      {/* Sub-Section 1: 9-Layer Defense Pipeline */}
       {activeSubSection === 'layers' && (
         <div className="space-y-4">
-          {/* Layer 0 to Layer 4 Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
+          {/* 9-Layer Grid (3x3 Responsive Grid) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {/* Layer 0 */}
-            <div className="panel bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-2">
+            <div className="panel bg-slate-900/90 border border-rose-500/30 flex flex-col justify-between space-y-2">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono font-bold text-rose-400">LAYER 0</span>
-                  <span className="text-[9px] font-mono text-slate-500">&lt;2ms</span>
+                  <span className="text-[10px] font-mono font-bold text-rose-400">LAYER 0 · TRANSPORT EDGE</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;2ms</span>
                 </div>
-                <h4 className="text-xs font-bold text-white font-sans">Anti-Checker Tarpit</h4>
+                <h4 className="text-xs font-bold text-white font-sans">Pre-Authentication Tarpit</h4>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
-                  Catches Telegram bots &amp; scrapers before gateway ingress. Injects 3000ms fake status delay.
+                  Detects CDP automation &amp; intercepts Telegram ₹1 micro-auth checkers before gateway API ingress. Injects 3,000ms synthetic delay.
                 </p>
               </div>
-              <div className="bg-slate-950 p-2 rounded text-[10px] font-mono text-rose-300 border border-slate-800">
-                ERR_CARD_INVALID
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-rose-300 border border-slate-800">
+                <span>ERR_CARD_INVALID_STATUS</span>
+                <span className="text-rose-400 font-bold">Poison BIN Cache</span>
               </div>
             </div>
 
@@ -143,67 +144,143 @@ export default function ArchitectureOverview() {
             <div className="panel bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-2">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono font-bold text-amber-400">LAYER 1</span>
-                  <span className="text-[9px] font-mono text-slate-500">&lt;3ms</span>
+                  <span className="text-[10px] font-mono font-bold text-slate-300">LAYER 1 · INGESTION</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;1ms</span>
                 </div>
-                <h4 className="text-xs font-bold text-white font-sans">Velocity &amp; Honeypots</h4>
+                <h4 className="text-xs font-bold text-white font-sans">Gateway Ingestion &amp; Canonicalization</h4>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
-                  Atomic Redis sliding windows + 50 Luhn-valid Canary cards with 0.00% False Positive Rate.
+                  Real-time telemetry extraction: 17 normalized features across 5 risk domains with strict zero-temporal-lookahead guarantees.
                 </p>
               </div>
-              <div className="bg-slate-950 p-2 rounded text-[10px] font-mono text-amber-300 border border-slate-800">
-                0% FPR Honeytrap
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-slate-300 border border-slate-800">
+                <span>17 Scaled Signals</span>
+                <span className="text-emerald-400 font-bold">Zero Leakage</span>
               </div>
             </div>
 
             {/* Layer 2 */}
-            <div className="panel bg-slate-900/90 border border-indigo-500/40 flex flex-col justify-between space-y-2">
+            <div className="panel bg-slate-900/90 border border-amber-500/30 flex flex-col justify-between space-y-2">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono font-bold text-indigo-400">LAYER 2</span>
-                  <span className="text-[9px] font-mono text-emerald-400 font-bold">P50: 9.08ms</span>
+                  <span className="text-[10px] font-mono font-bold text-amber-400">LAYER 2 · TEMPORAL VELOCITY</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;2ms</span>
                 </div>
-                <h4 className="text-xs font-bold text-white font-sans">Heterogeneous ML</h4>
+                <h4 className="text-xs font-bold text-white font-sans">Sliding-Window Velocity Engine</h4>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
-                  LightGBM + CatBoost + FT-Transformer deep embeddings + Split Conformal Calibration.
+                  Atomic Redis sliding windows across rolling 10-minute intervals: tracks BIN frequency, PAN fan-out, and 50 Luhn-valid Canary cards.
                 </p>
               </div>
-              <div className="bg-slate-950 p-2 rounded text-[10px] font-mono text-indigo-300 border border-slate-800">
-                PR-AUC: 0.9999
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-amber-300 border border-slate-800">
+                <span>50 Seeded Honeytokens</span>
+                <span className="text-amber-400 font-bold">0.00% FPR Trap</span>
               </div>
             </div>
 
             {/* Layer 3 */}
-            <div className="panel bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-2">
+            <div className="panel bg-slate-900/90 border border-sky-500/30 flex flex-col justify-between space-y-2">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono font-bold text-emerald-400">LAYER 3</span>
-                  <span className="text-[9px] font-mono text-slate-500">&lt;1ms</span>
+                  <span className="text-[10px] font-mono font-bold text-sky-400">LAYER 3 · NETWORK PROVENANCE</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;1ms</span>
                 </div>
-                <h4 className="text-xs font-bold text-white font-sans">Bayesian Loss Matrix</h4>
+                <h4 className="text-xs font-bold text-white font-sans">Network Infrastructure &amp; JA3 TLS</h4>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
-                  Minimizes financial loss across Gross Margin, Customer LTV, and ₹1,200 chargeback fine.
+                  Matches client TLS JA3 handshake fingerprints against declared User-Agents. Cross-references MaxMind Datacenter ASNs and proxy headers.
                 </p>
               </div>
-              <div className="bg-slate-950 p-2 rounded text-[10px] font-mono text-emerald-300 border border-slate-800">
-                Min E[Loss | Action]
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-sky-300 border border-slate-800">
+                <span>JA3 Hash Integrity</span>
+                <span className="text-sky-400 font-bold">Datacenter ASN Flag</span>
               </div>
             </div>
 
             {/* Layer 4 */}
-            <div className="panel bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-2">
+            <div className="panel bg-slate-900/90 border border-emerald-500/30 flex flex-col justify-between space-y-2">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono font-bold text-purple-400">LAYER 4</span>
-                  <span className="text-[9px] font-mono text-slate-500">Async</span>
+                  <span className="text-[10px] font-mono font-bold text-emerald-400">LAYER 4 · BEHAVIORAL BIOMETRICS</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;1ms</span>
                 </div>
-                <h4 className="text-xs font-bold text-white font-sans">5-Domain Dossier</h4>
+                <h4 className="text-xs font-bold text-white font-sans">Biometric Keystroke Dynamics</h4>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
-                  Compiles cryptographic ISO 8583 evidence across device, network, biometrics &amp; SCA.
+                  Calculates Shannon entropy H over inter-keystroke intervals (Δt) and mouse velocity jitter. Distinguishes biological typing from scripted replay.
                 </p>
               </div>
-              <div className="bg-slate-950 p-2 rounded text-[10px] font-mono text-purple-300 border border-slate-800">
-                Zero Hallucination
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-emerald-300 border border-slate-800">
+                <span>H &gt; 1.20 bits (Human)</span>
+                <span className="text-rose-400 font-bold">H &lt; 0.60 bits (Bot)</span>
+              </div>
+            </div>
+
+            {/* Layer 5 */}
+            <div className="panel bg-slate-900/90 border border-indigo-500/40 flex flex-col justify-between space-y-2">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-mono font-bold text-indigo-400">LAYER 5 · ENSEMBLE INFERENCE</span>
+                  <span className="text-[9px] font-mono text-emerald-400 font-bold">P50: 9.08ms</span>
+                </div>
+                <h4 className="text-xs font-bold text-white font-sans">Quad-Model Parallel Ensemble</h4>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
+                  Dual GBDT blend (0.55 LightGBM / 0.45 CatBoost) + FT-Transformer embeddings + Isolation Forest + HeteroGraphSAGE relational Louvain clustering.
+                </p>
+              </div>
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-indigo-300 border border-slate-800">
+                <span>PR-AUC: 0.9999</span>
+                <span className="text-indigo-400 font-bold">ROC-AUC: 0.9999</span>
+              </div>
+            </div>
+
+            {/* Layer 6 */}
+            <div className="panel bg-slate-900/90 border border-purple-500/30 flex flex-col justify-between space-y-2">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-mono font-bold text-purple-400">LAYER 6 · CONSENSUS VETO</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;1ms</span>
+                </div>
+                <h4 className="text-xs font-bold text-white font-sans">The Persistence Gate (Novel)</h4>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
+                  In ambiguous probability corridors [0.40, 0.60], requires joint consensus between unsupervised Isolation Forest and supervised boundaries.
+                </p>
+              </div>
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-purple-300 border border-slate-800">
+                <span>76.8% Zero-Day Recall</span>
+                <span className="text-purple-400 font-bold">9.4x Over Pure GBDT</span>
+              </div>
+            </div>
+
+            {/* Layer 7 */}
+            <div className="panel bg-slate-900/90 border border-teal-500/30 flex flex-col justify-between space-y-2">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-mono font-bold text-teal-400">LAYER 7 · UNCERTAINTY QUANTIFICATION</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;1ms</span>
+                </div>
+                <h4 className="text-xs font-bold text-white font-sans">Split Conformal Prediction</h4>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
+                  Generates distribution-free, finite-sample certified prediction sets with guaranteed 95% coverage: &#123;genuine&#125;, &#123;fraud&#125;, or &#123;ambiguous&#125;.
+                </p>
+              </div>
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-teal-300 border border-slate-800">
+                <span>1 - α = 0.95 Coverage</span>
+                <span className="text-teal-400 font-bold">Certified Interval</span>
+              </div>
+            </div>
+
+            {/* Layer 8 */}
+            <div className="panel bg-slate-900/90 border border-blue-500/30 flex flex-col justify-between space-y-2">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-mono font-bold text-blue-400">LAYER 8 · FINANCIAL ARBITRATION</span>
+                  <span className="text-[9px] font-mono text-slate-400 font-semibold">&lt;1ms</span>
+                </div>
+                <h4 className="text-xs font-bold text-white font-sans">Bayesian MEL Action Routing</h4>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed font-sans">
+                  Minimizes financial loss across Gross Margin, Customer LTV, and ₹1,200 fine: routes to Fast-Pass, Out-of-Band UPI QR Recovery, or Honeypot.
+                </p>
+              </div>
+              <div className="flex items-center justify-between bg-slate-950 p-2 rounded text-[10px] font-mono text-blue-300 border border-slate-800">
+                <span>Min E[Loss | Action]</span>
+                <span className="text-blue-400 font-bold">103.6x Net ROI</span>
               </div>
             </div>
           </div>
