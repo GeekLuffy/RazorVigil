@@ -3,7 +3,7 @@ uvicorn[standard]==0.32.1
 redis[hiredis]==5.2.0
 razorpay>=2.0.1
 lightgbm==4.5.0
-catboost>=1.2.20
+catboost>=1.2.7
 torch>=2.1.0
 scikit-learn==1.5.2
 imbalanced-learn==0.12.4
