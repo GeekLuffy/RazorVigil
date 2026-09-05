@@ -94,7 +94,7 @@ async def tool_get_cluster_risk_score(
 
 
 async def tool_investigate_transaction(transaction_id: str) -> dict[str, Any]:
-    """Run the full 8-layer forensic investigation pipeline."""
+    """Run the full 9-layer forensic investigation pipeline."""
     result = await _get(f"/investigate/{transaction_id}")
     if "error" in result:
         return {
@@ -203,7 +203,7 @@ async def get_cluster_risk_score(
 @server.tool(
     name="investigate_transaction",
     description=(
-        "Run the full 8-layer RazorVigil forensic pipeline on any transaction. "
+        "Run the full 9-layer RazorVigil forensic pipeline on any transaction. "
         "Returns tier (safe/soft_risk/elevated_review/high_confidence_bot), "
         "risk_score (0-1), explanation, and all forensic signal values. "
         "Use for specialist carding/bot-abuse deep-forensic analysis."

@@ -230,7 +230,7 @@ def run_five_round_arms_race() -> dict:
                 "velocity_10m": "45 req/min",
             },
             "defense_layer": "Layer 0: Autonomous Anti-Checker & Tarpit Guard",
-            "countermeasure": "Deterministic Luhn validation & instant 8-second synthetic delay poison response without backend DB load.",
+            "countermeasure": "Deterministic Luhn validation & 3,000ms synthetic delay poison response (up to 8s in Cloudflare WAF export) without backend DB load.",
             "initial_evasion_pct": 42.5,
             "final_evasion_pct": 0.0,
             "intercept_rate_pct": 100.0,

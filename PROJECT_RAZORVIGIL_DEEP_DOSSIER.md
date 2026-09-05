@@ -70,29 +70,15 @@ RazorVigil is engineered as a synchronous, in-line payment defense engine operat
                                             │
                                             ▼
 ┌───────────────────────────────────────────────────────────────────────────────────────┐
-│                    LAYER 0: Anti-Checker Tarpit Guard (<1.2ms)                        │
-│               Luhn verification, micro-auth (<₹2.00) traps, poison delay              │
-├───────────────────────────────────────────────────────────────────────────────────────┤
-│                  LAYER 1: 50 Armed Canary Honeytokens (<2.5ms)                        │
-│               Synthetic cryptographic BIN traps with 0% escape FPR                    │
-├───────────────────────────────────────────────────────────────────────────────────────┤
-│                  LAYER 2: Atomic Sliding-Window Velocity (<3.0ms)                     │
-│               Redis atomic counters (10s / 1m / 10m / 1h horizons)                    │
-├───────────────────────────────────────────────────────────────────────────────────────┤
-│                  LAYER 3: ASN & WebRTC Proxy Classifier (<3.5ms)                      │
-│               TLS JA3 fingerprint mismatch, datacenter ASN, WebRTC IP leak            │
-├───────────────────────────────────────────────────────────────────────────────────────┤
-│                  LAYER 4: Kinetic Biometric Shannon Gate (<4.0ms)                     │
-│               Inter-keystroke interval entropy H(Δt) < 0.60 bits = automated script   │
-├───────────────────────────────────────────────────────────────────────────────────────┤
-│                  LAYER 5: Persistence-Gated ML Ensemble (<8.5ms)                      │
-│               Local in-memory LightGBM + CatBoost + Isolation Forest + GraphSAGE      │
-├───────────────────────────────────────────────────────────────────────────────────────┤
-│                  LAYER 6: Zero-Trust 3DS2 & OTP Relay Defense (<2.1ms)                │
-│               Ed25519 single-use nonces, CAVV verification, AiTM token rejection      │
-├───────────────────────────────────────────────────────────────────────────────────────┤
-│                  LAYER 7: Temporal Louvain Modularity Cache (<4.2ms)                  │
-│               Bipartite graph community partition cache lookup (Q = 0.8994)           │
+│  LAYER 0: Pre-Auth Tarpit Guard (<1.2ms)    │ CDP automation, ₹1 micro-auth traps     │
+│  LAYER 1: Ingestion & Canonicalization (<0.8ms) │ 17 normalized features / 5 risk domains│
+│  LAYER 2: Velocity & 50 Canary Tokens (<2.5ms) │ Redis sliding windows & synthetic BINs│
+│  LAYER 3: Network & JA3 TLS Integrity (<3.0ms) │ Handshake JA3 vs UA, datacenter ASN  │
+│  LAYER 4: Kinetic Biometric Gate (<3.5ms)   │ Keystroke Shannon entropy H(Δt)        │
+│  LAYER 5: Quad-Ensemble ML Scoring (<8.5ms) │ LightGBM + CatBoost + IF + GraphSAGE    │
+│  LAYER 6: Persistence Gate Consensus (<1.0ms) │ Anomaly consensus veto in [0.40, 0.60] │
+│  LAYER 7: Split Conformal Calibration (<0.8ms)│ Finite-sample 95% coverage prediction  │
+│  LAYER 8: Bayesian MEL Action Routing (<0.6ms)│ Financial loss matrix arbitration      │
 └───────────────────────────────────────────┬───────────────────────────────────────────┘
                                             │
                    ┌────────────────────────┴────────────────────────┐
@@ -104,16 +90,16 @@ RazorVigil is engineered as a synchronous, in-line payment defense engine operat
       ┌────────────┴────────────────────────┬────────────────────────┴────────────┐
       ▼                                     ▼                                     ▼
 [TIER 1: PASS]                       [TIER 2: SOFT-RISK HOLD]              [TIER 3: TARPIT]
-• Instant Authorization (<12ms)      • Dynamic Out-of-Band UPI QR          • 8-Second Poison Latency
+• Instant Authorization (<12ms)      • Dynamic Out-of-Band UPI QR          • 3,000ms Poison Latency
 • Frictionless 3DS Exemption         • 5-Minute Inventory Hold             • Botnet Connection Neutralized
-• Clean Genuine Traffic              • Edge-Case Genuine Recovery          • IP/Device Quarantine
+• Clean Genuine Traffic              • Edge-Case Genuine Recovery          • Poisoned BIN Decline Code
 ```
 
 ### 2.2 Synchronous Hot Path vs. Asynchronous Intelligence Plane
 A foundational design requirement of RazorVigil is that **no external network call may block the live checkout authorization path**:
 
 1. **Synchronous In-Line Hot Path**:
-   - All 8 defense layers execute locally on the application host using in-memory feature pipelines, pre-loaded model weights, and Redis cache lookups.
+   - All 9 defense layers execute locally on the application host using in-memory feature pipelines, pre-loaded model weights, and Redis cache lookups.
    - Observed sequential latency: $p50 = 9.48\text{ ms}$, $p95 = 11.81\text{ ms}$, $p99 = 14.20\text{ ms}$.
    - Observed 40 RPS throughput latency: $p50 = 9.44\text{ ms}$, $p95 = 18.62\text{ ms}$, $p99 = 29.35\text{ ms}$.
    - This keeps end-to-end processing well within payment gateway SLA limits (50.0 ms).

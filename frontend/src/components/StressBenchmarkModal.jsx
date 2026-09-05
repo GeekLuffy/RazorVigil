@@ -107,7 +107,7 @@ export default function StressBenchmarkModal({ isOpen = true, onClose }) {
                 </span>
               </h2>
               <p className="text-xs text-slate-400 font-sans">
-                Executes parallel asynchronous checkout evaluations through the full 8-layer quad-ensemble pipeline.
+                Executes parallel asynchronous checkout evaluations through the full 9-layer quad-ensemble pipeline.
               </p>
             </div>
           </div>
@@ -371,7 +371,7 @@ export default function StressBenchmarkModal({ isOpen = true, onClose }) {
               <Sparkles size={32} className="text-amber-400 mx-auto" />
               <h3 className="text-sm font-bold text-white font-sans">Ready to Run Live SLA Stress Benchmark</h3>
               <p className="text-xs text-slate-400 max-w-lg mx-auto">
-                Click <strong>"Run Live Benchmark"</strong> to execute 300 real parallel checkout evaluations across all 8 layers and generate real-time p50/p95/p99 histograms and CDF SLA verification curves.
+                Click <strong>"Run Live Benchmark"</strong> to execute 300 real parallel checkout evaluations across all 9 layers and generate real-time p50/p95/p99 histograms and CDF SLA verification curves.
               </p>
             </div>
           )}

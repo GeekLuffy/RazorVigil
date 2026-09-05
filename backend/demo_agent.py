@@ -109,7 +109,7 @@ async def run_demo_agent(transaction_id: str):
     print(f"\n[Agent] Received suspicious transaction for investigation: {transaction_id}")
     print("[Agent] Delegating to RazorVigil specialist sub-agent...\n")
 
-    # Tool call 1: investigate_transaction — full 8-layer forensic pipeline
+    # Tool call 1: investigate_transaction — full 9-layer forensic pipeline
     print(f"[MCP Tool Call 1/4] investigate_transaction('{transaction_id}')")
     inv = await call_investigate_transaction(transaction_id)
     tier = inv.get("tier", "unknown")

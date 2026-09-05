@@ -89,7 +89,7 @@ curl -X POST http://localhost:8000/checkout \
 ```
 
 ### 🔍 What Just Happened:
-1. **Synchronous Latency**: The backend evaluated the request through the full 8-layer quad-ensemble pipeline in **$<14\text{ms}$**.
+1. **Synchronous Latency**: The backend evaluated the request through the full 9-layer quad-ensemble pipeline in **$<14\text{ms}$**.
 2. **Deterministic Tarpit Intercept**: Because `keystroke_entropy < 0.60` and `asn_type == "datacenter"`, the engine classified the transaction as **`high_confidence_bot`**.
 3. **Live UI WebSocket Update**: Look at your browser at `http://localhost:5173/`. You will see `tx_demo_tutorial_01` instantly flash red in the live transaction feed and link to the **Louvain Mule Ring Graph Explorer**.
 
@@ -98,7 +98,7 @@ curl -X POST http://localhost:8000/checkout \
 ## 🏆 What You Built & Explored
 
 You now have a fully operational local instance of RazorVigil with:
-- **8-Layer Risk Pipeline**: LightGBM + CatBoost + Isolation Forest + GraphSAGE (persistence-gated P2 ensemble).
+- **9-Layer Risk Pipeline**: LightGBM + CatBoost + Isolation Forest + GraphSAGE (persistence-gated P2 ensemble).
 - **Real-Time SOC Command Center**: Live WebSocket streaming at 60 FPS.
 - **Threat Memory Copilot RAG**: Ready to interrogate in the chat drawer.
 

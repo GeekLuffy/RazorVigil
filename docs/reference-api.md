@@ -10,7 +10,7 @@ Complete technical specification for all RazorVigil HTTP and WebSocket endpoints
 ## 1. Synchronous Checkout & Risk Gating
 
 ### `POST /checkout`
-Evaluates an incoming payment transaction through the full 8-layer quad-ensemble pipeline in $<15\text{ms}$.
+Evaluates an incoming payment transaction through the full 9-layer quad-ensemble pipeline in $<15\text{ms}$.
 
 #### Request Body (`application/json`):
 | Field | Type | Required | Default | Description |

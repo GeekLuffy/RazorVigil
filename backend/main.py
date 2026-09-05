@@ -866,7 +866,7 @@ async def inject_cluster_ring_endpoint(ring_type: str = "carding_swarm"):
 @app.get("/investigate/{transaction_id}")
 
 async def investigate_transaction_endpoint(transaction_id: str):
-    """Full 8-layer forensic investigation endpoint for Agent Studio delegation."""
+    """Full 9-layer forensic investigation endpoint for Agent Studio delegation."""
     tx = transaction_store.get(transaction_id)
     if tx:
         return {
@@ -1195,7 +1195,7 @@ async def run_live_stress_benchmark(
 ):
     """
     Executes live parallel stress benchmark running concurrent checkout evaluations
-    through the 8-layer quad-ensemble pipeline and computes exact latency percentiles,
+    through the 9-layer quad-ensemble pipeline and computes exact latency percentiles,
     histogram distributions, CDF curve, and SLA verification.
     """
     if req_body:

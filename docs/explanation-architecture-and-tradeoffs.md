@@ -43,7 +43,7 @@ Split Conformal Prediction provides **distribution-free mathematical error cover
 When automated carding botnets receive immediate HTTP 403 / 400 responses, they instantly cycle to the next card or proxy IP within milliseconds, testing thousands of stolen cards per minute.
 
 ### The RazorVigil Solution:
-Layer 0 intercepts high-confidence botnets deterministically and returns a **synthetic 8-second delay response** (`tarpit_delay_sec: 8`):
+Layer 0 intercepts high-confidence botnets deterministically and returns a **synthetic 3,000ms delay response** (`tarpit_delay_sec: 3.0`, with up to 8,000ms in exported Cloudflare WAF configurations):
 * Starves the attacker's concurrent worker threads.
 * Imposes severe computational cost on the botnet without placing any load on the merchant database.
 * Renders automated enumeration economically infeasible for the adversary.
